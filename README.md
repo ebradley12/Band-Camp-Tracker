@@ -136,18 +136,6 @@ Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
 
 ---
 
-## **Testing**
-
-Run Unit Tests:
-    ```bash
-    pytest tests/
-    ```
-Run Lint Checks:
-    ```bash
-    pylint pipeline/
-    ```
----
-
 ## **Documentation**
 
 1. **Architecture Diagram**:  
