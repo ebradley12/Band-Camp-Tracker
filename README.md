@@ -47,6 +47,7 @@ Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
     - `transform.py`: Data transformation script.
     - `load_to_rds.py`: Data loading script.
     - `main_pipeline.py`: Main script orchestrating the entire ETL pipeline.
+    - `test_pipeline.py`: Tests for extract, transform and load pipeline script.
 
 - **Streamlit Dashboard**:
   - [Dashboard README](./dashboard/README.md)  
@@ -61,15 +62,6 @@ Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
     - `main.tf`: Main Terraform configuration file.
     - `variables.tf`: Terraform variables.
     - `outputs.tf`: Terraform outputs.
-
-- **Testing**:
-  - [Tests README](./tests/README.md)  
-    Provides details on running unit and integration tests for the project.
-  - **Files**:
-    - `test_extract.py`: Tests for the extract script.
-    - `test_transform.py`: Tests for the transform script.
-    - `test_load.py`: Tests for the load script.
-    - `test_main_pipeline.py`: Tests for the main pipeline script.
 
 - **Documentation**:
   - **Files**:
