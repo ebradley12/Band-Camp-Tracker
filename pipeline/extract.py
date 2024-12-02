@@ -14,6 +14,9 @@ def config_log() -> None:
 
 
 def get_sales_information() -> dict:
+    """Returns a JSON dictionary of sales information 
+    from the Bandcamp API"""
+
     logging.info("Retrieving Sales Data")
     sales_url = "https://bandcamp.com/api/salesfeed/1/get_initial"
     response = requests.get(sales_url)
@@ -23,8 +26,6 @@ def get_sales_information() -> dict:
         return {}
     sales_data = response.json()
     logging.info("Sales Data retrieved.")
-
-    print(sales_data)
 
     return sales_data
 
