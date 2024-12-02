@@ -1,6 +1,6 @@
-import requests
-from bs4 import BeautifulSoup
+"""The script fo extracting from the Bandcamp API"""
 import logging
+import requests
 
 
 def config_log() -> None:
@@ -19,7 +19,7 @@ def get_sales_information() -> dict:
 
     logging.info("Retrieving Sales Data")
     sales_url = "https://bandcamp.com/api/salesfeed/1/get_initial"
-    response = requests.get(sales_url)
+    response = requests.get(sales_url, timeout=1000)
     if response.status_code != 200:
         logging.warning(
             "Couldn't retrieve Sales Data. Status Code %s", response.status_code)
