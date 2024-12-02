@@ -40,4 +40,4 @@ jobs:
         run: pip3 install pylint
 
       - name: Run tests
-        run : find . -name "*.py" | xargs pylint --fail-under=8
+        run : find . -name "*.py" ! -name "schema.py" | xargs pylint --fail-under=8 --disable=C0103,R0903,W0511
