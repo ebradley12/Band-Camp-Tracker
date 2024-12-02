@@ -1,2 +1,4 @@
-requests 
+requests
 beautifulsoup4
+pytest
+pylint

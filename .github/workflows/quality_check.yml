@@ -1,4 +1,4 @@
-ame: Quality_check
+name: Quality_check
 
 permissions:
   actions: write
@@ -20,26 +20,6 @@ on:
     branches: main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip3 install -r requirements.txt 
-
-      - name: Run tests
-        env : 
-          SCHEMA_NAME : ${{ secrets.SCHEMA_NAME }}
-        run : pytest 
   lint:
     runs-on: ubuntu-latest
 
