@@ -24,6 +24,8 @@ def get_sales_information() -> dict:
     sales_data = response.json()
     logging.info("Sales Data retrieved.")
 
+    print(sales_data)
+
     return sales_data
 
 
