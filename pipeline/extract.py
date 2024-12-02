@@ -19,8 +19,10 @@ def get_sales_information() -> dict:
     response = requests.get(sales_url)
     if response.status_code != 200:
         logging.warning(
-            "Couldn't retrieve sales data. Status Code %s".format(response.status_code))
+            "Couldn't retrieve Sales Data. Status Code %s".format(response.status_code))
+        return {}
     sales_data = response.json()
+    logging.info("Sales Data retrieved.")
 
     return sales_data
 
