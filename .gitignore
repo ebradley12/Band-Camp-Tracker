@@ -7,3 +7,4 @@ __pycache__
 .terraform
 *.tfvars
 *.ipynb
+.DS_Store
