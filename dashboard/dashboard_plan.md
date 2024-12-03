@@ -1,0 +1,4 @@
+- A main overview page including key metrics like total sales & top genres, current trending genre & artist
+- A trends page for sales trends over time with options to filter by date range, genre, artist and region.
+- A reports page for generating and downloading PDF reports
+- Maybe a settings page where users can subscribe to email notifications / alerts? 
