@@ -90,7 +90,7 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
             release_date = "None"
             genres = []
         else:
-            release_date = get_release_date(items["url"])
+            release_date = get_release_date_from_url(items["url"])
             genres = get_genres_from_url(items["url"])
 
         if not items["album_title"]:
@@ -148,7 +148,7 @@ def get_genres_from_url(artist_url: str) -> list[str]:
     return []
 
 
-def get_release_date(artist_url: str) -> str:
+def get_release_date_from_url(artist_url: str) -> str:
     """
     Retrieves the release date of a song or album provided in the URL.
     Returns an empty string if it cannot be found or an error occurs.
@@ -198,8 +198,14 @@ def create_sales_dataframe(sales_info: list[dict]) -> pd.DataFrame:
     return sales_df
 
 
-if __name__ == "__main__":
+def transform_sales_data(sales_data: dict) -> pd.DataFrame:
+    """
+    Fully transforms given sales data into a dataframe
+    and returns it. Also outputs it as a .csv file.
+    """
     config_log()
-    sales_data = main_extract()
     sale_info = get_sale_information(sales_data)
-    create_sales_dataframe(sale_info)
+    return create_sales_dataframe(sale_info)
+
+
+if __name__ == "__main__":
