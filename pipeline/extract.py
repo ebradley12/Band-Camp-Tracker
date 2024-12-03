@@ -4,7 +4,9 @@ import requests
 
 
 def config_log() -> None:
-    """Terminal logs configuration"""
+    """
+    Terminal logs configuration.
+    """
     logging.basicConfig(
         format="{asctime} - {levelname} - {message}",
         style="{",
@@ -14,8 +16,10 @@ def config_log() -> None:
 
 
 def get_sales_information() -> dict:
-    """Returns a JSON dictionary of sales information 
-    from the Bandcamp API"""
+    """
+    Returns a JSON dictionary of sales information 
+    from the Bandcamp API.
+    """
 
     logging.info("Retrieving Sales Data")
     sales_url = "https://bandcamp.com/api/salesfeed/1/get_initial"
@@ -31,12 +35,13 @@ def get_sales_information() -> dict:
 
 
 def main_extract() -> dict:
-    """Runs all the functions necessary for
-    extraction in one go."""
+    """
+    Main function to extract data from the Bandcamp API. 
+    Returns a dictionary containing raw data from the API."
+    """
     config_log()
-    sales_data = get_sales_information()
 
-    return sales_data
+    return get_sales_information()
 
 
 if __name__ == "__main__":
