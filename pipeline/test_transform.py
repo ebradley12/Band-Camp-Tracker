@@ -1,0 +1,32 @@
+"""Tests for the transform script."""
+import pytest
+from unittest.mock import patch, MagicMock
+from datetime import datetime
+import pandas as pd
+from transform import (
+    convert_from_unix_to_datetime,
+    convert_date_format,
+    convert_to_full_url,
+    validate_album_and_track,
+    get_sale_information,
+    get_genres_from_url,
+    get_release_date_from_url,
+    create_sales_dataframe
+)
+
+def test_convert_unix_to_datetime():
+    assert convert_from_unix_to_datetime("1633036800") == "01-10-2021"
+    assert convert_from_unix_to_datetime("invalid") == "None"
+
+def test_convert_date_format():
+    assert convert_date_format("1 October 2021") == "01-10-2021"
+    assert convert_date_format("invalid date") == "None"
+
+def test_convert_to_full_url():
+    assert convert_to_full_url("http://example.com") == "http://example.com"
+    assert convert_to_full_url("//example.com") == "https://example.com"
+
+def test_validate_album_and_track():
+    assert validate_album_and_track("a") is True
+    assert validate_album_and_track("t") is True
+    assert validate_album_and_track("x") is False
