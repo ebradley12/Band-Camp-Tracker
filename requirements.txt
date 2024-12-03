@@ -4,4 +4,6 @@ pytest
 pylint
 streamlit
 watchdog
+boto3
+python-dotenv
 geonamescache
