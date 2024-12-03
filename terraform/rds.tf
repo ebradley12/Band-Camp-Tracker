@@ -35,7 +35,7 @@ resource "aws_db_instance" "band-camp-tracker-db" {
   storage_encrypted                     = "true"
   storage_throughput                    = "0"
   storage_type                          = "gp2"
-  vpc_security_group_ids                = ["sg-09cfa7d5cc78a795a"]
+  vpc_security_group_ids                = [var.db_sec_group_id]
   username                              = var.db_user
   password                              = var.db_password
 }
