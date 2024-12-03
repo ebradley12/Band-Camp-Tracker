@@ -209,3 +209,4 @@ def transform_sales_data(sales_data: dict) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
+    transform_sales_data()
