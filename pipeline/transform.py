@@ -89,9 +89,7 @@ def validate_album_and_track(item_type: str) -> bool:
     Returns True if it is, False if it isn't.
     """
 
-    if item_type not in ["a", "t"]:
-        return False
-    return True
+    return item_type in ["a", "t"]
 
 
 def get_sale_information(sales_dict: dict) -> list[dict]:
