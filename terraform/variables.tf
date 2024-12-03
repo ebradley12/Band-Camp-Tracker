@@ -9,9 +9,3 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
-
-variable "db_sec_group_id" {
-  description = "security group id for the S3 database"
-  type        = string
-  sensitive   = true
-}
