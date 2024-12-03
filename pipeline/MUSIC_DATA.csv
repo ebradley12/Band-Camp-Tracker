@@ -1,19 +1,21 @@
-,item_type,item_description,album_title,artist_name,country,amount_paid_usd,genres,release_date,sale_date
-0,t,Johanna in the 80s,None,Sweeney,Australia,6.5,"['adelaide', 'alternative', 'australian', 'electronic pop', 'queerpop', 'synthpop', 'Australia']",02-12-2024,03-12-2024
-1,a,Steve Rothery Band - Live in Frankfurt,None,Steve Rothery,United Kingdom,8.87,"['progressive rock', 'rock', 'Aylesbury']",30-11-2024,03-12-2024
-2,a,UFO 50,None,Eirik Suhrke,United States,10.0,"['chiptune', 'soundtrack', 'video game music', 'jazz', 'synth', 'Norway']",02-10-2024,03-12-2024
-3,a,A Fenestrated Fantasy,None,silk,France,1.9,"['punk', 'emo', 'emoviolence', 'screamo', 'New York']",01-12-2024,03-12-2024
-4,a,Hidden Treasures of Egypt,None,Skhemty,Spain,3.16,"['ambient', 'ancient egypt', 'dark ambient', 'dark dungeon music', 'dungeon synth', 'egyptian', 'egyptian ambient', 'egyptian music', 'egyptian synth', 'folklore', 'middle eastern', 'orchestral', 'oriental', 'pyramids', 'soundtrack', 'France']",01-12-2024,03-12-2024
-5,t,Thank You,Divine Essence,Svava,United States,1.29,"['a course in miracles', 'christian', 'devotional', 'inspirational', 'Duchesne']",04-03-2019,03-12-2024
-6,a,OCS LIVE AT PERMANENT ROADHOUSE,None,OCS,United Kingdom,7.0,"['folk', 'flok', 'kraut', 'psych', 'Los Angeles']",,03-12-2024
-7,t,After Five,None,Luke Alessi,Japan,2.1,"['electronic', 'funky house', 'house', 'techno', 'Melbourne']",08-11-2024,03-12-2024
-8,a,Purr24,None,Projekt artists,Netherlands,3.0,"['ambient', 'ambient', 'asmr', 'cat', 'cat purr', 'cats', 'drone', 'electronic', 'new age', 'purr', 'purring', 'space music', 'Portland']",28-11-2024,03-12-2024
-9,t,Más Ruido,Más Ruido,Borgetti,Japan,0.98,"['electronic', 'dance', 'dark-disco', 'electronica', 'indie-dance', 'r-b', 'Culiacán']",27-09-2022,03-12-2024
-10,t,Last Year Was Boring (Tania Vulcano & Jose De Vina Remix),"Moments, Vol 11.",Circus Recordings,United Kingdom,1.9,['Liverpool'],19-03-2021,03-12-2024
-11,a,Ancestral Void,None,Morast,Germany,7.01,"['metal', 'death doom', 'death metal', 'doom death', 'doom metal', 'Germany']",10-04-2017,03-12-2024
-12,t,Luv Having U Around (NuClassic Reboot Mix),None,Stevie B,United States,1.0,"['deep house', 'electronic', 'house', 'nu disco', 'soulful house', 'Chicago']",02-07-2024,03-12-2024
-13,t,Spreadable,The Chants Of The Holy Oyster,Adam Pits,Australia,2.1,"['acid', 'ambient', 'breakbeat', 'downtempo', 'electro', 'house', 'techno', 'trance', 'Amsterdam']",05-05-2023,03-12-2024
-14,a,"Greatest Hits, Vol. 1",None,The Browns,United Kingdom,2.14,"['punk', 'horror punk', 'movies', 'rock', 'Canada']",31-10-1999,03-12-2024
-15,a,Behind The Shadows Lie Madness,None,Mithras,United States,16.48,"['death metal', 'experimental brutal death metal', 'extreme metal', 'metal', 'dark ambient', 'United Kingdom']",16-04-2007,03-12-2024
-16,a,Chiffons d'azur,None,Lamasz & Thme,United Kingdom,0.53,"['ambient', 'electronic', 'ambient', 'ambient electronic', 'chill', 'drone', 'drone ambient', 'field recordings', 'lofi', 'soundscapes', 'tape', 'Paris']",19-11-2024,03-12-2024
-17,a,Apprendre l'Ourdou - Volume 1 & 2,None,Nouredil Marlawi - Langues de l'Inde,France,1.05,"['audiobooks', ""langues de l'inde"", 'ourdou', 'hindi', 'France']",13-11-2024,03-12-2024
+item_type,item_description,album_title,artist_name,country,amount_paid_usd,genres,release_date,sale_date,sale_year,sale_month
+t,November,Unknown,Saschienne,Brazil,2.1,"['electronic', 'Berlin']",26-03-2012,2024-03-12,2024,3
+a,Inspire Me,None,San Nicolas,Mexico,2.0,"['peak time driving techno', 'Los Angeles']",10-05-2024,2024-03-12,2024,3
+a,Outban Knockout Series Vol. 3,None,Bakked,Germany,8.42,"['techno', 'house', 'electronic', 'electro', 'Italy']",01-07-2024,2024-03-12,2024,3
+t,Heartland,None,The Fulton Collective,Ireland,1.05,"['alternative rock', 'rock', 'Tullamore', 'alternative']",25-11-2024,2024-03-12,2024,3
+t,꧁ঔৣ☬✞ ARCA X ELJORDAN23 ✞☬ঔৣ꧂,None,666succi,United Kingdom,1.0,"['reggaeton', 'bass', 'techno', 'dubstep', 'Valparaíso', 'experimental', 'trap']",01-06-2023,2024-03-12,2024,3
+t,Raw Thrills (Original Mix),Raw Thrills,David Phoenix,Germany,1.5,['Los Angeles'],18-08-2023,2024-03-12,2024,3
+a,Rare Baby,None,KUKII,United Kingdom,1.27,"['mahraganat', 'alternative pop', 'alternative', 'kukii', 'Paris', 'lafawndah']",20-11-2024,2024-03-12,2024,3
+a,HAZED DISCONNECTED EP,None,DC (Rabbit in the Moon),Germany,7.0,"['drum & bass', 'acid', 'trippy', 'ambient', 'techno', 'house', 'Los Angeles', 'tech house', 'electronic', 'punk']",07-05-2021,2024-03-12,2024,3
+t,Compassion,Dragonfly,Kupla,United States,1.0,['Paris'],28-10-2024,2024-03-12,2024,3
+t,Heartland,None,The Fulton Collective,Ireland,1.05,"['alternative rock', 'rock', 'Tullamore', 'alternative']",25-11-2024,2024-03-12,2024,3
+a,REPO 25,None,L Clifford,United Kingdom,5.07,"['London', 'jazz', 'house', 'electronic', 'bruk', 'broken beat']",03-12-2024,2024-03-12,2024,3
+a,What A Feelin (Drop Out Orchestra and Moral Edit),None,Drop Out Orchestra,United Kingdom,1.0,"['Sweden', 'soul', 'house', 'nu disco', 'electronic', 'disco']",19-11-2019,2024-03-12,2024,3
+t,Wham-Club Tropicana (Mannix Crystal Disko Edit),Mannix-The Wham Revamps,Mannix,United Kingdom,2.1,"['Vienna', 'house', 'disco', 'electronic']",28-01-2020,2024-03-12,2024,3
+t,AMB005,None,Demuja,France,2.1,"['ambient', 'downtempo', 'Salzburg', 'house', 'electronic', 'disco']",27-11-2024,2024-03-12,2024,3
+a,Now & Zen,None,Asphalt DJ & Gzardin,Germany,5.26,"['breakbeat', 'Amsterdam', 'prog', 'techno', 'trance', 'house', 'electronic']",04-11-2022,2024-03-12,2024,3
+a,Amber and Gold,None,Our Throne,United Kingdom,5.26,"['experimental black metal', 'metal', 'The Netherlands']",06-12-2024,2024-03-12,2024,3
+a,Radio Palestine: Sounds Of The Eastern Mediterranean,None,Various Artists,United Kingdom,10.0,"['alan bishop', 'palestine', 'radio', 'Seattle', 'sublime frequencies', 'hisham mayet', 'radioshow']",08-03-2010,2024-03-12,2024,3
+a,AMAYLIA010,None,Amaylia Records,Belgium,21.04,"['microhouse', 'Serbia', 'rominimal', 'trinimal', 'minimal', 'electronic']",05-06-2022,2024-03-12,2024,3
+t,Gladys Wants To Be,None,ladiesonmars,United Kingdom,2.0,"['Buenos Aires', 'lom', 'hi-nrg', 'ladies on mars', 'house', 'rework', 'electronic', 'nu-disco', 'disco']",07-02-2021,2024-03-12,2024,3
+a,Dragger,None,Dragger,United Kingdom,1.25,"['sound collage', 'eai', 'dark ambient', 'musique concrete', 'experimental', 'Philadelphia']",11-05-2020,2024-03-12,2024,3

@@ -5,6 +5,7 @@ from datetime import datetime
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+from extract import main_extract
 
 
 def config_log() -> None:
@@ -23,28 +24,28 @@ def convert_from_unix_to_datetime(unix: str) -> datetime:
     """
     Converts a unix timestamp into
     'DD-MM-YYYY' format.
-    Returns an empty string if an error occurs.
+    Returns a "None" string if an error occurs.
     """
     try:
         date = datetime.fromtimestamp(int(unix))
         return date.strftime("%d-%m-%Y")
     except ValueError as e:
         logging.error("Invalid unix timestamp: %s", e)
-        return ""
+        return "None"
 
 
 def convert_date_format(date_str: str) -> str:
     """
     Takes dates in the "DD B YYYY" format and
     converts them to 'DD-MM-YYYY'.
-    Returns an empty string if an error occurs.
+    Returns a "None" string if an error occurs.
     """
     try:
         date = datetime.strptime(date_str, "%d %B %Y")
         return date.strftime("%d-%m-%Y")
     except ValueError as e:
         logging.error("Invalid date format: %s", e)
-        return ""
+        return "None"
 
 
 def convert_to_full_url(url: str) -> str:
@@ -62,7 +63,7 @@ def convert_to_full_url(url: str) -> str:
 def validate_album_and_track(item_type: str) -> bool:
     """
     Checks whether given item is an album or a track.
-    Returns True if it is.
+    Returns True if it is, False if it isn't.
     """
 
     if item_type not in ["a", "t"]:
@@ -88,9 +89,13 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
         if not items["url"]:
             release_date = "None"
             genres = []
-        else:
-            release_date = get_release_date_from_url(items["url"])
-            genres = get_genres_from_url(items["url"])
+
+        if not get_release_date_from_url(items["url"]):
+            release_date = "None"
+
+        release_date = get_release_date_from_url(items["url"])
+
+        genres = get_genres_from_url(items["url"])
 
         if not items["album_title"]:
             items["album_title"] = "None"
@@ -129,6 +134,7 @@ def get_genres_from_url(artist_url: str) -> list[str]:
 
             if tags:
                 genres = [tag.text for tag in tags]
+                genres = list(set(genres))
                 return genres
 
             logging.info("No genres listed for %s", full_url)
@@ -192,12 +198,22 @@ def create_sales_dataframe(sales_info: list[dict]) -> pd.DataFrame:
     """
     sales_df = pd.json_normalize(sales_info)
 
-    sales_df.to_csv("MUSIC_DATA.csv")
+    if "sale_date" in sales_df.columns:
+        sales_df["sale_date"] = pd.to_datetime(
+            sales_df["sale_date"], errors="coerce")
+
+        if sales_df["sale_date"].isna().any():
+            logging.warning(
+                "Some 'sale_date' entries could not be converted to datetime.")
+
+    sales_df["sale_year"] = sales_df["sale_date"].dt.year
+    sales_df["sale_month"] = sales_df["sale_date"].dt.month
+    sales_df.to_csv("MUSIC_DATA.csv", index=False)
 
     return sales_df
 
 
-def transform_sales_data(sales_data: dict) -> pd.DataFrame:
+def main_transform(sales_data: dict) -> pd.DataFrame:
     """
     Fully transforms given sales data into a dataframe
     and returns it. Also outputs it as a .csv file.
@@ -208,4 +224,5 @@ def transform_sales_data(sales_data: dict) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    transform_sales_data()
+    sales_data = main_extract()
+    main_transform(sales_data)
