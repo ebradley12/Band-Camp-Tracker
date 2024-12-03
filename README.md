@@ -33,7 +33,7 @@ The interactive Streamlit dashboard provides:
 
 ### **Wireframe Design**
 The dashboard wireframe provides a visual blueprint of its layout and features.  
-Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
+Refer to the **[Wireframe Design](./dashboard/wireframe-design.png)** for details.
 
 ---
 
@@ -53,6 +53,7 @@ Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
   - [Dashboard README](./dashboard/README.md)  
     Documentation for the Streamlit application and its configuration.
   - **Files**:
+    - `wireframe-design.png`: Dashboard wireframe design.
     - `app.py`: Streamlit app for visualising data.
 
 - **Terraform Infrastructure**:
@@ -66,7 +67,6 @@ Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
 - **Documentation**:
   - **Files**:
     - `architecture-diagram.png`: Architecture diagram.
-    - `wireframe-design.png`: Dashboard wireframe design.
     - `erd.png`: Entity Relationship Diagram (ERD).
 
 - **Docker Files**:
@@ -85,13 +85,13 @@ Refer to the **[Wireframe Design](./docs/wireframe-design.png)** for details.
 
 1. **Dashboard**:
     Real-time visualisation of sales and trends.
-    Dynamic filters to explore genres, artists, and regions.
+    Dynamic filters to explore genres, artists, and countries.
 
 2. **PDF Reports**:
     Automated daily summaries of key metrics.
 
 3. **Alerts**:
-    Notifications for trending genres and artists.
+    Notifications for current trending genres and artists.
 
 ---
 
@@ -160,7 +160,7 @@ Run Lint Checks:
 
 3. **Wireframe Design**:  
    The layout and functionality of the dashboard are illustrated in the wireframe design:  
-   ![Wireframe Design](./docs/wireframe-design.png)
+   ![Wireframe Design](./dashboard/wireframe-design.png)
 
 ---
 ## **Contributors**
