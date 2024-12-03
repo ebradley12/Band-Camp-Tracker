@@ -30,11 +30,13 @@ def get_sales_information() -> dict:
     return sales_data
 
 
-def main_extract():
+def main_extract() -> dict:
     """Runs all the functions necessary for
     extraction in one go."""
     config_log()
-    get_sales_information()
+    sales_data = get_sales_information()
+
+    return sales_data
 
 
 if __name__ == "__main__":
