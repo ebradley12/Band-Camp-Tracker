@@ -1,38 +1,42 @@
 """Tests for the transform script."""
-import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime
+import pytest
 import pandas as pd
 from transform import (
     convert_from_unix_to_datetime,
     convert_date_format,
     convert_to_full_url,
     validate_album_and_track,
-    get_sale_information,
     get_genres_from_url,
     get_release_date_from_url,
     create_sales_dataframe
 )
 
 def test_convert_unix_to_datetime():
+    """Test for convert_from_unix_to_datetime function."""
     assert convert_from_unix_to_datetime("1633036800") == "01-10-2021"
     assert convert_from_unix_to_datetime("invalid") == "None"
 
 def test_convert_date_format():
+    """Test for convert_date_format function."""
     assert convert_date_format("1 October 2021") == "01-10-2021"
     assert convert_date_format("invalid date") == "None"
 
 def test_convert_to_full_url():
+    """Test for convert_to_full_url function."""
     assert convert_to_full_url("http://example.com") == "http://example.com"
     assert convert_to_full_url("//example.com") == "https://example.com"
 
 def test_validate_album_and_track():
+    """Test for validate_album_and_track function."""
     assert validate_album_and_track("a") is True
     assert validate_album_and_track("t") is True
     assert validate_album_and_track("x") is False
 
 @patch("script_name.requests.get")
 def test_get_genres_from_url(mock_get):
+    """Test for get_genres_from_url function."""
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.text = '<a class="tag">Rock</a><a class="tag">Pop</a>'
@@ -44,6 +48,7 @@ def test_get_genres_from_url(mock_get):
 
 @patch("script_name.requests.get")
 def test_get_release_date_from_url(mock_get):
+    """Test for get_release_date_from_url function."""
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.text = '<meta name="description" content="released 1 October 2021">'
@@ -56,6 +61,7 @@ def test_get_release_date_from_url(mock_get):
     assert get_release_date_from_url("//example.com") == ""
 
 def test_create_sales_dataframe():
+    """Test for create_sales_dataframe function."""
     mock_sales_info = [
         {
             "item_type": "a",
