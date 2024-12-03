@@ -2,10 +2,33 @@
 import logging
 import re
 from datetime import datetime
+import geonamescache
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 from extract import main_extract
+
+
+def get_locations() -> list:
+    """
+    Returns a list of countries, country codes, 
+    US states and cities.
+    Used to filter genres.
+    """
+    gc = geonamescache.GeonamesCache()
+
+    countries = gc.get_countries()
+    states = gc.get_us_states()
+    cities = gc.get_cities()
+
+    country_codes = [key.lower() for key in countries.keys()]
+    country_names = [country["name"].lower() for country in countries.values()]
+    state_names = [state["name"].lower() for state in states.values()]
+    city_names = [city["name"].lower() for city in cities.values()]
+
+    all_locations = country_names + state_names + city_names + country_codes
+
+    return all_locations
 
 
 def config_log() -> None:
@@ -77,8 +100,8 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
     sales information.
     """
     sales_info = []
-
     events = sales_dict["feed_data"]["events"]
+    locations = get_locations()
 
     for event in events:
         items = event["items"][0]
@@ -90,12 +113,12 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
             release_date = "None"
             genres = []
 
-        if not get_release_date_from_url(items["url"]):
-            release_date = "None"
-
         release_date = get_release_date_from_url(items["url"])
 
-        genres = get_genres_from_url(items["url"])
+        if not release_date:
+            release_date = "None"
+
+        genres = get_genres_from_url(items["url"], locations)
 
         if not items["album_title"]:
             items["album_title"] = "None"
@@ -118,10 +141,11 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
     return sales_info
 
 
-def get_genres_from_url(artist_url: str) -> list[str]:
+def get_genres_from_url(artist_url: str, locations: list) -> list[str]:
     """
     Gets the lists of genres from a given artist URL.
     Returns an empty list if none can be found or an error occurs.
+    Filters out locations and duplicates automatically.
     """
     try:
         full_url = convert_to_full_url(artist_url)
@@ -133,7 +157,8 @@ def get_genres_from_url(artist_url: str) -> list[str]:
             tags = soup.find_all('a', class_='tag')
 
             if tags:
-                genres = [tag.text for tag in tags]
+                genres = [tag.text for tag in tags if tag.text.lower()
+                          not in locations]
                 genres = list(set(genres))
                 return genres
 
@@ -175,9 +200,9 @@ def get_release_date_from_url(artist_url: str) -> str:
                     if match:
                         release_date = match.group(1)
                         return convert_date_format(release_date)
-                else:
-                    logging.info(
-                        "No release date found in the meta description for %s", full_url)
+
+            logging.info("No valid release date found for %s", full_url)
+
         else:
             logging.warning("Failed to connect to %s, Status Code: %s",
                             full_url, response.status_code)
@@ -191,12 +216,13 @@ def get_release_date_from_url(artist_url: str) -> str:
     return ""
 
 
-def create_sales_dataframe(sales_info: list[dict]) -> pd.DataFrame:
+def extend_sales_from_df(sales_df: pd.DataFrame) -> None:
     """
-    Inserts given sales data into a dataframe and returns it.
-    Also exports it as a .csv file.
+    Coverts the "sale_date" column into datetime format 
+    and extends the given dataframe with month and year
+    of sales.
+    Does nothing if a "sale_date" column doesn't exist.
     """
-    sales_df = pd.json_normalize(sales_info)
 
     if "sale_date" in sales_df.columns:
         sales_df["sale_date"] = pd.to_datetime(
@@ -208,7 +234,49 @@ def create_sales_dataframe(sales_info: list[dict]) -> pd.DataFrame:
 
     sales_df["sale_year"] = sales_df["sale_date"].dt.year
     sales_df["sale_month"] = sales_df["sale_date"].dt.month
-    sales_df.to_csv("MUSIC_DATA.csv", index=False)
+
+
+def replace_blank_album_titles(sales_df: pd.DataFrame) -> None:
+    """
+    Replaces "None" entries in the "album_title" column
+    with the name provided in "item_description"
+    if the item is an album.
+    """
+
+    sales_df.loc[(sales_df["item_type"] == "a") &
+                 (sales_df["album_title"].isna() |
+                 (sales_df["album_title"] == "None")),
+                 "album_title"] = sales_df["item_description"]
+
+
+def fill_out_album_and_track(sales_df: pd.DataFrame) -> None:
+    """
+    Replaces the abbreviations for album and track
+    with the full "Album" or "Track" in the dataframe.
+    Does nothing if a "item_type" column doesn't exist.
+    """
+    if "item_type" in sales_df.columns:
+        sales_df["item_type"] = sales_df["item_type"].map(
+            {"a": "album", "t": "track"})
+
+
+def create_sales_dataframe(sales_info: list[dict]) -> pd.DataFrame:
+    """
+    Returns the given sales information as a dataframe.
+    """
+    sales_df = pd.json_normalize(sales_info)
+
+    return sales_df
+
+
+def clean_sales_dataframe(sales_df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans and formats the sales dataframe.
+    """
+
+    extend_sales_from_df(sales_df)
+    replace_blank_album_titles(sales_df)
+    fill_out_album_and_track(sales_df)
 
     return sales_df
 
@@ -216,11 +284,16 @@ def create_sales_dataframe(sales_info: list[dict]) -> pd.DataFrame:
 def main_transform(sales_data: dict) -> pd.DataFrame:
     """
     Fully transforms given sales data into a dataframe
-    and returns it. Also outputs it as a .csv file.
+    and returns it. 
+    Also outputs it as a .csv file.
     """
     config_log()
-    sale_info = get_sale_information(sales_data)
-    return create_sales_dataframe(sale_info)
+    sales_info = get_sale_information(sales_data)
+    sales_df = create_sales_dataframe(sales_info)
+    cleaned_sales_df = clean_sales_dataframe(sales_df)
+    cleaned_sales_df.to_csv("MUSIC_DATA.csv", index=None)
+
+    return cleaned_sales_df
 
 
 if __name__ == "__main__":
