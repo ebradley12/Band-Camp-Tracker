@@ -12,7 +12,7 @@ def is_valid_email(email: str) -> bool:
 
 def main_overview() -> None:
     """Creates main overview page on dashboard."""
-    st.title("Main Overview Page")
+    st.title("BandCamp Tracker: https://bandcamp.com/")
     st.write("Welcome to the Main Overview Page.")
 
 
