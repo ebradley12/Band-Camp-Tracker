@@ -1,12 +1,12 @@
 
 CREATE TABLE country (
-    country_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    country_id BIGINT PRIMARY KEY,
     country_name VARCHAR UNIQUE NOT NULL
 );
 
 
 CREATE TABLE customer (
-    customer_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    customer_id BIGINT PRIMARY KEY,
     customer_name VARCHAR NOT NULL,
     country_id BIGINT,
     FOREIGN KEY (country_id) REFERENCES country(country_id)
@@ -14,7 +14,7 @@ CREATE TABLE customer (
 
 
 CREATE TABLE artist (
-    artist_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artist_id BIGINT PRIMARY KEY,
     artist_name VARCHAR NOT NULL,
     country_id BIGINT,
     FOREIGN KEY (country_id) REFERENCES country(country_id)
@@ -22,19 +22,19 @@ CREATE TABLE artist (
 
 
 CREATE TABLE genre (
-    genre_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    genre_id BIGINT PRIMARY KEY,
     genre_name VARCHAR NOT NULL
 );
 
 
 CREATE TABLE type (
-    type_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    type_id BIGINT PRIMARY KEY,
     type_name VARCHAR NOT NULL
 );
 
 
 CREATE TABLE release (
-    release_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    release_id BIGINT PRIMARY KEY,
     release_name VARCHAR NOT NULL,
     release_date DATE NOT NULL,
     genre_id BIGINT,
@@ -47,7 +47,7 @@ CREATE TABLE release (
 
 
 CREATE TABLE sale (
-    sale_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sale_id BIGINT PRIMARY KEY,
     sale_price FLOAT NOT NULL,
     sale_date DATE NOT NULL,
     customer_id BIGINT,
@@ -58,7 +58,7 @@ CREATE TABLE sale (
 
 
 CREATE TABLE subscriber (
-    subscriber_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    subscriber_id BIGINT PRIMARY KEY,
     subscriber_email VARCHAR UNIQUE NOT NULL,
     alerts BOOLEAN DEFAULT FALSE,
     CHECK (subscriber_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
