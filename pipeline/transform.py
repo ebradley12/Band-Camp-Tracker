@@ -6,7 +6,6 @@ import geonamescache
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-from extract import main_extract
 
 
 def get_locations() -> list:
@@ -123,8 +122,8 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
 
         sale_date = convert_from_unix_to_datetime(items["utc_date"])
 
-        event_information = {"item_type": items["item_type"],
-                             "item_description": items["item_description"],
+        event_information = {"release_type": items["item_type"],
+                             "release_name": items["item_description"],
                              "album_title": items["album_title"],
                              "artist_name": items["artist_name"],
                              "country": items["country"],
@@ -283,17 +282,14 @@ def main_transform(sales_data: dict) -> pd.DataFrame:
     """
     Fully transforms given sales data into a dataframe
     and returns it. 
-    Also outputs it as a .csv file.
     """
     config_log()
     sales_info = get_sale_information(sales_data)
     sales_df = create_sales_dataframe(sales_info)
     cleaned_sales_df = clean_sales_dataframe(sales_df)
-    cleaned_sales_df.to_csv("MUSIC_DATA.csv", index=None)
 
     return cleaned_sales_df
 
 
 if __name__ == "__main__":
-    sales_data = main_extract()
-    main_transform(sales_data)
+    pass
