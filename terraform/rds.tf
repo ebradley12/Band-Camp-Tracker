@@ -1,4 +1,4 @@
-resource "aws_db_instance" "band-camp-tracker-db" {
+resource "aws_db_instance" "c14-bandcamp-db" {
   allocated_storage                     = "20"
   auto_minor_version_upgrade            = "true"
   availability_zone                     = "eu-west-2c"
@@ -15,7 +15,7 @@ resource "aws_db_instance" "band-camp-tracker-db" {
   engine_lifecycle_support              = "open-source-rds-extended-support-disabled"
   engine_version                        = "16.3"
   iam_database_authentication_enabled   = "false"
-  identifier                            = "band-camp-tracker-db"
+  identifier                            = "c14-bandcamp-db"
   instance_class                        = "db.t3.micro"
   iops                                  = "0"
   license_model                         = "postgresql-license"
