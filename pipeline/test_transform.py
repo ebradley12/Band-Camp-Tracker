@@ -77,8 +77,8 @@ def test_create_sales_dataframe():
     """Test for create_sales_dataframe function."""
     mock_sales_info = [
         {
-            "item_type": "a",
-            "item_description": "Sample Album",
+            "release_type": "a",
+            "release_description": "Sample Album",
             "album_title": "Mock Album",
             "artist_name": "Mock Artist",
             "country": "US",
