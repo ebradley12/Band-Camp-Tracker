@@ -16,7 +16,7 @@ CREATE TABLE country (
 
 
 CREATE TABLE customer (
-    customer_id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    customer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     customer_name VARCHAR NOT NULL,
     country_id SMALLINT,
     FOREIGN KEY (country_id) REFERENCES country(country_id)
@@ -24,7 +24,7 @@ CREATE TABLE customer (
 
 
 CREATE TABLE artist (
-    artist_id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    artist_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     artist_name VARCHAR NOT NULL,
     country_id SMALLINT,
     FOREIGN KEY (country_id) REFERENCES country(country_id)
@@ -32,7 +32,7 @@ CREATE TABLE artist (
 
 
 CREATE TABLE genre (
-    genre_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    genre_id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     genre_name VARCHAR NOT NULL
 );
 
@@ -47,7 +47,7 @@ CREATE TABLE release (
     release_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     release_name VARCHAR NOT NULL,
     release_date DATE NOT NULL,
-    artist_id SMALLINT,
+    artist_id INT,
     type_id SMALLINT,
     FOREIGN KEY (artist_id) REFERENCES artist(artist_id),
     FOREIGN KEY (type_id) REFERENCES type(type_id)
@@ -55,7 +55,7 @@ CREATE TABLE release (
 
 CREATE TABLE release_genre (
     release_id INT,
-    genre_id INT,
+    genre_id SMALLINT,
     PRIMARY KEY (release_id, genre_id),
     FOREIGN KEY (release_id) REFERENCES release(release_id) ON DELETE CASCADE,
     FOREIGN KEY (genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
@@ -65,7 +65,7 @@ CREATE TABLE sale (
     sale_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sale_price FLOAT NOT NULL,
     sale_date DATE NOT NULL,
-    customer_id SMALLINT,
+    customer_id INT,
     release_id INT,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (release_id) REFERENCES release(release_id)
@@ -73,7 +73,7 @@ CREATE TABLE sale (
 
 
 CREATE TABLE subscriber (
-    subscriber_id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    subscriber_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     subscriber_email VARCHAR UNIQUE NOT NULL,
     alerts BOOLEAN DEFAULT FALSE,
     CHECK (subscriber_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
@@ -81,8 +81,8 @@ CREATE TABLE subscriber (
 
 
 CREATE TABLE subscriber_genre (
-    subscriber_id SMALLINT,
-    genre_id INT,
+    subscriber_id INT,
+    genre_id SMALLINT,
     PRIMARY KEY (subscriber_id, genre_id),
     FOREIGN KEY (subscriber_id) REFERENCES subscriber(subscriber_id) ON DELETE CASCADE,
     FOREIGN KEY (genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
