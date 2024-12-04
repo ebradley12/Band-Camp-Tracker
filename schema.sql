@@ -23,7 +23,7 @@ CREATE TABLE artist (
 
 CREATE TABLE genre (
     genre_id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    genre_name VARCHAR NOT NULL
+    genre_name VARCHAR UNIQUE NOT NULL
 );
 
 
