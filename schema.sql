@@ -82,3 +82,7 @@ CREATE TABLE subscriber_genre (
     FOREIGN KEY (subscriber_id) REFERENCES subscriber(subscriber_id) ON DELETE CASCADE,
     FOREIGN KEY (genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
 );
+
+INSERT INTO type (type_name) VALUES
+('album'), 
+('track');
