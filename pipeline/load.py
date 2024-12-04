@@ -56,14 +56,6 @@ def get_cursor(connection: psycopg2.extensions.connection) -> psycopg2.extension
         return None
 
 
-def load_csv() -> pd.DataFrame:
-    """
-    Loads a given .csv into a dataframe.
-    """
-    music_data = pd.read_csv("MUSIC_DATA.csv")
-    return music_data
-
-
 def get_id_from_country(country_name: str, cursor: psycopg2.extensions.cursor) -> int:
     """
     Retrieves the country_id of a 
@@ -293,5 +285,4 @@ def main_load(sales_df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    music_csv = load_csv()
-    main_load(music_csv)
+    pass
