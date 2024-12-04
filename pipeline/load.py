@@ -46,7 +46,7 @@ def get_connection() -> extensions.connection:
 
 def get_cursor(connection: extensions.connection) -> Optional[extensions.cursor]:
     """
-    Returns a the cursor for querying
+    Retrieves a the cursor for querying
     the database from a connection.
     """
     try:
@@ -102,7 +102,6 @@ def get_id_from_release_type(release_type: str, cursor: extensions.cursor) -> in
 def insert_country(country_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts a country into the database if it doesn't already exist.
-    Logs whether the country was added or already exists.
     """
     try:
         check_query = "SELECT EXISTS (SELECT 1 FROM country WHERE country_name = %s);"
@@ -122,7 +121,6 @@ def insert_country(country_name: str, cursor: extensions.cursor) -> None:
 def insert_artist(artist_name: str, country: str, cursor: extensions.cursor) -> None:
     """
     Inserts an artist into the database if they doesn't already exist.
-    Logs whether the artist was added or already exists.
     """
     country_id = get_id_from_country(country, cursor)
     try:
@@ -147,8 +145,6 @@ def insert_genres(genre_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts genres into the database they don't already exist.
     Logs whether the genre was added or already exists.
-    Returns the genre id if inserted/exists.
-    Returns -1 in the case of an error.
     """
     try:
         check_query = "SELECT genre_id FROM genre WHERE genre_name = %s LIMIT 1;"
@@ -177,9 +173,6 @@ def insert_release(release_name: str, release_date: datetime,
                    cursor: extensions.cursor) -> int:
     """
     Inserts a release into the database if it doesn't already exist.
-    Logs whether the release was added or already exists.
-    Returns the release id if inserted/exists.
-    Returns -1 in the case of an error.
     """
     artist_id = get_id_from_artist(artist_name, cursor)
     type_id = get_id_from_release_type(release_type, cursor)
