@@ -12,6 +12,19 @@ from transform import (
     get_release_date_from_url,
     create_sales_dataframe,
 )
+from load import (
+    get_connection,
+    get_cursor,
+    get_id_from_country,
+    get_id_from_artist,
+    get_id_from_release_type,
+    insert_country,
+    insert_artist,
+    insert_genres,
+    insert_release,
+    insert_release_genres,
+    main_load
+)
 
 class TestExtract:
     """Tests the extract.py script."""
@@ -102,8 +115,8 @@ class TestTransform:
         mock_get.side_effect = Exception("Network Error")
         assert get_release_date_from_url("//example.com") == ""
 
-    def test_transform_create_sales_dataframe(self):
-        """Test for create_sales_dataframe function."""
+    def test_transform_create_sales_dataframe_album(self):
+        """Test for create_sales_dataframe function (album)."""
         mock_sales_info = [
             {
                 "release_type": "a",
@@ -122,3 +135,45 @@ class TestTransform:
         assert len(df) == 1
         assert "item_type" in df.columns
         assert df.iloc[0]["item_type"] == "a"
+    
+    def test_transform_create_sales_dataframe_track(self):
+        """Test for create_sales_dataframe function (track)."""
+        mock_sales_info = [
+            {
+                "release_type": "t",
+                "release_description": "Sample Track",
+                "album_title": "Mock Track",
+                "artist_name": "Mock Artist",
+                "country": "US",
+                "amount_paid_usd": 10.0,
+                "genres": ["Rock", "Pop"],
+                "release_date": "01-10-2021",
+                "sale_date": "2021-10-01",
+            }
+        ]
+        df = create_sales_dataframe(mock_sales_info)
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 1
+        assert "item_type" in df.columns
+        assert df.iloc[0]["item_type"] == "t"
+
+class TestLoad:
+    """Tests the load.py script."""
+    @pytest.fixture(autouse=True)
+    def mock_env(monkeypatch):
+        monkeypatch.setenv("DB_HOST", "mock_host")
+        monkeypatch.setenv("DB_PORT", "5432")
+        monkeypatch.setenv("DB_USER", "mock_user")
+        monkeypatch.setenv("DB_PASSWORD", "mock_password")
+        monkeypatch.setenv("DB_NAME", "mock_db")
+    
+    @pytest.fixture
+    def mock_connection():
+        connection = MagicMock()
+        return connection
+
+    @pytest.fixture
+    def mock_cursor(mock_connection):
+        cursor = MagicMock()
+        mock_connection.cursor.return_value = cursor
+        return cursor
