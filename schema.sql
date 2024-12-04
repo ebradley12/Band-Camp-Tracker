@@ -47,14 +47,19 @@ CREATE TABLE release (
     release_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     release_name VARCHAR NOT NULL,
     release_date DATE NOT NULL,
-    genre_id BIGINT,
     artist_id BIGINT,
     type_id BIGINT,
-    FOREIGN KEY (genre_id) REFERENCES genre(genre_id),
     FOREIGN KEY (artist_id) REFERENCES artist(artist_id),
     FOREIGN KEY (type_id) REFERENCES type(type_id)
 );
 
+CREATE TABLE release_genre (
+    release_id BIGINT,
+    genre_id BIGINT,
+    PRIMARY KEY (release_id, genre_id),
+    FOREIGN KEY (release_id) REFERENCES release(release_id) ON DELETE CASCADE,
+    FOREIGN KEY (genre_id) REFERENCES genre(genre_id) ON DELETE CASCADE
+);
 
 CREATE TABLE sale (
     sale_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
