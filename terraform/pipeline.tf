@@ -1,4 +1,4 @@
-# Define iam role
+# Define IAM role for the pipeline Lambda
 resource "aws_iam_role" "c14-bandcamp-pipeline-lambda-role" {
   name = "c14-bandcamp-pipeline-lambda-role"
   assume_role_policy = jsonencode({
@@ -15,7 +15,7 @@ resource "aws_iam_role" "c14-bandcamp-pipeline-lambda-role" {
   })
 }
 
-# Define lambda function
+# Define lambda function for pipeline
 resource "aws_lambda_function" "c14-bandcamp-pipeline-lambda-function" {
   function_name = "c14-band-camp-pipeline-lambda"
   role          = aws_iam_role.c14-bandcamp-pipeline-lambda-role.arn
