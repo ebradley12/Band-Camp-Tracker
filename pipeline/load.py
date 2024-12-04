@@ -1,4 +1,4 @@
-"""This is the script to load plant data into the database"""
+"""This is the script to load sales data into the database"""
 from os import environ
 from datetime import datetime
 import logging
@@ -27,12 +27,9 @@ def config_log() -> None:
 def get_connection() -> extensions.connection:
     """
     Tries to connect to the RDS database.
-    Returns a connection if successful.
     """
-
-    logging.info("Connecting to the database.")
-
     try:
+        logging.info("Connecting to the database.")
         connection = psycopg2.connect(
             host=environ["DB_HOST"],
             port=environ["DB_PORT"],
@@ -40,6 +37,7 @@ def get_connection() -> extensions.connection:
             password=environ["DB_PASSWORD"],
             database=environ["DB_NAME"]
         )
+        logging.info("Connected successfully.")
         return connection
     except psycopg2.OperationalError:
         logging.warning("The database %s doesn't exist", environ["DB_NAME"])
@@ -62,7 +60,6 @@ def get_id_from_country(country_name: str, cursor: extensions.cursor) -> int:
     """
     Retrieves the country_id of a 
     given country from the database.
-    Returns -1 if it cannot be found.
     """
     search_query = f"SELECT country_id FROM country WHERE country_name = '{
         country_name}';"
@@ -78,7 +75,6 @@ def get_id_from_artist(artist_name: str, cursor: extensions.cursor) -> int:
     """
     Retrieves the artist id of a 
     given artist from the database.
-    Returns -1 if it cannot be found.
     """
     search_query = "SELECT artist_id FROM artist WHERE artist_name = %s;"
     cursor.execute(search_query, (artist_name,))
@@ -93,7 +89,6 @@ def get_id_from_release_type(release_type: str, cursor: extensions.cursor) -> in
     """
     Retrieves the release type id of a 
     given release type.
-    Returns -1 if it cannot be found.
     """
     search_query = "SELECT type_id FROM type WHERE type_name = %s;"
     cursor.execute(search_query, (release_type.lower(),))
@@ -114,14 +109,12 @@ def insert_country(country_name: str, cursor: extensions.cursor) -> None:
         cursor.execute(check_query, (country_name,))
         exists = cursor.fetchone()[0]
 
-        if exists:
-            logging.info(
-                "Country '%s' already exists in the database.", country_name)
-        else:
+        if not exists:
             insert_query = "INSERT INTO country (country_name) VALUES (%s);"
             cursor.execute(insert_query, (country_name,))
             logging.info(
                 "Country '%s' was added to the database.", country_name)
+
     except psycopg2.Error:
         logging.error("Error inserting country: '%s'", country_name)
 
