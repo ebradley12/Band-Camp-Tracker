@@ -298,5 +298,4 @@ def main_transform(sales_data: dict) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    sales = main_extract()
-    main_transform(sales)
+    pass
