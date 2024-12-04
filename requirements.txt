@@ -7,3 +7,4 @@ watchdog
 boto3
 python-dotenv
 geonamescache
+psycopg2
