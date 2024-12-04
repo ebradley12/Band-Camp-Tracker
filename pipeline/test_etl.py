@@ -161,6 +161,7 @@ class TestLoad:
     """Tests the load.py script."""
     @pytest.fixture(autouse=True)
     def mock_env(monkeypatch):
+        """Mocks the environmental variables."""
         monkeypatch.setenv("DB_HOST", "mock_host")
         monkeypatch.setenv("DB_PORT", "5432")
         monkeypatch.setenv("DB_USER", "mock_user")
@@ -169,11 +170,26 @@ class TestLoad:
     
     @pytest.fixture
     def mock_connection():
+        """Mocks the connection."""
         connection = MagicMock()
         return connection
 
     @pytest.fixture
     def mock_cursor(mock_connection):
+        """Mocks the cursor."""
         cursor = MagicMock()
         mock_connection.cursor.return_value = cursor
         return cursor
+    
+    def test_get_connection():
+        """Test to check if the connection is called."""
+        with patch("psycopg2.connect") as mock_connect:
+            connection = get_connection()
+            assert mock_connect.called
+            assert connection is not None
+    
+    def test_get_cursor(mock_connection):
+        """Test to check that the cursor is called."""
+        cursor = get_cursor(mock_connection)
+        assert cursor is not None
+        mock_connection.cursor.assert_called_once()
