@@ -5,7 +5,6 @@ DROP TABLE IF EXISTS sale CASCADE;
 DROP TABLE IF EXISTS release CASCADE;
 DROP TABLE IF EXISTS genre CASCADE;
 DROP TABLE IF EXISTS artist CASCADE;
-DROP TABLE IF EXISTS customer CASCADE;
 DROP TABLE IF EXISTS type CASCADE;
 DROP TABLE IF EXISTS country CASCADE;
 
@@ -16,19 +15,9 @@ CREATE TABLE country (
 );
 
 
-CREATE TABLE customer (
-    customer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    customer_name VARCHAR NOT NULL,
-    country_id SMALLINT,
-    FOREIGN KEY (country_id) REFERENCES country(country_id)
-);
-
-
 CREATE TABLE artist (
     artist_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     artist_name VARCHAR NOT NULL,
-    country_id SMALLINT,
-    FOREIGN KEY (country_id) REFERENCES country(country_id)
 );
 
 
@@ -66,9 +55,9 @@ CREATE TABLE sale (
     sale_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sale_price FLOAT NOT NULL,
     sale_date DATE NOT NULL,
-    customer_id INT,
+    country_id INT,
     release_id INT,
-    FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+    FOREIGN KEY (country_id) REFERENCES country(country_id),
     FOREIGN KEY (release_id) REFERENCES release(release_id)
 );
 
