@@ -62,7 +62,7 @@ CREATE TABLE release_genre (
 );
 
 CREATE TABLE sale (
-    sale_id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sale_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sale_price FLOAT NOT NULL,
     sale_date DATE NOT NULL,
     customer_id SMALLINT,
