@@ -3,8 +3,10 @@ from os import environ
 from datetime import datetime
 import logging
 import ast
+from typing import Optional
 import pandas as pd
 import psycopg2
+from psycopg2 import extensions
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,7 +24,7 @@ def config_log() -> None:
     )
 
 
-def get_connection() -> psycopg2.extensions.connection:
+def get_connection() -> extensions.connection:
     """
     Tries to connect to the RDS database.
     Returns a connection if successful.
@@ -44,7 +46,7 @@ def get_connection() -> psycopg2.extensions.connection:
         return None
 
 
-def get_cursor(connection: psycopg2.extensions.connection) -> psycopg2.extensions.cursor:
+def get_cursor(connection: extensions.connection) -> Optional[extensions.cursor]:
     """
     Returns a the cursor for querying
     the database from a connection.
@@ -56,7 +58,7 @@ def get_cursor(connection: psycopg2.extensions.connection) -> psycopg2.extension
         return None
 
 
-def get_id_from_country(country_name: str, cursor: psycopg2.extensions.cursor) -> int:
+def get_id_from_country(country_name: str, cursor: extensions.cursor) -> int:
     """
     Retrieves the country_id of a 
     given country from the database.
@@ -72,7 +74,7 @@ def get_id_from_country(country_name: str, cursor: psycopg2.extensions.cursor) -
     return country_id[0]
 
 
-def get_id_from_artist(artist_name: str, cursor: psycopg2.extensions.cursor) -> int:
+def get_id_from_artist(artist_name: str, cursor: extensions.cursor) -> int:
     """
     Retrieves the artist id of a 
     given artist from the database.
@@ -87,7 +89,7 @@ def get_id_from_artist(artist_name: str, cursor: psycopg2.extensions.cursor) -> 
     return artist_id[0]
 
 
-def get_id_from_release_type(release_type: str, cursor: psycopg2.extensions.cursor) -> int:
+def get_id_from_release_type(release_type: str, cursor: extensions.cursor) -> int:
     """
     Retrieves the release type id of a 
     given release type.
@@ -102,7 +104,7 @@ def get_id_from_release_type(release_type: str, cursor: psycopg2.extensions.curs
     return type_id[0]
 
 
-def insert_country(country_name: str, cursor: psycopg2.extensions.cursor) -> None:
+def insert_country(country_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts a country into the database if it doesn't already exist.
     Logs whether the country was added or already exists.
@@ -124,7 +126,7 @@ def insert_country(country_name: str, cursor: psycopg2.extensions.cursor) -> Non
         logging.error("Error inserting country: '%s'", country_name)
 
 
-def insert_artist(artist_name: str, country: str, cursor: psycopg2.extensions.cursor) -> None:
+def insert_artist(artist_name: str, country: str, cursor: extensions.cursor) -> None:
     """
     Inserts an artist into the database if they doesn't already exist.
     Logs whether the artist was added or already exists.
@@ -148,7 +150,7 @@ def insert_artist(artist_name: str, country: str, cursor: psycopg2.extensions.cu
         logging.error("Error inserting artist: '%s'", artist_name)
 
 
-def insert_genres(genre_name: str, cursor: psycopg2.extensions.cursor) -> None:
+def insert_genres(genre_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts genres into the database they don't already exist.
     Logs whether the genre was added or already exists.
@@ -179,7 +181,7 @@ def insert_genres(genre_name: str, cursor: psycopg2.extensions.cursor) -> None:
 
 def insert_release(release_name: str, release_date: datetime,
                    release_type: str, artist_name: str,
-                   cursor: psycopg2.extensions.cursor) -> int:
+                   cursor: extensions.cursor) -> int:
     """
     Inserts a release into the database if it doesn't already exist.
     Logs whether the release was added or already exists.
@@ -229,7 +231,7 @@ def insert_release(release_name: str, release_date: datetime,
 
 
 def insert_release_genres(release_id: int, genre_id: int, genre_name: str,
-                          release_name: str, cursor: psycopg2.extensions.cursor) -> None:
+                          release_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts release genres into the database if it doesn't already exist.
     Logs whether the release genre was added or already exists.
@@ -282,6 +284,7 @@ def main_load(sales_df: pd.DataFrame) -> None:
                                   genre.lower(), row["release_name"], cursor)
 
     connection.commit()
+    connection.close()
 
 
 if __name__ == "__main__":
