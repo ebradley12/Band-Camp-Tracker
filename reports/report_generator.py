@@ -8,7 +8,7 @@ import base64
 import logging
 
 
-def config_log():
+def config_log() -> None:
     """Configure logging for the script."""
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(message)s",
@@ -16,7 +16,7 @@ def config_log():
     )
 
 
-def get_db_connection():
+def get_db_connection() -> psycopg2.extensions.connection:
     """Create a connection to the database."""
     try:
         conn = psycopg2.connect(
@@ -32,10 +32,9 @@ def get_db_connection():
         raise
 
 
-def query_sales_data():
+def query_sales_data() -> dict:
     """Query sales data from the RDS database for the previous day."""
     try:
-        # Calculate yesterday's date
         yesterday = datetime.now() - timedelta(days=1)
         formatted_date = yesterday.strftime("%Y-%m-%d")
 
@@ -103,7 +102,7 @@ def query_sales_data():
         return {}
 
 
-def generate_pdf(data, output_file):
+def generate_pdf(data: dict, output_file: str) -> None:
     """Generate a PDF report containing sales data."""
     try:
         pdf = FPDF()
@@ -137,7 +136,7 @@ def generate_pdf(data, output_file):
         raise
 
 
-def upload_to_s3(file_name, bucket_name, object_name):
+def upload_to_s3(file_name: str, bucket_name: str, object_name: str) -> None:
     """Upload a file to an S3 bucket."""
     try:
         s3 = boto3.client('s3')
@@ -148,7 +147,7 @@ def upload_to_s3(file_name, bucket_name, object_name):
         raise
 
 
-def send_email_with_attachment(pdf_file, recipient_email):
+def send_email_with_attachment(pdf_file: str, recipient_email: str) -> None:
     """Send an email with a PDF attachment using AWS SES."""
     try:
         ses_client = boto3.client('ses', region_name='us-east-1')
@@ -185,7 +184,7 @@ def send_email_with_attachment(pdf_file, recipient_email):
         raise
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: dict) -> dict:
     """AWS Lambda function to generate a PDF report, upload it to S3, and email it."""
     try:
         config_log()
