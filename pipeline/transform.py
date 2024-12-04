@@ -6,7 +6,6 @@ import geonamescache
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-from extract import main_extract
 
 
 def get_locations() -> list:
@@ -65,7 +64,7 @@ def convert_date_format(date_str: str) -> str:
     """
     try:
         date = datetime.strptime(date_str, "%d %B %Y")
-        return date.strftime("%Y-%m-%d")
+        return date.strftime("%d-%m-%Y")
     except ValueError as e:
         logging.error("Invalid date format: %s", e)
         return "None"
@@ -237,14 +236,14 @@ def extend_sales_from_df(sales_df: pd.DataFrame) -> None:
 def replace_blank_album_titles(sales_df: pd.DataFrame) -> None:
     """
     Replaces "None" entries in the "album_title" column
-    with the name provided in "release_name"
+    with the name provided in "item_description"
     if the item is an album.
     """
 
-    sales_df.loc[(sales_df["release_type"] == "a") &
+    sales_df.loc[(sales_df["item_type"] == "a") &
                  (sales_df["album_title"].isna() |
                  (sales_df["album_title"] == "None")),
-                 "album_title"] = sales_df["release_name"]
+                 "album_title"] = sales_df["item_description"]
 
 
 def fill_out_album_and_track(sales_df: pd.DataFrame) -> None:
@@ -253,8 +252,8 @@ def fill_out_album_and_track(sales_df: pd.DataFrame) -> None:
     with the full "Album" or "Track" in the dataframe.
     Does nothing if a "item_type" column doesn't exist.
     """
-    if "release_type" in sales_df.columns:
-        sales_df["release_type"] = sales_df["release_type"].map(
+    if "item_type" in sales_df.columns:
+        sales_df["item_type"] = sales_df["item_type"].map(
             {"a": "album", "t": "track"})
 
 
@@ -275,9 +274,6 @@ def clean_sales_dataframe(sales_df: pd.DataFrame) -> pd.DataFrame:
     extend_sales_from_df(sales_df)
     replace_blank_album_titles(sales_df)
     fill_out_album_and_track(sales_df)
-
-    sales_df = sales_df[sales_df['release_date'] != "None"]
-    sales_df = sales_df[sales_df['sale_date'] != "None"]
 
     return sales_df
 
