@@ -1,11 +1,15 @@
 import boto3
 import psycopg2
+from psycopg2 import extensions
 from fpdf import FPDF
-import os
+from os import environ
 from datetime import datetime, timedelta
 from botocore.exceptions import ClientError
 import base64
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def config_log() -> None:
@@ -18,22 +22,37 @@ def config_log() -> None:
     )
 
 
-def get_db_connection() -> psycopg2.extensions.connection:
+def get_db_connection() -> extensions.connection:
     """
-    Create a connection to the database.
+    Tries to connect to the RDS database.
     """
     try:
-        conn = psycopg2.connect(
-            dbname=os.environ['DB_NAME'],
-            user=os.environ['DB_USER'],
-            password=os.environ['DB_PASSWORD'],
-            host=os.environ['DB_HOST'],
-            port=os.environ['DB_PORT']
+        logging.info("Connecting to the database.")
+        connection = psycopg2.connect(
+            host=environ["DB_HOST"],
+            port=environ["DB_PORT"],
+            user=environ["DB_USER"],
+            password=environ["DB_PASSWORD"],
+            database=environ["DB_NAME"]
         )
-        return conn
-    except Exception as e:
-        logging.error("Failed to connect to the database: %s", e)
-        raise
+        logging.info("Connected successfully.")
+        return connection
+
+    except psycopg2.OperationalError:
+        logging.warning("The database %s doesn't exist", environ["DB_NAME"])
+        return None
+
+
+def get_cursor(connection: extensions.connection) -> extensions.cursor:
+    """
+    Retrieves a the cursor for querying
+    the database from a connection.
+    """
+    try:
+        return connection.cursor()
+    except:
+        logging.warning("Unable to retrieve cursor for connection")
+        return None
 
 
 def query_top_genres(cursor, date: str) -> list:
@@ -73,13 +92,12 @@ def query_top_artists(cursor, date: str) -> list:
 
 def query_top_regions(cursor, date: str) -> list:
     """
-    Query the top regions for a given date.
+    Query the top regions (countries) for a given date.
     """
     cursor.execute("""
         SELECT c.country_name, SUM(s.sale_price)
         FROM sale s
-        JOIN customer cu ON s.customer_id = cu.customer_id
-        JOIN country c ON cu.country_id = c.country_id
+        JOIN country c ON s.country_id = c.country_id
         WHERE s.sale_date = %s
         GROUP BY c.country_name
         ORDER BY SUM(s.sale_price) DESC
@@ -92,12 +110,19 @@ def query_total_transactions_and_sales(cursor, date: str) -> tuple:
     """
     Query the total transactions and sales for a given date.
     """
-    cursor.execute("""
-        SELECT COUNT(*), SUM(s.sale_price)
-        FROM sale
-        WHERE sale_date = %s;
-    """, (date,))
-    return cursor.fetchone() or (0, 0.0)
+    try:
+        cursor.execute("""
+            SELECT COUNT(*), SUM(s.sale_price)
+            FROM sale AS s
+            WHERE s.sale_date = %s;
+        """, (date,))
+        result = cursor.fetchone()
+        total_transactions = result[0] if result[0] is not None else 0
+        total_sales = result[1] if result[1] is not None else 0.0
+        return total_transactions, total_sales
+    except Exception as e:
+        logging.error("Error querying total transactions and sales: %s", e)
+        return 0, 0.0
 
 
 def query_sales_data() -> dict:
@@ -141,11 +166,13 @@ def generate_pdf(data: dict, output_file: str) -> None:
         pdf.cell(200, 10, txt="Daily Sales Report", ln=True, align='C')
         pdf.ln(10)
 
+        total_sales = data.get('total_sales', 0.0) or 0.0
+        total_transactions = data.get('total_transactions', 0) or 0
+
         pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt=f"""Total Sales: ${
-                 data['total_sales']:.2f}""", ln=True)
+        pdf.cell(200, 10, txt=f"""Total Sales: ${total_sales:.2f}""", ln=True)
         pdf.cell(200, 10, txt=f"""Total Transactions: {
-                 data['total_transactions']}""", ln=True)
+                 total_transactions}""", ln=True)
         pdf.cell(200, 10, txt=f"Top Genre: {data['top_genre']}", ln=True)
         pdf.cell(200, 10, txt=f"Top Artist: {data['top_artist']}", ln=True)
         pdf.ln(10)
@@ -247,3 +274,6 @@ def lambda_handler(event: dict) -> dict:
     except Exception as e:
         logging.error("Lambda execution failed: %s", e)
         return {"statusCode": 500, "body": "Internal Server Error"}
+
+
+# Save as folder name month
