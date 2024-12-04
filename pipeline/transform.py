@@ -292,8 +292,6 @@ def main_transform(sales_data: dict) -> pd.DataFrame:
     sales_df = create_sales_dataframe(sales_info)
     cleaned_sales_df = clean_sales_dataframe(sales_df)
 
-    cleaned_sales_df.to_csv("MUSIC_DATA.csv", index=None)
-
     return cleaned_sales_df
 
 

@@ -99,6 +99,27 @@ def get_id_from_release_type(release_type: str, cursor: extensions.cursor) -> in
     return type_id[0]
 
 
+def get_id_from_release_info(release_name: str, release_date: datetime,
+                             artist_id: int, type_id: int, cursor: extensions.cursor):
+    """
+    Retrieves the release id of the 
+    release with given information.
+    """
+
+    check_query = """SELECT release_id FROM release
+                    WHERE (release_name = %s
+                    AND release_date = %s
+                    AND artist_id = %s
+                    AND type_id = %s);"""
+
+    cursor.execute(check_query, (release_name,
+                                 release_date, artist_id, type_id))
+    release_id = cursor.fetchone()
+    if release_id:
+        return release_id[0]
+    return -1
+
+
 def insert_country(country_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts a country into the database if it doesn't already exist.
@@ -144,7 +165,6 @@ def insert_artist(artist_name: str, country: str, cursor: extensions.cursor) -> 
 def insert_genres(genre_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts genres into the database they don't already exist.
-    Logs whether the genre was added or already exists.
     """
     try:
         check_query = "SELECT genre_id FROM genre WHERE genre_name = %s LIMIT 1;"
@@ -186,30 +206,22 @@ def insert_release(release_name: str, release_date: datetime,
         return -1
 
     try:
-        check_query = """SELECT release_id FROM release
-                        WHERE (release_name = %s
-                        AND release_date = %s
-                        AND artist_id = %s
-                        AND type_id = %s);"""
-
-        cursor.execute(check_query, (release_name,
-                       release_date, artist_id, type_id))
-        release_id = cursor.fetchone()
-
-        if release_id:
+        release_id = get_id_from_release_info(release_name, release_date,
+                                              artist_id, type_id, cursor)
+        if release_id != -1:
             logging.info(
-                "'%s' already exists with release ID %s.", release_name, release_id[0])
-            return release_id[0]
+                "'%s' already exists with release ID %s.", release_name, release_id)
+            return release_id
 
         insert_query = """INSERT INTO release (release_name, release_date, artist_id, type_id)
                             VALUES (%s, %s, %s, %s)
                             RETURNING release_id;"""
         cursor.execute(insert_query, (release_name,
                                       release_date, artist_id, type_id))
-        release_id = cursor.fetchone()
+        release_id = cursor.fetchone()[0]
         logging.info(
             "Release '%s' of '%s' was added to the database.", release_id, release_name)
-        return release_id[0]
+        return release_id
 
     except psycopg2.Error:
         logging.error("Error inserting release: %s", release_name)
@@ -274,4 +286,5 @@ def main_load(sales_df: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    pass
+    music_data = pd.read_csv("MUSIC_DATA.csv")
+    main_load(music_data)
