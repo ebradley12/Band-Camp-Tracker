@@ -16,7 +16,7 @@ from transform import (
 class TestExtract:
     """Tests the extract.py script."""
     @patch("extract.requests.get")
-    def test_get_sales_information_success(self, mock_get):
+    def test_extract_get_sales_information_success(self, mock_get):
         """Test successful retrieval of sales data."""
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -30,7 +30,7 @@ class TestExtract:
         )
 
     @patch("extract.requests.get")
-    def test_get_sales_information_failure(self, mock_get):
+    def test_extract_get_sales_information_failure(self, mock_get):
         """Test failure to retrieve sales data."""
         mock_response = MagicMock()
         mock_response.status_code = 404
@@ -46,7 +46,7 @@ class TestTransform:
         ("1633036800", "01-10-2021"),
         ("invalid", "None"),
     ])
-    def test_convert_unix_to_datetime(self, unix_input, expected):
+    def test_transform_convert_unix_to_datetime(self, unix_input, expected):
         """Test for convert_from_unix_to_datetime function."""
         assert convert_from_unix_to_datetime(unix_input) == expected
 
@@ -54,7 +54,7 @@ class TestTransform:
         ("1 October 2021", "01-10-2021"),
         ("invalid date", "None"),
     ])
-    def test_convert_date_format(self, date_input, expected):
+    def test_transform_convert_date_format(self, date_input, expected):
         """Test for convert_date_format function."""
         assert convert_date_format(date_input) == expected
 
@@ -62,7 +62,7 @@ class TestTransform:
         ("http://example.com", "http://example.com"),
         ("//example.com", "https://example.com"),
     ])
-    def test_convert_to_full_url(self, url_input, expected):
+    def test_transform_convert_to_full_url(self, url_input, expected):
         """Test for convert_to_full_url function."""
         assert convert_to_full_url(url_input) == expected
 
@@ -71,12 +71,12 @@ class TestTransform:
         ("t", True),
         ("x", False),
     ])
-    def test_validate_album_and_track(self, item_type, expected):
+    def test_transform_validate_album_and_track(self, item_type, expected):
         """Test for validate_album_and_track function."""
         assert validate_album_and_track(item_type) == expected
 
     @patch("transform.requests.get")
-    def test_get_genres_from_url(self, mock_get):
+    def test_transform_get_genres_from_url(self, mock_get):
         """Test for get_genres_from_url function."""
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -89,7 +89,7 @@ class TestTransform:
         assert get_genres_from_url("//example.com", locations) == []
 
     @patch("transform.requests.get")
-    def test_get_release_date_from_url(self, mock_get):
+    def test_transform_get_release_date_from_url(self, mock_get):
         """Test for get_release_date_from_url function."""
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -102,7 +102,7 @@ class TestTransform:
         mock_get.side_effect = Exception("Network Error")
         assert get_release_date_from_url("//example.com") == ""
 
-    def test_create_sales_dataframe(self):
+    def test_transform_create_sales_dataframe(self):
         """Test for create_sales_dataframe function."""
         mock_sales_info = [
             {
