@@ -10,7 +10,7 @@ import logging
 from dotenv import load_dotenv
 import matplotlib.pyplot as plt
 import io
-import qrcode
+import tempfile
 
 load_dotenv()
 
@@ -27,7 +27,7 @@ def config_log() -> None:
 
 def get_db_connection() -> extensions.connection:
     """
-    Tries to connect to the RDS database.
+    Connect to the RDS database.
     """
     try:
         logging.info("Connecting to the database.")
@@ -73,7 +73,6 @@ def query_top_genres(cursor, date: str) -> list:
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
     """, (date,))
-
     return cursor.fetchall()
 
 
@@ -81,16 +80,16 @@ def query_top_artists(cursor, date: str) -> list:
     """
     Query the top artists for a given date.
     """
-    cursor.execute(f"""
+    cursor.execute("""
         SELECT a.artist_name, SUM(s.sale_price)
         FROM sale AS s
         JOIN release AS r ON s.release_id = r.release_id
         JOIN artist AS a ON r.artist_id = a.artist_id
-        WHERE s.sale_date = '{date}'
+        WHERE s.sale_date = %s
         GROUP BY a.artist_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
-    """)
+    """, (date,))
     return cursor.fetchall()
 
 
@@ -98,15 +97,15 @@ def query_top_regions(cursor, date: str) -> list:
     """
     Query the top regions (countries) for a given date.
     """
-    cursor.execute(f"""
+    cursor.execute("""
         SELECT c.country_name, SUM(s.sale_price)
         FROM sale AS s
         JOIN country AS c ON s.country_id = c.country_id
-        WHERE s.sale_date = '{date}'
+        WHERE s.sale_date = %s
         GROUP BY c.country_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
-    """)
+    """, (date,))
     return cursor.fetchall()
 
 
@@ -114,37 +113,26 @@ def query_total_transactions_and_sales(cursor, date: str) -> tuple:
     """
     Query the total transactions and sales for a given date.
     """
-    try:
-        cursor.execute(f"""
-            SELECT COUNT(*), SUM(s.sale_price)
-            FROM sale AS s
-            WHERE s.sale_date = '{date}';
-        """)
-        result = cursor.fetchone()
-        total_transactions = result[0] if result[0] is not None else 0
-        total_sales = result[1] if result[1] is not None else 0.0
-        return total_transactions, total_sales
-    except Exception as e:
-        logging.error("Error querying total transactions and sales: %s", e)
-        return 0, 0.0
+    cursor.execute(f"""
+        SELECT COUNT(*), SUM(s.sale_price)
+        FROM sale AS s
+        WHERE s.sale_date = %s;
+    """, (date,))
+    return cursor.fetchone()
 
 
-def query_sales_data() -> dict:
+def query_sales_data(date: str) -> dict:
     """
-    Query sales data from the RDS database for the previous day.
+    Query all sales data from the RDS database for a given date.
     """
     try:
-        # yesterday = datetime.now() - timedelta(days=1)
-        # formatted_date = yesterday.strftime("%Y-%m-%d")
-        formatted_date = "2024-12-05"
-
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 top_genres = query_top_genres(cursor, formatted_date)
                 top_artists = query_top_artists(cursor, formatted_date)
                 top_regions = query_top_regions(cursor, formatted_date)
                 total_transactions, total_sales = query_total_transactions_and_sales(
-                    cursor, formatted_date)
+                    cursor, date)
 
         return {
             "total_transactions": total_transactions,
@@ -162,45 +150,38 @@ def query_sales_data() -> dict:
 
 def generate_bar_chart(data: list, title: str, xlabel: str, ylabel: str) -> None:
     """
-    Generate a bar chart and save it as an image.
+    Generate a bar chart.
     """
-    try:
-        labels = [item.split(": $")[0] for item in data]
-        values = [float(item.split(": $")[1]) for item in data]
-
-        plt.figure(figsize=(10, 6))
-        plt.bar(labels, values, color="skyblue")
-        plt.title(title, fontsize=16)
-        plt.xlabel(xlabel, fontsize=14)
-        plt.ylabel(ylabel, fontsize=14)
-        plt.xticks(rotation=45, ha="right")
-        plt.tight_layout()
-
-        image_file = f"{title.lower().replace(' ', '_')}.png"
-        plt.savefig(image_file)
-        plt.close()
-    except Exception as e:
-        logging.error("Error generating bar chart for %s: %s", title, e)
-        raise
+    plt.figure(figsize=(10, 6))
+    labels, values = zip(*data) if data else ([], [])
+    plt.barh(labels, values, color="2596be")
+    plt.title(title, fontsize=16)
+    plt.xlabel(xlabel, fontsize=14)
+    plt.ylabel(ylabel, fontsize=14)
+    plt.tight_layout()
+    img_buffer = io.BytesIO()
+    plt.savefig(img_buffer, format='png')
+    plt.close()
+    img_buffer.seek(0)
+    return img_buffer
 
 
-def generate_qr_code(url: str) -> io.BytesIO:
+def add_table_to_pdf(pdf, headers, data, column_widths, row_height=8):
+    pdf.set_font("Arial", 'B', 12)
+    for i, header in enumerate(headers):
+        pdf.cell(column_widths[i], row_height, header, border=1, align='C')
+    pdf.ln(row_height)
+    pdf.set_font("Arial", size=10)
+    for row in data:
+        for i, cell in enumerate(row):
+            pdf.cell(column_widths[i], row_height,
+                     str(cell), border=1, align='C')
+        pdf.ln(row_height)
+
+
+def generate_pdf(current_data: dict, previous_data: dict, output_file: str, date: str) -> None:
     """
-    Generates a QR code for a given URL.
-    """
-    qr = qrcode.QRCode(box_size=10, border=4)
-    qr.add_data(url)
-    qr.make(fit=True)
-    img = qr.make_image(fill='black', back_color='white')
-    qr_buffer = io.BytesIO()
-    img.save(qr_buffer, format='PNG')
-    qr_buffer.seek(0)
-    return qr_buffer
-
-
-def generate_pdf(data: dict, output_file: str, date: str) -> None:
-    """
-    Generate a PDF report containing sales data.
+    Generate a PDF report containing the daily summary.
     """
     try:
         pdf = FPDF()
@@ -210,51 +191,63 @@ def generate_pdf(data: dict, output_file: str, date: str) -> None:
         pdf.cell(
             200, 10, txt=f"Daily Sales Report ({date})", ln=True, align='C')
         pdf.ln(10)
-
-        total_sales = data.get('total_sales', 0.0) or 0.0
-        total_transactions = data.get('total_transactions', 0) or 0
         pdf.set_font("Arial", 'B', size=12)
         pdf.cell(200, 10, txt=f"""Total Sales: ${
-                 total_sales:.2f}""", ln=True)
+            current_data.get('total_sales', 0) or 0:.2f}""", ln=True)
         pdf.cell(200, 10, txt=f"""Total Transactions: {
-                 total_transactions}""", ln=True)
-        pdf.cell(200, 10, txt=f"Top Genre: {data['top_genre']}", ln=True)
-        pdf.cell(200, 10, txt=f"Top Artist: {data['top_artist']}", ln=True)
+            current_data.get('total_transactions', 0) or 0}""", ln=True)
+        pdf.cell(200, 10, txt=f"""Top Genre: {
+            current_data.get('top_genre', 'N/A')}""", ln=True)
+        pdf.cell(200, 10, txt=f"""Top Artist: {
+            current_data.get('top_artist', 'N/A')}""", ln=True)
         pdf.ln(10)
 
-        for section, content in data.items():
-            if isinstance(content, list):
-                pdf.set_font("Arial", 'B', 12)
-                pdf.cell(200, 10, txt=section.replace(
-                    '_', ' ').title(), ln=True)
-                pdf.set_font("Arial", size=12)
-                for line in content:
-                    pdf.cell(200, 10, txt=line, ln=True)
-                pdf.ln(5)
+        pdf.set_font("Arial", 'B', 14)
+        pdf.cell(200, 10, txt="Comparison with Previous Day", ln=True, align='L')
+        pdf.ln(5)
 
-        if data.get("top_genres"):
-            generate_bar_chart(
-                data["top_genres"], "Top Genres", "Genre", "Revenue (USD)"
-            )
-            pdf.image("top_genres.png", x=10, y=None, w=180)
-            pdf.ln(5)
+        date_obj = datetime.strptime(date, "%Y-%m-%d")
+        previous_date_obj = date_obj - timedelta(days=1)
+        previous_date = previous_date_obj.strftime("%Y-%m-%d")
+        headers = ["Metric", f"{date}", f"{previous_date}", "Change (%)"]
+        comparison_data = [
+            [
+                "Total Sales",
+                f"${current_data.get('total_sales', 0) or 0:.2f}",
+                f"${previous_data.get('total_sales', 0) or 0:.2f}",
+                f"{((current_data.get('total_sales', 0) - (previous_data.get('total_sales', 0)
+                                                           or 0)) / ((previous_data.get('total_sales', 0) or 1))) * 100:.1f}%"
+            ],
+            [
+                "Total Transactions",
+                current_data.get('total_transactions', 0) or 0,
+                previous_data.get('total_transactions', 0) or 0,
+                f"{((current_data.get('total_transactions', 0) - (previous_data.get('total_transactions', 0)
+                                                                  or 0)) / ((previous_data.get('total_transactions', 0) or 1))) * 100:.1f}%"
+            ]
+        ]
+        add_table_to_pdf(pdf, headers, comparison_data, [50, 40, 40, 40])
 
-        if data.get("top_artists"):
-            generate_bar_chart(
-                data["top_artists"], "Top Artists", "Artist", "Revenue (USD)"
-            )
-            pdf.image("top_artists.png", x=10, y=None, w=180)
-            pdf.ln(5)
+        pdf.ln(30)
 
-        if data.get("top_regions"):
-            generate_bar_chart(
-                data["top_regions"], "Top Regions", "Region", "Revenue (USD)"
-            )
-            pdf.image("top_regions.png", x=10, y=None, w=180)
-            pdf.ln(5)
+        def add_graph_to_pdf(pdf, title, data):
+            buffer = generate_bar_chart(data, title, "Revenue ($)", "")
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=True) as tmp_file:
+                with open(tmp_file.name, "wb") as f:
+                    f.write(buffer.read())
+                pdf.image(tmp_file.name, x=30, y=pdf.get_y(), w=150)
+                pdf.ln(10)
+
+        add_graph_to_pdf(pdf, "Top Genres by Revenue",
+                         current_data["top_genres"])
+        add_graph_to_pdf(pdf, "Top Artists by Revenue",
+                         current_data["top_artists"])
+        add_graph_to_pdf(pdf, "Top Regions by Revenue",
+                         current_data["top_regions"])
 
         pdf.output(output_file)
         logging.info(f"PDF report generated at {output_file}")
+
     except Exception as e:
         logging.error("Error generating PDF: %s", e)
         raise
@@ -273,7 +266,7 @@ def upload_to_s3(file_name: str, bucket_name: str, object_name: str) -> None:
         raise
 
 
-def send_email_with_attachment(pdf_file: str, recipient_email: str) -> None:
+def send_email_with_attachment(pdf_file: str, recipient_email: str, date: str) -> None:
     """
     Send an email with a PDF attachment using AWS SES.
     """
@@ -286,7 +279,8 @@ def send_email_with_attachment(pdf_file: str, recipient_email: str) -> None:
 
         pdf_base64 = base64.b64encode(pdf_data).decode()
         subject = "Daily Sales Report"
-        body_text = "Please find attached the daily sales report for Band Camp Tracker."
+        body_text = f"""Please find attached the daily sales report for Band Camp Tracker ({
+            date})."""
 
         response = ses_client.send_raw_email(
             RawMessage={
@@ -343,12 +337,16 @@ def lambda_handler(event: dict) -> dict:
         return {"statusCode": 500, "body": "Internal Server Error"}
 
 
-sales_data = query_sales_data()
-print(sales_data)
-
 today = datetime.now()
-formatted_date = today.strftime("%Y-%m-%d")
+yesterday = today - timedelta(days=1)
 
-pdf_file = f"./daily_sales_report_{formatted_date}.pdf"
-generate_pdf(sales_data, pdf_file, formatted_date)
+formatted_today = today.strftime("%Y-%m-%d")
+formatted_yesterday = yesterday.strftime("%Y-%m-%d")
+
+current_data = query_sales_data(formatted_today)
+previous_data = query_sales_data(formatted_yesterday)
+
+
+pdf_file = f"./daily_sales_report_{formatted_today}.pdf"
+generate_pdf(current_data, previous_data, pdf_file, formatted_today)
 print(f"PDF generated: {pdf_file}")
