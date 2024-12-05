@@ -52,27 +52,11 @@ This folder contains the scripts that implement the ETL (Extract, Transform, Loa
   DB_HOST=<Your RDS Endpoint>
   DB_NAME=<Database Name>
 
-# **Steps**
-
-1. **Extract Step**:
-    ```bash
-    python3 extract.py
-    ```
-
-2. **Transform Step**:
-    ```bash
-    python3 transform.py
-    ```
-
-3. **Load Step**:
-   ```bash
-   python3 load_to_rds.py
-   ```
-
-4. **Full Pipeline**:
+# **Run the Pipeline:**
     ```bash
     python3 pipeline.py
     ```
+
 ---
 
 ## **Testing**
