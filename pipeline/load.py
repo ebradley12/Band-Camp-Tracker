@@ -3,7 +3,6 @@ from os import environ
 from datetime import datetime
 import logging
 import ast
-from typing import Optional
 import pandas as pd
 import psycopg2
 from psycopg2 import extensions
@@ -24,7 +23,18 @@ def config_log() -> None:
     )
 
 
-def get_connection() -> extensions.connection:
+def validate_env_vars() -> None:
+    """
+    Raises an error if any environment variables are missing.
+    """
+    required_vars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"]
+    missing_vars = [var for var in required_vars if var not in environ]
+    if missing_vars:
+        raise EnvironmentError(
+            f"Missing required environment variables: {missing_vars}")
+
+
+def get_connection() -> extensions.connection | None:
     """
     Tries to connect to the RDS database.
     """
@@ -44,65 +54,38 @@ def get_connection() -> extensions.connection:
         return None
 
 
-def get_cursor(connection: extensions.connection) -> Optional[extensions.cursor]:
+def get_cursor(connection: extensions.connection) -> extensions.cursor:
     """
-    Retrieves a the cursor for querying
-    the database from a connection.
+    Retrieves the cursor for querying the database from a connection.
     """
     try:
         return connection.cursor()
-    except:
-        logging.warning("Unable to retrieve cursor for connection")
+    except Exception as e:
+        logging.error("Unable to retrieve cursor for connection: %s", str(e))
+        raise
+
+
+def get_id_from_table(search_value: str, table_name: str,
+                      cursor: extensions.cursor) -> int | None:
+    """
+    Retrieves the id of a given value from a specified table.
+    """
+    query = f"""SELECT {table_name}_id FROM {
+        table_name} WHERE {table_name}_name = %s;"""
+    try:
+        cursor.execute(query, (search_value,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+    except Exception as e:
+        logging.error("Error querying %s: %s", table_name, str(e))
         return None
 
 
-def get_id_from_country(country_name: str, cursor: extensions.cursor) -> int:
-    """
-    Retrieves the country_id of a 
-    given country from the database.
-    """
-    search_query = f"SELECT country_id FROM country WHERE country_name = '{
-        country_name}';"
-    cursor.execute(search_query)
-    country_id = cursor.fetchone()
-    if not country_id:
-        logging.info("Unable to find id for %s", country_name)
-        return -1
-    return country_id[0]
-
-
-def get_id_from_artist(artist_name: str, cursor: extensions.cursor) -> int:
-    """
-    Retrieves the artist id of a 
-    given artist from the database.
-    """
-    search_query = "SELECT artist_id FROM artist WHERE artist_name = %s;"
-    cursor.execute(search_query, (artist_name,))
-    artist_id = cursor.fetchone()
-    if not artist_id:
-        logging.info("Unable to find id for %s", artist_name)
-        return -1
-    return artist_id[0]
-
-
-def get_id_from_release_type(release_type: str, cursor: extensions.cursor) -> int:
-    """
-    Retrieves the release type id of a 
-    given release type.
-    """
-    search_query = "SELECT type_id FROM type WHERE type_name = %s;"
-    cursor.execute(search_query, (release_type.lower(),))
-    type_id = cursor.fetchone()
-    if not type_id:
-        logging.info("Unable to find id for %s", release_type)
-        return -1
-    return type_id[0]
-
-
 def get_id_from_release_info(release_name: str, release_date: datetime,
-                             artist_id: int, type_id: int, cursor: extensions.cursor):
+                             artist_id: int, type_id: int,
+                             cursor: extensions.cursor) -> int | None:
     """
-    Retrieves the release id of the 
+    Retrieves the release id of the
     release with given information.
     """
 
@@ -115,9 +98,10 @@ def get_id_from_release_info(release_name: str, release_date: datetime,
     cursor.execute(check_query, (release_name,
                                  release_date, artist_id, type_id))
     release_id = cursor.fetchone()
+
     if release_id:
         return release_id[0]
-    return -1
+    return None
 
 
 def insert_country(country_name: str, cursor: extensions.cursor) -> None:
@@ -139,32 +123,32 @@ def insert_country(country_name: str, cursor: extensions.cursor) -> None:
         logging.error("Error inserting country: '%s'", country_name)
 
 
-def insert_artist(artist_name: str, country: str, cursor: extensions.cursor) -> None:
+def insert_artist(artist_name: str, cursor: extensions.cursor) -> None:
     """
-    Inserts an artist into the database if they doesn't already exist.
+    Inserts an artist into the database if they don't already exist.
     """
-    country_id = get_id_from_country(country, cursor)
+
     try:
         check_query = """SELECT artist_id FROM artist
-                        WHERE (artist_name = %s
-                        AND country_id = %s);"""
-        cursor.execute(check_query, (artist_name, country_id))
+                        WHERE artist_name = %s;"""
+
+        cursor.execute(check_query, (artist_name,))
         artist_id = cursor.fetchone()
 
         if artist_id:
             logging.info(
                 "Artist '%s' already exists in with ID: %s.", artist_name, artist_id[0])
         else:
-            insert_query = "INSERT INTO artist (artist_name, country_id) VALUES (%s, %s);"
-            cursor.execute(insert_query, (artist_name, country_id))
+            insert_query = "INSERT INTO artist (artist_name) VALUES (%s);"
+            cursor.execute(insert_query, (artist_name,))
             logging.info("Artist '%s' was added to the database.", artist_name)
     except psycopg2.Error:
         logging.error("Error inserting artist: '%s'", artist_name)
 
 
-def insert_genres(genre_name: str, cursor: extensions.cursor) -> None:
+def insert_genres(genre_name: str, cursor: extensions.cursor) -> int | None:
     """
-    Inserts genres into the database they don't already exist.
+    Inserts genres into the database if it doesn't already exist.
     """
     try:
         check_query = "SELECT genre_id FROM genre WHERE genre_name = %s LIMIT 1;"
@@ -185,30 +169,30 @@ def insert_genres(genre_name: str, cursor: extensions.cursor) -> None:
 
     except psycopg2.Error:
         logging.error("Error inserting genre: '%s'", genre_name)
-        return -1
+        return None
 
 
 def insert_release(release_name: str, release_date: datetime,
                    release_type: str, artist_name: str,
-                   cursor: extensions.cursor) -> int:
+                   cursor: extensions.cursor) -> int | None:
     """
     Inserts a release into the database if it doesn't already exist.
     """
-    artist_id = get_id_from_artist(artist_name, cursor)
-    type_id = get_id_from_release_type(release_type, cursor)
+    artist_id = get_id_from_table(artist_name, "artist", cursor)
+    type_id = get_id_from_table(release_type, "type", cursor)
 
-    if artist_id == -1:
+    if not artist_id:
         logging.info("Error with provided artist name: %s", artist_name)
-        return -1
+        return None
 
-    if type_id == -1:
+    if not type_id:
         logging.info("Error with provided release_type: %s", release_type)
-        return -1
+        return None
 
     try:
         release_id = get_id_from_release_info(release_name, release_date,
                                               artist_id, type_id, cursor)
-        if release_id != -1:
+        if release_id:
             logging.info(
                 "'%s' already exists with release ID %s.", release_name, release_id)
             return release_id
@@ -225,14 +209,13 @@ def insert_release(release_name: str, release_date: datetime,
 
     except psycopg2.Error:
         logging.error("Error inserting release: %s", release_name)
-        return -1
+        return None
 
 
 def insert_release_genres(release_id: int, genre_id: int, genre_name: str,
                           release_name: str, cursor: extensions.cursor) -> None:
     """
     Inserts release genres into the database if it doesn't already exist.
-    Logs whether the release genre was added or already exists.
     """
     try:
         check_query = """SELECT EXISTS
@@ -257,34 +240,73 @@ def insert_release_genres(release_id: int, genre_id: int, genre_name: str,
             "Error adding '%s' to '%s' ID: %s", genre_name, release_name, release_id)
 
 
+def insert_sale_data(sale_price: float, sale_date: datetime,
+                     country_name: str, release_id: int, cursor) -> None:
+    """"
+    Inserts the sale data relating to a release into the database.
+    """
+    country_id = get_id_from_table(country_name, "country", cursor)
+
+    try:
+        insert_query = """INSERT INTO sale (sale_price, sale_date, country_id, release_id)
+                                VALUES (%s, %s, %s, %s);"""
+        cursor.execute(insert_query, (sale_price,
+                       sale_date, country_id, release_id))
+        logging.info(
+            "Purchase of release '%s' added successfully.", release_id)
+
+    except psycopg2.Error:
+        logging.error(
+            "Error adding purchase of release '%s'", release_id)
+
+
 def main_load(sales_df: pd.DataFrame) -> None:
     """
     Loads data from the sales dataframe into the database.
     """
+    validate_env_vars()
     config_log()
     connection = get_connection()
+
+    if not connection:
+        logging.error("Database connection failed. Exiting.")
+        return
+
     cursor = get_cursor(connection)
 
-    sales_df["genres"] = sales_df["genres"].apply(ast.literal_eval)
+    if not cursor:
+        logging.error("Unable to get cursor. Exiting.")
+        return
 
-    for _, row in sales_df.iterrows():
-        insert_country(row["country"], cursor)
-        insert_artist(row["artist_name"], row["country"], cursor)
+    try:
 
-        release_id = insert_release(row["release_name"], row["release_date"],
-                                    row["release_type"], row["artist_name"], cursor)
+        sales_df["genres"] = sales_df["genres"].apply(ast.literal_eval)
 
-        for genre in row["genres"]:
-            genre_id = insert_genres(genre.lower(), cursor)
-            if genre_id == -1:
+        for _, row in sales_df.iterrows():
+            insert_country(row["country"], cursor)
+            insert_artist(row["artist_name"], cursor)
+
+            release_id = insert_release(row["release_name"], row["release_date"],
+                                        row["release_type"], row["artist_name"], cursor)
+            if not release_id:
                 continue
-            insert_release_genres(release_id, genre_id,
-                                  genre.lower(), row["release_name"], cursor)
 
-    connection.commit()
-    connection.close()
+            for genre in row["genres"]:
+                genre_id = insert_genres(genre.title(), cursor)
+                if genre_id:
+                    insert_release_genres(release_id, genre_id,
+                                          genre.title(), row["release_name"], cursor)
+
+            insert_sale_data(row["amount_paid_usd"], row["sale_date"],
+                             row["country"], release_id, cursor)
+
+        connection.commit()
+        connection.close()
+
+        logging.info("Data loaded successfully.")
+    except Exception as e:
+        logging.error("Error during data loading: %s", str(e))
 
 
 if __name__ == "__main__":
-    music_data = pd.read_csv("MUSIC_DATA.csv")
-    main_load(music_data)
+    pass
