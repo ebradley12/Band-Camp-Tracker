@@ -1,3 +1,4 @@
+"""Script to make the bar chart of top sales by genre."""
 from os import environ
 import streamlit as st
 import psycopg2
