@@ -279,9 +279,6 @@ def main_load(sales_df: pd.DataFrame) -> None:
         return
 
     try:
-
-        sales_df["genres"] = sales_df["genres"].apply(ast.literal_eval)
-
         for _, row in sales_df.iterrows():
             insert_country(row["country"], cursor)
             insert_artist(row["artist_name"], cursor)
