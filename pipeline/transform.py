@@ -57,7 +57,7 @@ def convert_from_unix_to_datetime(unix: str) -> datetime:
         return "None"
 
 
-def convert_date_format(date_str: str) -> str:
+def convert_written_date_format(date_str: str) -> str:
     """
     Takes dates in the "DD B YYYY" format and
     converts them to 'DD-MM-YYYY'.
@@ -65,6 +65,19 @@ def convert_date_format(date_str: str) -> str:
     """
     try:
         date = datetime.strptime(date_str, "%d %B %Y")
+        return date.strftime("%Y-%m-%d")
+    except ValueError as e:
+        logging.error("Invalid date format: %s", e)
+        return "None"
+
+
+def convert_date_format(date_str: str) -> str:
+    """
+    Converts dates in the 'DD-MM-YYYY' format to 'YYYY-MM-DD'.
+    Returns "None" as a string if an error occurs.
+    """
+    try:
+        date = datetime.strptime(date_str, "%d-%m-%Y")
         return date.strftime("%Y-%m-%d")
     except ValueError as e:
         logging.error("Invalid date format: %s", e)
@@ -122,6 +135,7 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
             items["album_title"] = "None"
 
         sale_date = convert_from_unix_to_datetime(items["utc_date"])
+        formatted_sale_date = convert_date_format(sale_date)
 
         event_information = {"release_type": items["item_type"],
                              "release_name": items["item_description"],
@@ -131,7 +145,7 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
                              "amount_paid_usd": items["amount_paid_usd"],
                              "genres": genres,
                              "release_date": release_date,
-                             "sale_date": sale_date
+                             "sale_date": formatted_sale_date
                              }
 
         sales_info.append(event_information)
@@ -197,7 +211,7 @@ def get_release_date_from_url(artist_url: str) -> str:
                     match = re.search(date_pattern, description_content)
                     if match:
                         release_date = match.group(1)
-                        return convert_date_format(release_date)
+                        return convert_written_date_format(release_date)
 
             logging.info("No valid release date found for %s", full_url)
 

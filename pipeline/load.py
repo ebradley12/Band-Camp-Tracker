@@ -3,7 +3,6 @@ from os import environ
 from datetime import datetime
 import logging
 import ast
-from typing import Optional
 import pandas as pd
 import psycopg2
 from psycopg2 import extensions
@@ -26,7 +25,7 @@ def config_log() -> None:
 
 def validate_env_vars() -> None:
     """
-    Raises an error if any environment variables are missing
+    Raises an error if any environment variables are missing.
     """
     required_vars = ["DB_HOST", "DB_PORT", "DB_USER", "DB_PASSWORD", "DB_NAME"]
     missing_vars = [var for var in required_vars if var not in environ]
@@ -35,7 +34,7 @@ def validate_env_vars() -> None:
             f"Missing required environment variables: {missing_vars}")
 
 
-def get_connection() -> Optional[extensions.connection]:
+def get_connection() -> extensions.connection | None:
     """
     Tries to connect to the RDS database.
     """
@@ -67,7 +66,7 @@ def get_cursor(connection: extensions.connection) -> extensions.cursor:
 
 
 def get_id_from_table(search_value: str, table_name: str,
-                      cursor: extensions.cursor) -> Optional[int]:
+                      cursor: extensions.cursor) -> int | None:
     """
     Retrieves the id of a given value from a specified table.
     """
@@ -84,7 +83,7 @@ def get_id_from_table(search_value: str, table_name: str,
 
 def get_id_from_release_info(release_name: str, release_date: datetime,
                              artist_id: int, type_id: int,
-                             cursor: extensions.cursor) -> Optional[int]:
+                             cursor: extensions.cursor) -> int | None:
     """
     Retrieves the release id of the
     release with given information.
@@ -147,7 +146,7 @@ def insert_artist(artist_name: str, cursor: extensions.cursor) -> None:
         logging.error("Error inserting artist: '%s'", artist_name)
 
 
-def insert_genres(genre_name: str, cursor: extensions.cursor) -> Optional[int]:
+def insert_genres(genre_name: str, cursor: extensions.cursor) -> int | None:
     """
     Inserts genres into the database they don't already exist.
     """
@@ -175,7 +174,7 @@ def insert_genres(genre_name: str, cursor: extensions.cursor) -> Optional[int]:
 
 def insert_release(release_name: str, release_date: datetime,
                    release_type: str, artist_name: str,
-                   cursor: extensions.cursor) -> Optional[int]:
+                   cursor: extensions.cursor) -> int | None:
     """
     Inserts a release into the database if it doesn't already exist.
     """
@@ -244,7 +243,7 @@ def insert_release_genres(release_id: int, genre_id: int, genre_name: str,
 def insert_sale_data(sale_price: float, sale_date: datetime,
                      country_name: str, release_id: int, cursor) -> None:
     """"
-    Inserts the sale data relating to a release into the database
+    Inserts the sale data relating to a release into the database.
     """
     country_id = get_id_from_table(country_name, "country", cursor)
 
@@ -254,11 +253,11 @@ def insert_sale_data(sale_price: float, sale_date: datetime,
         cursor.execute(insert_query, (sale_price,
                        sale_date, country_id, release_id))
         logging.info(
-            "Purchase of release '%s' by customer '%s' added successfully.", release_id, country_id)
+            "Purchase of release '%s' added successfully.", release_id)
 
     except psycopg2.Error:
         logging.error(
-            "Error adding purchase of release '%s' to customer '%s'", release_id, country_id)
+            "Error adding purchase of release '%s'", release_id)
 
 
 def main_load(sales_df: pd.DataFrame) -> None:
@@ -293,10 +292,10 @@ def main_load(sales_df: pd.DataFrame) -> None:
                 continue
 
             for genre in row["genres"]:
-                genre_id = insert_genres(genre.lower(), cursor)
+                genre_id = insert_genres(genre.title(), cursor)
                 if genre_id:
                     insert_release_genres(release_id, genre_id,
-                                          genre.lower(), row["release_name"], cursor)
+                                          genre.title(), row["release_name"], cursor)
 
             insert_sale_data(row["amount_paid_usd"], row["sale_date"],
                              row["country"], release_id, cursor)
