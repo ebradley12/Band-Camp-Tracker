@@ -56,7 +56,7 @@ def get_sales_data(connection: extensions.connection) -> pd.DataFrame:
     return sales_data
 
 
-def create_genre_sales_chart(connection) -> alt.Chart | None:
+def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | None:
     """
     Generates a bar chart for genre sales data.
     """
