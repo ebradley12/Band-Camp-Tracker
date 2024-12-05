@@ -301,12 +301,12 @@ def main_load(sales_df: pd.DataFrame) -> None:
             insert_sale_data(row["amount_paid_usd"], row["sale_date"],
                              row["country"], release_id, cursor)
 
+        connection.commit()
+        connection.close()
+
         logging.info("Data loaded successfully.")
     except Exception as e:
         logging.error("Error during data loading: %s", str(e))
-    finally:
-        connection.commit()
-        connection.close()
 
 
 if __name__ == "__main__":
