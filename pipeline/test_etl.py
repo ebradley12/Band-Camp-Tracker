@@ -10,6 +10,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 import requests
 import pandas as pd
+import numpy as np
 from extract import get_sales_information
 from transform import (
     convert_from_unix_to_datetime,
@@ -19,6 +20,7 @@ from transform import (
     get_genres_from_url,
     get_release_date_from_url,
     create_sales_dataframe,
+    fill_out_album_and_track,
 )
 from load import (
     get_connection,
@@ -52,7 +54,41 @@ class TestExtract:
         result = get_sales_information()
         assert result == {}
         mock_get.assert_called_once()
+    
+    @patch("extract.requests.get")
+    def test_extract_get_sales_information_invalid_json(self, mock_get):
+        """Verify handling of an invalid JSON response."""
+        mock_response = MagicMock(status_code=200, json=lambda: None)
+        mock_response.json.side_effect = ValueError("Invalid JSON")
+        mock_get.return_value = mock_response
 
+        result = get_sales_information()
+        assert result == None
+        mock_get.assert_called_once_with(
+            "https://bandcamp.com/api/salesfeed/1/get_initial", timeout=1000
+        )
+    
+    @patch("extract.requests.get")
+    def test_extract_get_sales_information_timeout(self, mock_get):
+        """Verify handling of a request timeout."""
+        mock_get.side_effect = requests.exceptions.Timeout
+
+        result = get_sales_information()
+        assert result == {}
+        mock_get.assert_called_once_with(
+            "https://bandcamp.com/api/salesfeed/1/get_initial", timeout=1000
+        )
+    
+    @patch("extract.requests.get")
+    def test_extract_get_sales_information_connection_error(self, mock_get):
+        """Verify handling of a connection error."""
+        mock_get.side_effect = requests.exceptions.ConnectionError
+
+        result = get_sales_information()
+        assert result == {}
+        mock_get.assert_called_once_with(
+            "https://bandcamp.com/api/salesfeed/1/get_initial", timeout=1000
+        )
 
 class TestTransform:
     """Tests for the transform phase of the ETL process."""
@@ -143,7 +179,7 @@ class TestTransform:
         assert "release_type" in df.columns
         assert df.iloc[0]["release_type"] == "a"
 
-    def test_transform_create_sales_dataframe_album(self):
+    def test_transform_create_sales_dataframe_track(self):
         """Test DataFrame creation for album sales."""
         mock_sales_info = [
             {
@@ -163,6 +199,20 @@ class TestTransform:
         assert len(df) == 1
         assert "release_type" in df.columns
         assert df.iloc[0]["release_type"] == "t"
+    
+    def test_transform_fill_out_album_and_track(self):
+        test_data = {
+            "release_type": ["a", "t", "a", "t", "x"],
+            "other_column": [1, 2, 3, 4, 5],
+        }
+        test_df = pd.DataFrame(test_data)
+        expected_data = {
+            "release_type": ["album", "track", "album", "track", np.nan],
+            "other_column": [1, 2, 3, 4, 5],
+        }
+        expected_df = pd.DataFrame(expected_data)
+        fill_out_album_and_track(test_df)
+        pd.testing.assert_frame_equal(test_df, expected_df)
 
 
 class TestLoad:
