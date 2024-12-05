@@ -10,3 +10,4 @@ geonamescache
 psycopg2
 fpdf
 logging
+matplotlib

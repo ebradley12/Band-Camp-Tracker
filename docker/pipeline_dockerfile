@@ -10,4 +10,4 @@ COPY . .
 
 RUN pip install python-dotenv
 
-CMD ["python", "pipeline.py"]
+CMD ["python", "etl.py"]

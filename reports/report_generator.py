@@ -8,6 +8,9 @@ from botocore.exceptions import ClientError
 import base64
 import logging
 from dotenv import load_dotenv
+import matplotlib.pyplot as plt
+import io
+import qrcode
 
 load_dotenv()
 
@@ -157,6 +160,44 @@ def query_sales_data() -> dict:
         return {}
 
 
+def generate_bar_chart(data: list, title: str, xlabel: str, ylabel: str) -> None:
+    """
+    Generate a bar chart and save it as an image.
+    """
+    try:
+        labels = [item.split(": $")[0] for item in data]
+        values = [float(item.split(": $")[1]) for item in data]
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(labels, values, color="skyblue")
+        plt.title(title, fontsize=16)
+        plt.xlabel(xlabel, fontsize=14)
+        plt.ylabel(ylabel, fontsize=14)
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+
+        image_file = f"{title.lower().replace(' ', '_')}.png"
+        plt.savefig(image_file)
+        plt.close()
+    except Exception as e:
+        logging.error("Error generating bar chart for %s: %s", title, e)
+        raise
+
+
+def generate_qr_code(url: str) -> io.BytesIO:
+    """
+    Generates a QR code for a given URL.
+    """
+    qr = qrcode.QRCode(box_size=10, border=4)
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill='black', back_color='white')
+    qr_buffer = io.BytesIO()
+    img.save(qr_buffer, format='PNG')
+    qr_buffer.seek(0)
+    return qr_buffer
+
+
 def generate_pdf(data: dict, output_file: str, date: str) -> None:
     """
     Generate a PDF report containing sales data.
@@ -164,6 +205,7 @@ def generate_pdf(data: dict, output_file: str, date: str) -> None:
     try:
         pdf = FPDF()
         pdf.add_page()
+
         pdf.set_font("Arial", 'B', 16)
         pdf.cell(
             200, 10, txt=f"Daily Sales Report ({date})", ln=True, align='C')
@@ -171,7 +213,6 @@ def generate_pdf(data: dict, output_file: str, date: str) -> None:
 
         total_sales = data.get('total_sales', 0.0) or 0.0
         total_transactions = data.get('total_transactions', 0) or 0
-
         pdf.set_font("Arial", 'B', size=12)
         pdf.cell(200, 10, txt=f"""Total Sales: ${
                  total_sales:.2f}""", ln=True)
@@ -190,6 +231,27 @@ def generate_pdf(data: dict, output_file: str, date: str) -> None:
                 for line in content:
                     pdf.cell(200, 10, txt=line, ln=True)
                 pdf.ln(5)
+
+        if data.get("top_genres"):
+            generate_bar_chart(
+                data["top_genres"], "Top Genres", "Genre", "Revenue (USD)"
+            )
+            pdf.image("top_genres.png", x=10, y=None, w=180)
+            pdf.ln(5)
+
+        if data.get("top_artists"):
+            generate_bar_chart(
+                data["top_artists"], "Top Artists", "Artist", "Revenue (USD)"
+            )
+            pdf.image("top_artists.png", x=10, y=None, w=180)
+            pdf.ln(5)
+
+        if data.get("top_regions"):
+            generate_bar_chart(
+                data["top_regions"], "Top Regions", "Region", "Revenue (USD)"
+            )
+            pdf.image("top_regions.png", x=10, y=None, w=180)
+            pdf.ln(5)
 
         pdf.output(output_file)
         logging.info(f"PDF report generated at {output_file}")
