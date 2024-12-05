@@ -59,17 +59,17 @@ def query_top_genres(cursor, date: str) -> list:
     """
     Query the top genres for a given date.
     """
-    cursor.execute("""
+    cursor.execute(f"""
         SELECT g.genre_name, SUM(s.sale_price)
-        FROM sale s
-        JOIN release r ON s.release_id = r.release_id
-        JOIN release_genre rg ON r.release_id = rg.release_id
-        JOIN genre g ON rg.genre_id = g.genre_id
-        WHERE s.sale_date = %s
+        FROM sale AS s
+        JOIN release AS r ON s.release_id = r.release_id
+        JOIN release_genre AS rg ON r.release_id = rg.release_id
+        JOIN genre AS g ON rg.genre_id = g.genre_id
+        WHERE s.sale_date = '{date}'
         GROUP BY g.genre_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
-    """, (date,))
+    """)
     return cursor.fetchall()
 
 
@@ -77,16 +77,16 @@ def query_top_artists(cursor, date: str) -> list:
     """
     Query the top artists for a given date.
     """
-    cursor.execute("""
+    cursor.execute(f"""
         SELECT a.artist_name, SUM(s.sale_price)
-        FROM sale s
-        JOIN release r ON s.release_id = r.release_id
-        JOIN artist a ON r.artist_id = a.artist_id
-        WHERE s.sale_date = %s
+        FROM sale AS s
+        JOIN release AS r ON s.release_id = r.release_id
+        JOIN artist AS a ON r.artist_id = a.artist_id
+        WHERE s.sale_date = '{date}'
         GROUP BY a.artist_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
-    """, (date,))
+    """)
     return cursor.fetchall()
 
 
@@ -94,15 +94,15 @@ def query_top_regions(cursor, date: str) -> list:
     """
     Query the top regions (countries) for a given date.
     """
-    cursor.execute("""
+    cursor.execute(f"""
         SELECT c.country_name, SUM(s.sale_price)
-        FROM sale s
-        JOIN country c ON s.country_id = c.country_id
-        WHERE s.sale_date = %s
+        FROM sale AS s
+        JOIN country AS c ON s.country_id = c.country_id
+        WHERE s.sale_date = '{date}'
         GROUP BY c.country_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
-    """, (date,))
+    """)
     return cursor.fetchall()
 
 
@@ -111,11 +111,11 @@ def query_total_transactions_and_sales(cursor, date: str) -> tuple:
     Query the total transactions and sales for a given date.
     """
     try:
-        cursor.execute("""
+        cursor.execute(f"""
             SELECT COUNT(*), SUM(s.sale_price)
             FROM sale AS s
-            WHERE s.sale_date = %s;
-        """, (date,))
+            WHERE s.sale_date = '{date}';
+        """)
         result = cursor.fetchone()
         total_transactions = result[0] if result[0] is not None else 0
         total_sales = result[1] if result[1] is not None else 0.0
@@ -130,8 +130,9 @@ def query_sales_data() -> dict:
     Query sales data from the RDS database for the previous day.
     """
     try:
-        yesterday = datetime.now() - timedelta(days=1)
-        formatted_date = yesterday.strftime("%Y-%m-%d")
+        # yesterday = datetime.now() - timedelta(days=1)
+        # formatted_date = yesterday.strftime("%Y-%m-%d")
+        formatted_date = "2024-12-05"
 
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
@@ -144,7 +145,7 @@ def query_sales_data() -> dict:
         return {
             "total_transactions": total_transactions,
             "total_sales": total_sales,
-            "top_genres": [f"{row[0]}: ${row[1]:.2f}" for row in top_genres],
+            "top_genre": [f"{row[0]}: ${row[1]:.2f}" for row in top_genres],
             "top_artists": [f"{row[0]}: ${row[1]:.2f}" for row in top_artists],
             "top_regions": [f"{row[0]}: ${row[1]:.2f}" for row in top_regions],
             "top_genre": top_genres[0][0] if top_genres else "N/A",
@@ -155,7 +156,7 @@ def query_sales_data() -> dict:
         return {}
 
 
-def generate_pdf(data: dict, output_file: str) -> None:
+def generate_pdf(data: dict, output_file: str, date: str) -> None:
     """
     Generate a PDF report containing sales data.
     """
@@ -163,14 +164,16 @@ def generate_pdf(data: dict, output_file: str) -> None:
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", 'B', 16)
-        pdf.cell(200, 10, txt="Daily Sales Report", ln=True, align='C')
+        pdf.cell(
+            200, 10, txt=f"Daily Sales Report ({date})", ln=True, align='C')
         pdf.ln(10)
 
         total_sales = data.get('total_sales', 0.0) or 0.0
         total_transactions = data.get('total_transactions', 0) or 0
 
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt=f"""Total Sales: ${total_sales:.2f}""", ln=True)
+        pdf.set_font("Arial", 'B', size=12)
+        pdf.cell(200, 10, txt=f"""Total Sales: ${
+                 total_sales:.2f}""", ln=True)
         pdf.cell(200, 10, txt=f"""Total Transactions: {
                  total_transactions}""", ln=True)
         pdf.cell(200, 10, txt=f"Top Genre: {data['top_genre']}", ln=True)
@@ -180,7 +183,8 @@ def generate_pdf(data: dict, output_file: str) -> None:
         for section, content in data.items():
             if isinstance(content, list):
                 pdf.set_font("Arial", 'B', 12)
-                pdf.cell(200, 10, txt=section, ln=True)
+                pdf.cell(200, 10, txt=section.replace(
+                    '_', ' ').title(), ln=True)
                 pdf.set_font("Arial", size=12)
                 for line in content:
                     pdf.cell(200, 10, txt=line, ln=True)
@@ -245,35 +249,43 @@ def send_email_with_attachment(pdf_file: str, recipient_email: str) -> None:
         raise
 
 
-def lambda_handler(event: dict) -> dict:
-    """
-    AWS Lambda function to generate a PDF report, upload it to S3, and email it.
-    """
-    try:
-        config_log()
+# def lambda_handler(event: dict) -> dict:
+#     """
+#     AWS Lambda function to generate a PDF report, upload it to S3, and email it.
+#     """
+#     try:
+#         config_log()
 
-        sales_data = query_sales_data()
+#         sales_data = query_sales_data()
 
-        yesterday = datetime.now() - timedelta(days=1)
-        formatted_date = yesterday.strftime("%Y-%m-%d")
+#         yesterday = datetime.now() - timedelta(days=1)
+#         formatted_date = yesterday.strftime("%Y-%m-%d")
 
-        pdf_file = f"/tmp/daily_sales_report_{formatted_date}.pdf"
-        generate_pdf(sales_data, pdf_file)
+#         pdf_file = f"/tmp/daily_sales_report_{formatted_date}.pdf"
+#         generate_pdf(sales_data, pdf_file, formatted_date)
 
-        s3_bucket = os.environ['S3_BUCKET']
-        s3_object = f"reports/daily_sales_report_{formatted_date}.pdf"
-        upload_to_s3(pdf_file, s3_bucket, s3_object)
+#         s3_bucket = os.environ['S3_BUCKET']
+#         s3_object = f"reports/daily_sales_report_{formatted_date}.pdf"
+#         upload_to_s3(pdf_file, s3_bucket, s3_object)
 
-        recipient_email = os.environ['RECIPIENT_EMAIL']
-        send_email_with_attachment(pdf_file, recipient_email)
+#         recipient_email = os.environ['RECIPIENT_EMAIL']
+#         send_email_with_attachment(pdf_file, recipient_email)
 
-        return {
-            "statusCode": 200,
-            "body": f"PDF report generated, uploaded to {s3_bucket}/{s3_object}, and emailed to {recipient_email}."
-        }
-    except Exception as e:
-        logging.error("Lambda execution failed: %s", e)
-        return {"statusCode": 500, "body": "Internal Server Error"}
+#         return {
+#             "statusCode": 200,
+#             "body": f"PDF report generated, uploaded to {s3_bucket}/{s3_object}, and emailed to {recipient_email}."
+#         }
+#     except Exception as e:
+#         logging.error("Lambda execution failed: %s", e)
+#         return {"statusCode": 500, "body": "Internal Server Error"}
 
 
 # Save as folder name month
+sales_data = query_sales_data()
+print(sales_data)
+
+formatted_date = '04-12-2024'
+
+pdf_file = f"./daily_sales_report_{formatted_date}.pdf"
+generate_pdf(sales_data, pdf_file, formatted_date)
+print(f"PDF generated: {pdf_file}")
