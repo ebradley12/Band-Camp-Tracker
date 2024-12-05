@@ -7,3 +7,9 @@ __pycache__
 .terraform
 *.tfvars
 *.ipynb
+*.terraform
+.terraform.*
+terraform.*
+.DS_Store
+*.csv
+.csv
