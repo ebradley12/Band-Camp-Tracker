@@ -59,17 +59,18 @@ def query_top_genres(cursor, date: str) -> list:
     """
     Query the top genres for a given date.
     """
-    cursor.execute(f"""
+    cursor.execute("""
         SELECT g.genre_name, SUM(s.sale_price)
         FROM sale AS s
         JOIN release AS r ON s.release_id = r.release_id
         JOIN release_genre AS rg ON r.release_id = rg.release_id
         JOIN genre AS g ON rg.genre_id = g.genre_id
-        WHERE s.sale_date = '{date}'
+        WHERE s.sale_date = %s
         GROUP BY g.genre_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
-    """)
+    """, (date,))
+
     return cursor.fetchall()
 
 
@@ -145,7 +146,7 @@ def query_sales_data() -> dict:
         return {
             "total_transactions": total_transactions,
             "total_sales": total_sales,
-            "top_genre": [f"{row[0]}: ${row[1]:.2f}" for row in top_genres],
+            "top_genres": [f"{row[0]}: ${row[1]:.2f}" for row in top_genres],
             "top_artists": [f"{row[0]}: ${row[1]:.2f}" for row in top_artists],
             "top_regions": [f"{row[0]}: ${row[1]:.2f}" for row in top_regions],
             "top_genre": top_genres[0][0] if top_genres else "N/A",
@@ -278,3 +279,14 @@ def lambda_handler(event: dict) -> dict:
     except Exception as e:
         logging.error("Lambda execution failed: %s", e)
         return {"statusCode": 500, "body": "Internal Server Error"}
+
+
+sales_data = query_sales_data()
+print(sales_data)
+
+today = datetime.now()
+formatted_date = today.strftime("%Y-%m-%d")
+
+pdf_file = f"./daily_sales_report_{formatted_date}.pdf"
+generate_pdf(sales_data, pdf_file, formatted_date)
+print(f"PDF generated: {pdf_file}")
