@@ -20,18 +20,28 @@ def get_sales_information() -> dict:
     Returns a JSON dictionary of sales information 
     from the Bandcamp API.
     """
-
     logging.info("Retrieving Sales Data")
     sales_url = "https://bandcamp.com/api/salesfeed/1/get_initial"
-    response = requests.get(sales_url, timeout=1000)
-    if response.status_code != 200:
-        logging.warning(
-            "Couldn't retrieve Sales Data. Status Code %s", response.status_code)
-        return {}
-    sales_data = response.json()
-    logging.info("Sales Data retrieved.")
 
-    return sales_data
+    try:
+        response = requests.get(sales_url, timeout=1000)
+        if response.status_code != 200:
+            logging.warning(
+                "Couldn't retrieve Sales Data. Status Code %s", response.status_code)
+            return {}
+        sales_data = response.json()
+        logging.info("Sales Data retrieved.")
+        return sales_data
+
+    except requests.exceptions.Timeout:
+        logging.warning("Request to retrieve Sales Data timed out.")
+        return {}
+    except requests.exceptions.ConnectionError:
+        logging.warning("Failed to connect to retrieve Sales Data.")
+        return {}
+    except requests.exceptions.RequestException as e:
+        logging.error("An error occurred: %s", e)
+        return {}
 
 
 def main_extract() -> dict:
