@@ -60,7 +60,7 @@ def convert_from_unix_to_datetime(unix: str) -> datetime:
 def convert_written_date_format(date_str: str) -> str:
     """
     Takes dates in the "DD B YYYY" format and
-    converts them to 'DD-MM-YYYY'.
+    converts them to 'YYYY-MM-DD'.
     Returns a "None" string if an error occurs.
     """
     try:

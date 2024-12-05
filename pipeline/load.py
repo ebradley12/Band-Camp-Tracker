@@ -125,7 +125,7 @@ def insert_country(country_name: str, cursor: extensions.cursor) -> None:
 
 def insert_artist(artist_name: str, cursor: extensions.cursor) -> None:
     """
-    Inserts an artist into the database if they doesn't already exist.
+    Inserts an artist into the database if they don't already exist.
     """
 
     try:
@@ -148,7 +148,7 @@ def insert_artist(artist_name: str, cursor: extensions.cursor) -> None:
 
 def insert_genres(genre_name: str, cursor: extensions.cursor) -> int | None:
     """
-    Inserts genres into the database they don't already exist.
+    Inserts genres into the database if it doesn't already exist.
     """
     try:
         check_query = "SELECT genre_id FROM genre WHERE genre_name = %s LIMIT 1;"
