@@ -249,43 +249,32 @@ def send_email_with_attachment(pdf_file: str, recipient_email: str) -> None:
         raise
 
 
-# def lambda_handler(event: dict) -> dict:
-#     """
-#     AWS Lambda function to generate a PDF report, upload it to S3, and email it.
-#     """
-#     try:
-#         config_log()
+def lambda_handler(event: dict) -> dict:
+    """
+    AWS Lambda function to generate a PDF report, upload it to S3, and email it.
+    """
+    try:
+        config_log()
 
-#         sales_data = query_sales_data()
+        sales_data = query_sales_data()
 
-#         yesterday = datetime.now() - timedelta(days=1)
-#         formatted_date = yesterday.strftime("%Y-%m-%d")
+        yesterday = datetime.now() - timedelta(days=1)
+        formatted_date = yesterday.strftime("%Y-%m-%d")
 
-#         pdf_file = f"/tmp/daily_sales_report_{formatted_date}.pdf"
-#         generate_pdf(sales_data, pdf_file, formatted_date)
+        pdf_file = f"/tmp/daily_sales_report_{formatted_date}.pdf"
+        generate_pdf(sales_data, pdf_file, formatted_date)
 
-#         s3_bucket = os.environ['S3_BUCKET']
-#         s3_object = f"reports/daily_sales_report_{formatted_date}.pdf"
-#         upload_to_s3(pdf_file, s3_bucket, s3_object)
+        s3_bucket = os.environ['S3_BUCKET']
+        s3_object = f"reports/daily_sales_report_{formatted_date}.pdf"
+        upload_to_s3(pdf_file, s3_bucket, s3_object)
 
-#         recipient_email = os.environ['RECIPIENT_EMAIL']
-#         send_email_with_attachment(pdf_file, recipient_email)
+        recipient_email = os.environ['RECIPIENT_EMAIL']
+        send_email_with_attachment(pdf_file, recipient_email)
 
-#         return {
-#             "statusCode": 200,
-#             "body": f"PDF report generated, uploaded to {s3_bucket}/{s3_object}, and emailed to {recipient_email}."
-#         }
-#     except Exception as e:
-#         logging.error("Lambda execution failed: %s", e)
-#         return {"statusCode": 500, "body": "Internal Server Error"}
-
-
-# Save as folder name month
-sales_data = query_sales_data()
-print(sales_data)
-
-formatted_date = '04-12-2024'
-
-pdf_file = f"./daily_sales_report_{formatted_date}.pdf"
-generate_pdf(sales_data, pdf_file, formatted_date)
-print(f"PDF generated: {pdf_file}")
+        return {
+            "statusCode": 200,
+            "body": f"PDF report generated, uploaded to {s3_bucket}/{s3_object}, and emailed to {recipient_email}."
+        }
+    except Exception as e:
+        logging.error("Lambda execution failed: %s", e)
+        return {"statusCode": 500, "body": "Internal Server Error"}
