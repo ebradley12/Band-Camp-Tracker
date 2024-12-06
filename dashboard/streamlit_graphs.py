@@ -38,21 +38,29 @@ def get_connection() -> extensions.connection | None:
         return None
 
 
-def fetch_sales_per_hour(connection, target_date) -> pd.DataFrame | None:
+def fetch_sales_within_date_range(connection, start_date, end_date) -> pd.DataFrame | None:
+    """
+    Fetches sales data aggregated by hour for a given date range.
+    """
     query = """
     SELECT
         DATE_TRUNC('hour', sale_date) AS sale_hour,
         COUNT(sale_id) AS total_sales
     FROM sale
-    WHERE sale_date::DATE = %s
+    WHERE sale_date BETWEEN %s AND %s
     GROUP BY sale_hour
     ORDER BY sale_hour;
     """
-    sale_data = pd.read_sql(query, connection, params=[target_date])
+    try:
+        sale_data = pd.read_sql(query, connection, params=[
+                                start_date, end_date])
 
-    if not sale_data.empty:
-        return sale_data
-    else:
+        if not sale_data.empty:
+            return sale_data
+        else:
+            return None
+    except Exception as e:
+        logging.error("Error fetching sales data: %s", e)
         return None
 
 
@@ -133,7 +141,8 @@ def plot_sales_per_hour(connection: extensions.connection, start_date: datetime,
     Plots a line graph of sales per hour for the current day.
     """
     try:
-        sales_data = fetch_sales_per_hour(connection, start_date)
+        sales_data = fetch_sales_within_date_range(
+            connection, start_date, end_date)
         if sales_data.empty:
             st.error("No data available to display")
             return None
