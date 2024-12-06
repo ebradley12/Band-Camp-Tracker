@@ -186,14 +186,15 @@ def subscribe_page() -> None:
     email = st.text_input("Enter your email address:")
 
     # Checkbox for user alerts
-    subscribe_alerts = st.checkbox("Subscribe to alerts")
+    subscribe_alerts = st.checkbox("Subscribe to general alerts")
 
     genres_dict = get_genres_from_db()
     genre_names = list(genres_dict.keys())
 
+    subscribe_alerts = st.checkbox("Subscribe to specific genre alerts")
     # Multi-select for genres
     selected_genres = st.multiselect(
-        "Select genres you want to receive updates about:",
+        "Select genres you want to receive alerts about:",
         genre_names
     )
 
