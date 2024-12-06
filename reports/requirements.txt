@@ -1,6 +1,7 @@
 boto3
 psycopg2
 fpdf
-logging
 python-dotenv
 matplotlib
+tempfile
+base64
