@@ -9,6 +9,7 @@ import streamlit as st
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
+from streamlit_graphs import *
 
 
 def get_connection() -> psycopg2.connect:
@@ -155,6 +156,28 @@ def trends_page() -> None:
     st.title("Trends Page")
     st.write("Explore trends on this page.")
 
+    connection = get_connection()
+
+    default_start = datetime(2024, 12, 1)
+
+    default_end = datetime(2024, 12, 6)
+    date_range = st.date_input(
+        "Select Date Range:",
+        value=(default_start.date(), default_end.date()),
+        min_value=datetime(2023, 1, 1).date(),
+        max_value=datetime.today().date()
+    )
+
+    if len(date_range) == 2:
+        start_date, end_date = date_range
+        if start_date > end_date:
+            st.error("Start date must be before or equal to the end date.")
+        else:
+            sales_data = plot_sales_per_hour(connection, start_date, end_date)
+            st.altair_chart(sales_data, use_container_width=True)
+    else:
+        st.info("Please select a valid date range.")
+
 
 def report_download_page() -> None:
     """
@@ -257,6 +280,5 @@ if __name__ == "__main__":
         level=logging.INFO,
         handlers=[logging.StreamHandler()]
     )
-
     load_dotenv()
     run_dashboard()
