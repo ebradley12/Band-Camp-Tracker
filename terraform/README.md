@@ -4,7 +4,7 @@
 
 ## **Overview**
 
-This folder contains the Terraform scripts that define the serverless infrastructure for the Band Camp Tracker project. The scripts provision resources such as an AWS Lambda function to execute the ETL pipeline, an EventBridge rule to schedule pipeline runs, and an Amazon ECR repository to store the Docker image for the Lambda function. IAM roles and policies are configured to ensure secure and appropriate permissions for each resource. The infrastructure is designed to be efficient, scalable, and maintainable, leveraging serverless technologies to minimize operational overhead.
+This folder contains the Terraform scripts that define the complete infrastructure for the Band Camp Tracker project. The scripts provision essential resources such as AWS Lambda functions for executing the ETL pipeline and report generation, an EventBridge rule for scheduling pipeline runs, and an Amazon ECR repository to store the Lambda Docker images. Additionally, the infrastructure includes an RDS instance for database storage, an S3 bucket for storing reports, and security groups to control access to services. IAM roles and policies are configured to ensure secure and appropriate permissions for all resources. The infrastructure is designed to be efficient, scalable, and maintainable, utilizing serverless technologies and managed services to minimize operational overhead.
 
 ---
 
@@ -34,6 +34,12 @@ This folder contains the Terraform scripts that define the serverless infrastruc
     - Defines sensitive variables for database connection, including username, password, name, host, and port.
     - Specifies the S3 bucket name for report storage and SES email addresses for sending and receiving reports.
     - Ensures secure handling of sensitive data with defaults where applicable, like the database port.
+
+6. **`dashboard.tf`**
+    ...
+
+7. **`alerts.tf`**
+    ...
 
 ---
 
