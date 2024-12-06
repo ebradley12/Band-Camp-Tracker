@@ -2,7 +2,8 @@ requests
 beautifulsoup4
 pytest
 pylint
-streamlit
+pandas
 python-dotenv
 geonamescache
-psycopg2
+psycopg2-binary
+aiohttp

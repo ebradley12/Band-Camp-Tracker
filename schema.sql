@@ -17,7 +17,7 @@ CREATE TABLE country (
 
 CREATE TABLE artist (
     artist_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    artist_name VARCHAR NOT NULL,
+    artist_name VARCHAR NOT NULL
 );
 
 
@@ -54,7 +54,7 @@ CREATE TABLE release_genre (
 CREATE TABLE sale (
     sale_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sale_price FLOAT NOT NULL,
-    sale_date DATE NOT NULL,
+    sale_date TIMESTAMP NOT NULL,
     country_id INT,
     release_id INT,
     FOREIGN KEY (country_id) REFERENCES country(country_id),
@@ -65,7 +65,8 @@ CREATE TABLE sale (
 CREATE TABLE subscriber (
     subscriber_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     subscriber_email VARCHAR UNIQUE NOT NULL,
-    alerts BOOLEAN DEFAULT FALSE,
+    subscribe_alert BOOLEAN DEFAULT FALSE,
+    subscribe_report BOOLEAN DEFAULT FALSE,
     CHECK (subscriber_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
 
