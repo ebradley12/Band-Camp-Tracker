@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 def generate_bar_chart(data: list, title: str, xlabel: str, ylabel: str) -> io.BytesIO:
     """
-    Generate a bar chart.
+    Generate a horizontal bar chart visualization for the given data.
     """
     try:
         if not data:
