@@ -63,8 +63,8 @@ Notifications are triggered by AWS Lambda and sent via email to designated recip
     - `extract.py`: Data extraction script.
     - `transform.py`: Data transformation script.
     - `load_to_rds.py`: Data loading script.
-    - `main_pipeline.py`: Main script orchestrating the entire ETL pipeline.
-    - `test_pipeline.py`: Tests for extract, transform and load pipeline script.
+    - `etl.py`: Main script orchestrating the entire ETL pipeline.
+    - `test_etl.py`: Tests for extract, transform and load pipeline script.
     - `requirements.txt`: Python dependencies specific for the pipeline.
 
 - **Streamlit Dashboard**:
@@ -147,7 +147,7 @@ Notifications are triggered by AWS Lambda and sent via email to designated recip
 2. **Install Dependencies**:
   While each directory has its own `requirements.txt` file tailored to its specific functionality, there is also a **main `requirements.txt`** file in the project root.  
   This main file consolidates all dependencies required for the entire project, ensuring consistency across environments and simplifying setup for comprehensive workflows.
-  
+
     ```bash
     pip install -r requirements.txt
     ```
