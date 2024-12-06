@@ -1,11 +1,25 @@
 """Script for transforming data from the Bandcamp API"""
 import logging
 import re
+import asyncio
 from datetime import datetime
 import geonamescache
 import requests
 import pandas as pd
+import aiohttp
 from bs4 import BeautifulSoup
+from extract import main_extract
+
+
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            # Read response text
+            if response.headers.get('Content-Type') == 'application/json':
+                return await response.json()
+            else:
+                # Handle non-JSON response
+                return await response.text()
 
 
 def get_locations() -> list:
@@ -56,15 +70,28 @@ def convert_from_unix_to_datetime(unix: str) -> datetime:
         return "None"
 
 
-def convert_date_format(date_str: str) -> str:
+def convert_written_date_format(date_str: str) -> str:
     """
     Takes dates in the "DD B YYYY" format and
-    converts them to 'DD-MM-YYYY'.
+    converts them to 'YYYY-MM-DD'.
     Returns a "None" string if an error occurs.
     """
     try:
         date = datetime.strptime(date_str, "%d %B %Y")
-        return date.strftime("%d-%m-%Y")
+        return date.strftime("%Y-%m-%d")
+    except ValueError as e:
+        logging.error("Invalid date format: %s", e)
+        return "None"
+
+
+def convert_date_format(date_str: str) -> str:
+    """
+    Converts dates in the 'DD-MM-YYYY' format to 'YYYY-MM-DD'.
+    Returns "None" as a string if an error occurs.
+    """
+    try:
+        date = datetime.strptime(date_str, "%d-%m-%Y")
+        return date.strftime("%Y-%m-%d")
     except ValueError as e:
         logging.error("Invalid date format: %s", e)
         return "None"
@@ -120,7 +147,9 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
         if not items["album_title"]:
             items["album_title"] = "None"
 
-        sale_date = convert_from_unix_to_datetime(items["utc_date"])
+        # sale_date = convert_from_unix_to_datetime(items["utc_date"])
+        # formatted_sale_date = convert_date_format(sale_date)
+        formatted_sale_date = datetime.now()
 
         event_information = {"release_type": items["item_type"],
                              "release_name": items["item_description"],
@@ -130,7 +159,7 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
                              "amount_paid_usd": items["amount_paid_usd"],
                              "genres": genres,
                              "release_date": release_date,
-                             "sale_date": sale_date
+                             "sale_date": formatted_sale_date
                              }
 
         sales_info.append(event_information)
@@ -146,11 +175,11 @@ def get_genres_from_url(artist_url: str, locations: list) -> list[str]:
     """
     try:
         full_url = convert_to_full_url(artist_url)
-        response = requests.get(full_url, timeout=1000)
+        response = asyncio.run(fetch_data(full_url))
 
-        if response.status_code == 200:
+        if response:
             logging.info("Getting genre tags for %s", full_url)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response, 'html.parser')
             tags = soup.find_all('a', class_='tag')
 
             if tags:
@@ -162,8 +191,8 @@ def get_genres_from_url(artist_url: str, locations: list) -> list[str]:
             logging.info("No genres listed for %s", full_url)
             return []
 
-        logging.warning("Failed to connect to %s, Status Code: %s",
-                        full_url, response.status_code)
+        logging.warning("GENRES: Failed to connect to %s, Status Code: %s, Message: %s",
+                        full_url, response.status_code, response.text)
         return []
 
     except requests.exceptions.RequestException as e:
@@ -182,11 +211,11 @@ def get_release_date_from_url(artist_url: str) -> str:
     """
     try:
         full_url = convert_to_full_url(artist_url)
-        response = requests.get(full_url, timeout=1000)
+        response = asyncio.run(fetch_data(full_url))
 
-        if response.status_code == 200:
+        if response:
             logging.info("Getting release date for %s", full_url)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response, 'html.parser')
             meta_tag = soup.find('meta', attrs={'name': 'description'})
 
             if meta_tag:
@@ -196,12 +225,12 @@ def get_release_date_from_url(artist_url: str) -> str:
                     match = re.search(date_pattern, description_content)
                     if match:
                         release_date = match.group(1)
-                        return convert_date_format(release_date)
+                        return convert_written_date_format(release_date)
 
             logging.info("No valid release date found for %s", full_url)
 
         else:
-            logging.warning("Failed to connect to %s, Status Code: %s",
+            logging.warning("RELEASE DATE: Failed to connect to %s, Status Code: %s",
                             full_url, response.status_code)
 
     except requests.exceptions.RequestException as e:
@@ -236,14 +265,14 @@ def extend_sales_from_df(sales_df: pd.DataFrame) -> None:
 def replace_blank_album_titles(sales_df: pd.DataFrame) -> None:
     """
     Replaces "None" entries in the "album_title" column
-    with the name provided in "item_description"
+    with the name provided in "release_name"
     if the item is an album.
     """
 
-    sales_df.loc[(sales_df["item_type"] == "a") &
+    sales_df.loc[(sales_df["release_type"] == "a") &
                  (sales_df["album_title"].isna() |
                  (sales_df["album_title"] == "None")),
-                 "album_title"] = sales_df["item_description"]
+                 "album_title"] = sales_df["release_name"]
 
 
 def fill_out_album_and_track(sales_df: pd.DataFrame) -> None:
@@ -252,8 +281,8 @@ def fill_out_album_and_track(sales_df: pd.DataFrame) -> None:
     with the full "Album" or "Track" in the dataframe.
     Does nothing if a "item_type" column doesn't exist.
     """
-    if "item_type" in sales_df.columns:
-        sales_df["item_type"] = sales_df["item_type"].map(
+    if "release_type" in sales_df.columns:
+        sales_df["release_type"] = sales_df["release_type"].map(
             {"a": "album", "t": "track"})
 
 
@@ -274,6 +303,9 @@ def clean_sales_dataframe(sales_df: pd.DataFrame) -> pd.DataFrame:
     extend_sales_from_df(sales_df)
     replace_blank_album_titles(sales_df)
     fill_out_album_and_track(sales_df)
+
+    sales_df = sales_df[sales_df['release_date'] != "None"]
+    sales_df = sales_df[sales_df['sale_date'] != "None"]
 
     return sales_df
 

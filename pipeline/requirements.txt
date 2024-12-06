@@ -2,5 +2,8 @@ requests
 beautifulsoup4
 pytest
 pylint
-streamlit
-dotenv
+pandas
+python-dotenv
+geonamescache
+psycopg2-binary
+aiohttp
