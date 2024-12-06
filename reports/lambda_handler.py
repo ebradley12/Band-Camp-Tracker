@@ -1,15 +1,15 @@
 """
 This script is designed to be the entry point for an AWS Lambda function.
-The primary purpose of the Lambda function is to generate a daily sales PDF report for the previous day,
+The purpose of the Lambda function is to generate a daily sales PDF report for the previous day,
 upload it to an Amazon S3 bucket, and send the report to subscribers via email using AWS SES.
 """
+from os import environ
+import logging
 import boto3
 from botocore.exceptions import ClientError
 from report_generator import generate_daily_report
 from emailer import send_email_with_attachment
-from queries import query_sales_data, get_report_subscriber_emails
-import logging
-from os import environ
+from queries import get_db_connection, get_report_subscriber_emails
 
 
 def lambda_handler(event: dict, context=None) -> dict:
@@ -27,7 +27,7 @@ def lambda_handler(event: dict, context=None) -> dict:
         s3_object = f"reports/{pdf_file.split('/')[-1]}"
         upload_to_s3(pdf_file, s3_bucket, s3_object)
 
-        with query_sales_data.get_db_connection() as conn:
+        with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 recipients = get_report_subscriber_emails(cursor)
 
@@ -47,11 +47,8 @@ def lambda_handler(event: dict, context=None) -> dict:
             "body": "Report generated and emailed successfully."
         }
     except ValueError as ve:
-        logging.error(f"Validation error: {ve}")
-        return {"statusCode": 400, "body": f"Validation Error: {ve}"}
-    except Exception as e:
-        logging.error(f"Error during Lambda execution: {e}")
-        return {"statusCode": 500, "body": "Internal Server Error"}
+        logging.error("Validation error: %s", ve)
+        return {"statusCode": 400, "body": "Validation Error: %s" % ve}
 
 
 def upload_to_s3(file_name: str, bucket_name: str, object_name: str) -> None:
@@ -61,7 +58,8 @@ def upload_to_s3(file_name: str, bucket_name: str, object_name: str) -> None:
     try:
         s3 = boto3.client('s3')
         s3.upload_file(file_name, bucket_name, object_name)
-        logging.info(f"Uploaded {file_name} to {bucket_name}/{object_name}")
+        logging.info("Uploaded %s to %s/%s", file_name,
+                     bucket_name, object_name)
     except ClientError as e:
         logging.error("Failed to upload file to S3: %s", e)
         raise

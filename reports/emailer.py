@@ -1,11 +1,15 @@
-"""This script extracts subscriber emails from the database and sends the PDF Report via email with AWS SES."""
-import boto3
+"""
+This script extracts subscriber emails from the
+database and sends the PDF Report via email with AWS SES.
+"""
 import base64
 import logging
 from datetime import datetime, timedelta
+from os import environ
+import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-from os import environ
+
 from queries import get_subscriber_emails, get_db_connection
 
 load_dotenv()
@@ -21,7 +25,8 @@ def config_log() -> None:
     )
 
 
-def send_email_with_attachment(pdf_file: str, recipient_emails: list, subject: str, body_text: str) -> None:
+def send_email_with_attachment(pdf_file: str, recipient_emails: list,
+                               subject: str, body_text: str) -> None:
     """
     Send an email with a PDF attachment to multiple recipients using AWS SES.
     """
@@ -54,42 +59,40 @@ def send_email_with_attachment(pdf_file: str, recipient_emails: list, subject: s
                     f"--NextPart--"
                 }
             )
-            logging.info(f"""Email sent successfully to {
-                         recipient_email}: {response}""")
+            logging.info("Email sent successfully to %s: %s",
+                         recipient_email, response)
     except ClientError as e:
-        logging.error(f"Failed to send email: {e}")
+        logging.error("Failed to send email: %s", e)
         raise
     except Exception as e:
-        logging.error(f"Error sending emails: {e}")
+        logging.error("Error sending emails: %s", e)
         raise
 
 
 if __name__ == "__main__":
-    try:
-        config_log()
 
-        yesterday = datetime.now() - timedelta(days=1)
-        formatted_date = yesterday.strftime("%Y-%m-%d")
+    config_log()
 
-        pdf_file = f"/tmp/daily_sales_report_{formatted_date}.pdf"
+    yesterday = datetime.now() - timedelta(days=1)
+    formatted_date = yesterday.strftime("%Y-%m-%d")
 
-        logging.info("Establishing database connection.")
-        with get_db_connection() as conn:
-            with conn.cursor() as cursor:
-                logging.info("Retrieving subscriber emails for PDF reports.")
-                recipient_emails = get_subscriber_emails(
-                    cursor)
+    report_file = f"/tmp/daily_sales_report_{formatted_date}.pdf"
 
-        if recipient_emails:
-            send_email_with_attachment(
-                pdf_file=pdf_file,
-                recipient_emails=recipient_emails,
-                subject="Daily Sales Report",
-                body_text=f"Please find attached the daily sales report for {
-                    formatted_date}."
-            )
-            logging.info("All emails sent successfully.")
-        else:
-            logging.info("No subscribers opted in for the PDF report.")
-    except Exception as e:
-        logging.error(f"Failed to send emails: {e}")
+    logging.info("Establishing database connection.")
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            logging.info("Retrieving subscriber emails for PDF reports.")
+            subscriber_emails = get_subscriber_emails(
+                cursor)
+
+    if subscriber_emails:
+        send_email_with_attachment(
+            pdf_file=report_file,
+            recipient_emails=subscriber_emails,
+            subject="Daily Sales Report",
+            body_text=f"Please find attached the daily sales report for {
+                formatted_date}."
+        )
+        logging.info("All emails sent successfully.")
+    else:
+        logging.info("No subscribers opted in for the PDF report.")

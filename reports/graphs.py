@@ -2,9 +2,10 @@
 This script provides functions for generating visualisations as part of the PDF Report.
 
 """
-import matplotlib.pyplot as plt
+
 import io
 import logging
+import matplotlib.pyplot as plt
 
 
 def generate_bar_chart(data: list, title: str, xlabel: str, ylabel: str) -> io.BytesIO:
