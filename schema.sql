@@ -17,7 +17,7 @@ CREATE TABLE country (
 
 CREATE TABLE artist (
     artist_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    artist_name VARCHAR NOT NULL,
+    artist_name VARCHAR NOT NULL
 );
 
 
@@ -54,7 +54,7 @@ CREATE TABLE release_genre (
 CREATE TABLE sale (
     sale_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sale_price FLOAT NOT NULL,
-    sale_date DATE NOT NULL,
+    sale_date TIMESTAMP NOT NULL,
     country_id INT,
     release_id INT,
     FOREIGN KEY (country_id) REFERENCES country(country_id),
