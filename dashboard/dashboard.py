@@ -9,6 +9,7 @@ import streamlit as st
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
+from top_genre_sales import *
 
 
 def get_connection() -> psycopg2.connect:
@@ -17,7 +18,7 @@ def get_connection() -> psycopg2.connect:
         return psycopg2.connect(
             dbname=environ.get("DB_NAME"),
             host=environ.get("DB_HOST"),
-            user=environ.get("DB_USERNAME"),
+            user=environ.get("DB_USER"),
             password=environ.get("DB_PASSWORD"),
             port=environ.get("DB_PORT")
         )
@@ -154,6 +155,13 @@ def trends_page() -> None:
     """Creates trends page on dashboard."""
     st.title("Trends Page")
     st.write("Explore trends on this page.")
+    target_date = st.date_input(
+        "Select a date:", value=datetime.today()).strftime('%Y-%m-%d')
+    connect = get_connection()
+
+    sales_data = plot_sales_per_hour(connect, target_date)
+
+    st.altair_chart(sales_data, use_container_width=True)
 
 
 def report_download_page() -> None:
@@ -256,6 +264,5 @@ if __name__ == "__main__":
         level=logging.INFO,
         handlers=[logging.StreamHandler()]
     )
-
     load_dotenv()
     run_dashboard()
