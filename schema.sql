@@ -65,7 +65,8 @@ CREATE TABLE sale (
 CREATE TABLE subscriber (
     subscriber_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     subscriber_email VARCHAR UNIQUE NOT NULL,
-    alerts BOOLEAN DEFAULT FALSE,
+    subscribe_alert BOOLEAN DEFAULT FALSE,
+    subscribe_report BOOLEAN DEFAULT FALSE,
     CHECK (subscriber_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
 
