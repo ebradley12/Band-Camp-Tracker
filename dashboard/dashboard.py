@@ -17,7 +17,7 @@ def get_connection() -> psycopg2.connect:
         return psycopg2.connect(
             dbname=environ.get("DB_NAME"),
             host=environ.get("DB_HOST"),
-            user=environ.get("DB_USERNAME"),
+            user=environ.get("DB_USER"),
             password=environ.get("DB_PASSWORD"),
             port=environ.get("DB_PORT")
         )
@@ -178,14 +178,15 @@ def subscribe_page() -> None:
     email = st.text_input("Enter your email address:")
 
     # Checkbox for user alerts
-    subscribe_alerts = st.checkbox("Subscribe to alerts")
+    subscribe_alerts = st.checkbox("Subscribe to general alerts")
 
     genres_dict = get_genres_from_db()
     genre_names = list(genres_dict.keys())
 
+    subscribe_alerts = st.checkbox("Subscribe to specific genre alerts")
     # Multi-select for genres
     selected_genres = st.multiselect(
-        "Select genres you want to receive updates about:",
+        "Select genres you want to receive alerts about:",
         genre_names
     )
 

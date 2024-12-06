@@ -6,7 +6,7 @@ from transform import main_transform
 from load import main_load
 
 
-def main_etl():
+def lambda_handler(event, context):
     """The main pipeline script that fully extract, transforms and loads the bandcamp data."""
     config_log()
     logging.info("\n --- Running The Pipeline --- \n")
@@ -23,4 +23,4 @@ def main_etl():
 
 
 if __name__ == "__main__":
-    main_etl()
+    lambda_handler(None, None)

@@ -1,12 +1,25 @@
 """Script for transforming data from the Bandcamp API"""
 import logging
 import re
+import asyncio
 from datetime import datetime
 import geonamescache
 import requests
 import pandas as pd
+import aiohttp
 from bs4 import BeautifulSoup
 from extract import main_extract
+
+
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            # Read response text
+            if response.headers.get('Content-Type') == 'application/json':
+                return await response.json()
+            else:
+                # Handle non-JSON response
+                return await response.text()
 
 
 def get_locations() -> list:
@@ -134,8 +147,9 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
         if not items["album_title"]:
             items["album_title"] = "None"
 
-        sale_date = convert_from_unix_to_datetime(items["utc_date"])
-        formatted_sale_date = convert_date_format(sale_date)
+        # sale_date = convert_from_unix_to_datetime(items["utc_date"])
+        # formatted_sale_date = convert_date_format(sale_date)
+        formatted_sale_date = datetime.now()
 
         event_information = {"release_type": items["item_type"],
                              "release_name": items["item_description"],
@@ -161,11 +175,11 @@ def get_genres_from_url(artist_url: str, locations: list) -> list[str]:
     """
     try:
         full_url = convert_to_full_url(artist_url)
-        response = requests.get(full_url, timeout=1000)
+        response = asyncio.run(fetch_data(full_url))
 
-        if response.status_code == 200:
+        if response:
             logging.info("Getting genre tags for %s", full_url)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response, 'html.parser')
             tags = soup.find_all('a', class_='tag')
 
             if tags:
@@ -177,8 +191,8 @@ def get_genres_from_url(artist_url: str, locations: list) -> list[str]:
             logging.info("No genres listed for %s", full_url)
             return []
 
-        logging.warning("Failed to connect to %s, Status Code: %s",
-                        full_url, response.status_code)
+        logging.warning("GENRES: Failed to connect to %s, Status Code: %s, Message: %s",
+                        full_url, response.status_code, response.text)
         return []
 
     except requests.exceptions.RequestException as e:
@@ -197,11 +211,11 @@ def get_release_date_from_url(artist_url: str) -> str:
     """
     try:
         full_url = convert_to_full_url(artist_url)
-        response = requests.get(full_url, timeout=1000)
+        response = asyncio.run(fetch_data(full_url))
 
-        if response.status_code == 200:
+        if response:
             logging.info("Getting release date for %s", full_url)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response, 'html.parser')
             meta_tag = soup.find('meta', attrs={'name': 'description'})
 
             if meta_tag:
@@ -216,7 +230,7 @@ def get_release_date_from_url(artist_url: str) -> str:
             logging.info("No valid release date found for %s", full_url)
 
         else:
-            logging.warning("Failed to connect to %s, Status Code: %s",
+            logging.warning("RELEASE DATE: Failed to connect to %s, Status Code: %s",
                             full_url, response.status_code)
 
     except requests.exceptions.RequestException as e:
