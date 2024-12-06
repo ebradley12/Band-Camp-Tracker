@@ -7,8 +7,9 @@ This script tests the entire ETL process:
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 import requests
+import os
 import pandas as pd
 import numpy as np
 from extract import get_sales_information
@@ -28,6 +29,8 @@ from load import (
     insert_country,
     insert_artist,
     insert_genres,
+    get_id_from_table,
+    main_load,
 )
 
 class TestExtract:
@@ -280,3 +283,92 @@ class TestLoad:
         mock_cursor.fetchone.side_effect = [None, (1,)]
         genre_id = insert_genres("NewGenre", mock_cursor)
         assert genre_id == 1
+    
+    def test_load_get_id_from_table_found(self, mock_cursor):
+        """Test retrieving an existing ID from the table."""
+        mock_cursor.fetchone.return_value = (123,)
+        result = get_id_from_table("TestValue", "test_table", mock_cursor)
+        assert result == 123
+        mock_cursor.execute.assert_called_once_with(
+            "SELECT test_table_id FROM test_table WHERE test_table_name = %s;", 
+            ("TestValue",)
+        )
+
+    def test_load_get_id_from_table_not_found(self, mock_cursor):
+        """Test handling of a value not found in the table."""
+        mock_cursor.fetchone.return_value = None
+        result = get_id_from_table("NonExistentValue", "test_table", mock_cursor)
+        assert result is None
+        mock_cursor.execute.assert_called_once_with(
+            "SELECT test_table_id FROM test_table WHERE test_table_name = %s;", 
+            ("NonExistentValue",)
+        )
+
+
+    @patch.dict("os.environ", {
+        "DB_HOST": "localhost",
+        "DB_PORT": "5432",
+        "DB_USER": "test_user",
+        "DB_PASSWORD": "test_password",
+        "DB_NAME": "test_db",
+    })
+    @patch("load.insert_country")
+    @patch("load.insert_artist")
+    @patch("load.insert_release")
+    @patch("load.insert_genres")
+    @patch("load.insert_release_genres")
+    @patch("load.insert_sale_data")
+    @patch("load.get_cursor")
+    @patch("load.get_connection")
+    def test_load_main_success(
+        self,
+        mock_get_connection,
+        mock_get_cursor,
+        mock_insert_sale_data,
+        mock_insert_release_genres,
+        mock_insert_genres,
+        mock_insert_release,
+        mock_insert_artist,
+        mock_insert_country,
+    ):
+        """Test successful execution of the main load function."""
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_get_connection.return_value = mock_connection
+        mock_get_cursor.return_value = mock_cursor
+        sales_df = pd.DataFrame({
+            "country": ["USA", "Canada"],
+            "artist_name": ["Artist1", "Artist2"],
+            "release_name": ["Album1", "Album2"],
+            "release_date": ["2023-01-01", "2023-02-01"],
+            "release_type": ["Album", "Single"],
+            "genres": [["Rock", "Pop"], ["Jazz"]],
+            "amount_paid_usd": [9.99, 14.99],
+            "sale_date": ["2023-03-01", "2023-03-02"],
+        })
+        main_load(sales_df)
+
+        mock_insert_country.assert_has_calls([
+            call("USA", mock_cursor),
+            call("Canada", mock_cursor),
+        ])
+        mock_insert_artist.assert_has_calls([
+            call("Artist1", mock_cursor),
+            call("Artist2", mock_cursor),
+        ])
+
+    @patch("load.get_connection")
+    @patch.dict(os.environ, {
+        "DB_HOST": "localhost",
+        "DB_PORT": "5432",
+        "DB_USER": "test_user",
+        "DB_PASSWORD": "password",
+        "DB_NAME": "test_db"
+    })
+    def test_load_main_failure(self, mock_get_connection):
+        """Test the behavior of main_load when the connection fails."""
+        mock_get_connection.return_value = None
+        sales_df = pd.DataFrame({"column1": [1, 2, 3], "column2": ["A", "B", "C"]})
+        with patch("logging.error") as mock_log_error:
+            main_load(sales_df)
+        mock_log_error.assert_called_with("Database connection failed. Exiting.")
