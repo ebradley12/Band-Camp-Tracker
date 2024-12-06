@@ -3,5 +3,3 @@ psycopg2
 fpdf
 python-dotenv
 matplotlib
-tempfile
-base64

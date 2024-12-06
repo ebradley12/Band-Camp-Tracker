@@ -65,9 +65,6 @@ def send_email_with_attachment(pdf_file: str, recipient_emails: list, subject: s
 
 
 if __name__ == "__main__":
-    """
-    Main script to send the daily PDF report to subscribers who opted in for reports.
-    """
     try:
         config_log()
 
