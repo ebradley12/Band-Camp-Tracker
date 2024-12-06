@@ -5,17 +5,57 @@ This folder contains the script and resources required to generate the daily sal
 ## Files in This Directory
 
 ### 1. `report_generation.py`
-- **Description**: The main script responsible for querying the database, generating visualizations, creating the PDF report, and sending the report via email.
-- **Key Features**:
-  - Queries sales data from the database (genres, artists, regions, transactions, and sales).
-  - Produces bar charts for visualizations.
-  - Compares current day's data with the previous day's metrics.
-  - Outputs a detailed PDF report.
-  - Sends the previous day's report via email at 09:00 AM.
+**Description**: Handles the generation of the PDF report.
 
-### 2. `requirements.txt`
-- **Description**: Contains the Python dependencies required specifically for the `report_generation.py` script.
-- **Note**: Use this file if you're installing dependencies only for the report generation functionality.
+**Key Features**:
+- Queries sales data from the database.
+- Generates visualizations (bar charts and line charts) using data from the `graphs.py` script.
+- Produces a detailed PDF report containing:
+  - Key metrics (sales, transactions, top genres, artists, and regions).
+  - Comparisons with the previous day's data.
+  - Visual representations of revenue and sales trends.
+
+### 2. `emailer.py`
+**Description**: Manages email functionality for sending the report to subscribers.
+
+**Key Features**:
+- Retrieves subscriber emails from the database based on preferences (e.g., opted-in for reports).
+- Sends the PDF report as an attachment using AWS SES.
+- Supports multiple recipients and error handling for email delivery issues.
+
+### 3. `queries.py`
+**Description**: Contains SQL query functions to retrieve data from the database.
+
+**Key Features**:
+- Queries key metrics, such as:
+  - Total sales and transactions.
+  - Top genres, artists, and regions.
+  - Sales trends over time.
+- Retrieves subscriber email data for the emailer script.
+
+### 4. `graphs.py`
+**Description**: Generates graphs and visualizations for the report.
+
+**Key Features**:
+- Creates bar charts for revenue by genre, artist, and region.
+- Produces a line chart for sales trends over time.
+- Supports error handling for cases with no data.
+
+
+### 5. `lambda_handler.py`
+**Description**: The entry point for AWS Lambda to automate the report generation process.
+
+**Key Features**:
+- Orchestrates the process of:
+  - Querying sales data.
+  - Generating the PDF report.
+  - Uploading the report to S3.
+  - Sending the report via email.
+- Configured for scheduled triggers (e.g., daily at 09:00 AM).
+
+### 6. `requirements.txt`
+**Description**: Contains the Python dependencies required specifically for the report generation functionality.
+**Note**: Use this file if you're installing dependencies only for the for the scripts in this folder.
 
 ---
 
@@ -44,10 +84,18 @@ pip install -r ../requirements.txt
 
 ## Running the Script
 
-### Execute the script to generate the PDF report and send it via email:
+### Generate the PDF Report:
 ```bash
-python3 report_generation.py
+python3 report_generator.py
 ```
+
+### Send the Report via Email:
+```bash
+python3 emailer.py
+```
+
+### Run via Lambda:
+The `lambda_handler.py` script can be deployed as an AWS Lambda function and triggered daily.
 
 ## Configurations
 
@@ -65,7 +113,6 @@ Ensure the following environment variables are set up:
 
 ### Email:
 - `SENDER_EMAIL`
-- `RECIPIENT_EMAIL` (for sending reports via SES)
 
 ---
 
@@ -74,20 +121,18 @@ Ensure the following environment variables are set up:
 ### Report Generation
 **What It Includes:**
 - Key metrics such as:
-  - Total sales
-  - Total transactions
-  - Top genres
-  - Top artists
-  - Top regions
-- Bar charts visualizing revenue by genre, artist, and region.
+  - Total sales and transactions
+  - Top genres, artists and countries 
+- Bar charts visualising revenue by genre, artist, and region.
+- A line chart for sales trends over time
 - Comparison with the previous day's data, including percentage changes.
 
 ### Automated Email
-**When It Runs:**
+**Attachment:**
 - The script sends the previous day's report via email at **09:00 AM**.
 
-**Recipient:**
-- Configured via the `RECIPIENT_EMAIL` environment variable.
+**Recipients:**
+- Subscribers opted in for reports (retrieved from the database).
 
 **Attachment:**
 - The PDF report for the previous day is attached to the email.
