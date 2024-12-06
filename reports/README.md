@@ -102,11 +102,11 @@ The `lambda_handler.py` script can be deployed as an AWS Lambda function and tri
 Ensure the following environment variables are set up:
 
 ### Database Credentials:
-- `DB_HOST`
-- `DB_PORT`
-- `DB_USER`
-- `DB_PASSWORD`
-- `DB_NAME`
+- `DB_HOST` - The host address of the database.
+- `DB_PORT` - The port used to access the database.
+- `DB_USER` - The user associated with the database.
+- `DB_PASSWORD` -  The password for accessing the database.
+- `DB_NAME` - The name of the database being accessed.
 
 ### AWS S3:
 - `S3_BUCKET` (for uploading reports)
