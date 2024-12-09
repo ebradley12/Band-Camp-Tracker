@@ -32,7 +32,7 @@ def send_email_with_attachment(pdf_file: str, recipient_emails: list,
     """
     try:
         ses_client = boto3.client(
-            'ses', region_name=environ.get('AWS_REGION', 'us-east-1'))
+            'ses', region_name=environ.get('AWS_REGION', 'eu-west-2'))
         sender_email = environ['SENDER_EMAIL']
 
         with open(pdf_file, "rb") as file:
