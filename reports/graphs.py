@@ -1,6 +1,5 @@
 """
 This script provides functions for generating visualisations as part of the PDF Report.
-
 """
 
 import io
