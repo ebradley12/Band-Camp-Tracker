@@ -160,6 +160,5 @@ if __name__ == "__main__":
         level=logging.INFO,
         handlers=[logging.StreamHandler()]
     )
-
     load_dotenv()
     run_dashboard()
