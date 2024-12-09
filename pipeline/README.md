@@ -25,11 +25,11 @@ This folder contains the scripts that implement the ETL (Extract, Transform, Loa
    - Loads the transformed data into the Amazon RDS database.
    - Handles database connections and inserts data into appropriate tables.
 
-4. **`main_pipeline.py`**  
+4. **`etl.py`**  
    - Orchestrates the entire ETL process by sequentially calling the `extract`, `transform`, and `load` scripts.
    - Provides a modular approach for running the full pipeline or individual components.
 
-5. **`test_pipeline.py`**  
+5. **`test_etl.py`**  
    - Contains unit tests to validate the functionality of each stage of the ETL pipeline.
    - Tests the following:
      - **Extraction**: Ensures API calls work and handle edge cases like missing or malformed data.
@@ -52,32 +52,16 @@ This folder contains the scripts that implement the ETL (Extract, Transform, Loa
   DB_HOST=<Your RDS Endpoint>
   DB_NAME=<Database Name>
 
-# **Steps**
-
-1. **Extract Step**:
+# **Run the Pipeline:**
     ```bash
-    python3 extract.py
+    python3 etl.py
     ```
 
-2. **Transform Step**:
-    ```bash
-    python3 transform.py
-    ```
-
-3. **Load Step**:
-   ```bash
-   python3 load_to_rds.py
-   ```
-
-4. **Full Pipeline**:
-    ```bash
-    python3 pipeline.py
-    ```
 ---
 
 ## **Testing**
 
 The test_pipeline.py script provides comprehensive tests for the ETL pipeline. To run the tests:
     ```bash
-    pytest test_pipeline.py
+    pytest test_etl.py
     ```
