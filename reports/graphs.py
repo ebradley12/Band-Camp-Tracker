@@ -27,9 +27,16 @@ def generate_bar_chart(data: list, title: str, xlabel: str, ylabel: str) -> io.B
         plt.close()
         img_buffer.seek(0)
         return img_buffer
-    except Exception as e:
-        logging.error(f"Error generating bar chart: {e}")
+    except ValueError as ve:
+        logging.error(f"ValueError: {ve}")
         raise
+    except TypeError as te:
+        logging.error(f"TypeError: {te}")
+        raise
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        raise RuntimeError(
+            "An unexpected error occurred while generating the chart.") from e
 
 
 def generate_sales_over_time_chart(data: list, title: str) -> io.BytesIO:

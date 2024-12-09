@@ -193,9 +193,13 @@ def format_pdf(current_data: dict, previous_data: dict, output_file: str, date: 
         pdf.output(output_file)
         logging.info(f"PDF report generated at {output_file}")
 
-    except Exception as e:
-        logging.error(f"Error generating PDF: {e}")
+    except ValueError as ve:
+        logging.error(f"Validation error: {ve}")
         raise
+    except Exception as e:
+        logging.error(f"Unexpected error generating PDF: {e}")
+        raise RuntimeError(
+            "An unexpected error occurred while generating the PDF.") from e
 
 
 def generate_daily_report():
@@ -219,10 +223,17 @@ def generate_daily_report():
 
         logging.info(f"PDF report generated: {pdf_file}")
         return pdf_file
-    except Exception as e:
-        logging.error(f"Failed to generate PDF report: {e}")
+    except ValueError as ve:
+        logging.error(f"Validation error: {ve}")
         raise
+    except IOError as io_error:
+        logging.error(f"File handling error: {io_error}")
+        raise
+    except Exception as e:
+        logging.error(f"Unexpected error generating daily report: {e}")
+        raise RuntimeError(
+            "An unexpected error occurred while generating the daily report.") from e
 
 
 if __name__ == "__main__":
-    pdf_file = generate_daily_report()
+    generate_daily_report()

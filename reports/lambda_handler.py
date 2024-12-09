@@ -12,14 +12,22 @@ from emailer import send_email_with_attachment
 from queries import get_db_connection, get_report_subscriber_emails
 
 
+def configure_logging():
+    """
+    Configure logging settings for the application.
+    """
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        level=logging.INFO,
+    )
+
+
 def lambda_handler(event: dict, context=None) -> dict:
     """
     AWS Lambda function to generate a PDF report, upload it to S3, and email it to subscribers.
     """
+    configure_logging()
     try:
-        logging.basicConfig(
-            format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
-        )
 
         pdf_file = generate_daily_report()
 
@@ -49,6 +57,12 @@ def lambda_handler(event: dict, context=None) -> dict:
     except ValueError as ve:
         logging.error("Validation error: %s", ve)
         return {"statusCode": 400, "body": "Validation Error: %s" % ve}
+    except ClientError as ce:
+        logging.error("AWS Client error: %s", ce)
+        return {"statusCode": 503, "body": "AWS Service Unavailable. Please try again later."}
+    except Exception as e:
+        logging.error("Unexpected error: %s", e)
+        return {"statusCode": 500, "body": "Internal Server Error. Please check the logs for more details."}
 
 
 def upload_to_s3(file_name: str, bucket_name: str, object_name: str) -> None:
