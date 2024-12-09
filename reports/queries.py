@@ -38,6 +38,9 @@ def get_db_connection() -> extensions.connection:
         logging.info("Connected successfully.")
         return connection
 
+    except ValueError as ve:
+        logging.error(f"Environment configuration error: {ve}")
+        raise
     except psycopg2.OperationalError:
         logging.warning("The database %s doesn't exist", environ["DB_NAME"])
         return None
