@@ -1,4 +1,4 @@
-"""The script fo extracting from the Bandcamp API"""
+"""The script for extracting from the Bandcamp API"""
 import logging
 import requests
 import aiohttp
