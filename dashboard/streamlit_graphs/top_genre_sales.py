@@ -1,21 +1,15 @@
-"""Script to make the bar chart of top sales by genre."""
+"""Script to make the bar chart of sales of the top 5 genres."""
 from os import environ
+import logging
 import streamlit as st
 import psycopg2
-from datetime import datetime
 from psycopg2 import extensions
 import pandas as pd
 import altair as alt
-
 from dotenv import load_dotenv
-import logging
 
-# Adjust Streamlit logger to suppress errors or specific logs
 logger = logging.getLogger('streamlit')
 logger.setLevel(logging.CRITICAL)
-
-# Your app code
-st.write("Errors from Streamlit won't appear here.")
 
 
 load_dotenv()
@@ -38,33 +32,7 @@ def get_connection() -> extensions.connection | None:
         return None
 
 
-def fetch_sales_within_date_range(connection, start_date, end_date) -> pd.DataFrame | None:
-    """
-    Fetches sales data aggregated by hour for a given date range.
-    """
-    query = """
-    SELECT
-        DATE_TRUNC('hour', sale_date) AS sale_hour,
-        COUNT(sale_id) AS total_sales
-    FROM sale
-    WHERE sale_date BETWEEN %s AND %s
-    GROUP BY sale_hour
-    ORDER BY sale_hour;
-    """
-    try:
-        sale_data = pd.read_sql(query, connection, params=[
-                                start_date, end_date])
-
-        if not sale_data.empty:
-            return sale_data
-        else:
-            return None
-    except Exception as e:
-        logging.error("Error fetching sales data: %s", e)
-        return None
-
-
-def get_sales_data(connection: extensions.connection) -> pd.DataFrame:
+def get_top_genre_sales(connection: extensions.connection) -> pd.DataFrame:
     """
     Returns the total sales of the top
     5 performing genres as a dataframe.
@@ -96,7 +64,7 @@ def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | N
     Generates a bar chart for genre sales data.
     """
 
-    sales_data = get_sales_data(connection)
+    sales_data = get_top_genre_sales(connection)
 
     if sales_data.empty:
         st.warning("No data available to display.")
@@ -121,7 +89,11 @@ def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | N
                 title="Ranking",
                 legend=None
             ),
-            tooltip=["genre_name", "total_sales", "rank"]
+            tooltip=[
+                alt.Tooltip("genre_name", title="Genre"),
+                alt.Tooltip("total_sales", title="Total Sales"),
+                alt.Tooltip("rank", title="Rank")
+            ]
         )
         .properties(
             title="Top 5 Genres by Total Sales",
@@ -136,40 +108,13 @@ def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | N
     return chart
 
 
-def plot_sales_per_hour(connection: extensions.connection, start_date: datetime, end_date: datetime) -> alt.Chart | None:
+def visualize_genre_sales(connection: extensions.connection) -> None:
     """
-    Plots a line graph of sales per hour for the current day.
+    Produces the visualization of the sales 
+    of the top 5 genres for the Streamlit Dashboard.
     """
-    try:
-        sales_data = fetch_sales_within_date_range(
-            connection, start_date, end_date)
-        if sales_data.empty:
-            st.error("No data available to display")
-            return None
-
-    except AttributeError as e:
-        st.error("No data available to display")
-
-    chart = (
-        alt.Chart(sales_data)
-        .mark_line(point=True)
-        .encode(
-            x=alt.X(
-                'sale_hour:T',
-                title='Hour of the Day',
-                axis=alt.Axis(format='%H:%M', titleFontSize=12)
-            ),
-            y=alt.Y(
-                'total_sales:Q',
-                title='Total Sales',
-                axis=alt.Axis(titleFontSize=12)
-            ),
-            tooltip=['sale_hour:T', 'total_sales:Q']
-        )
-        .properties(
-            title=f'Sales Per Hour for {str(start_date)}',
-            width=700,
-            height=400
-        )
-    )
-    return chart
+    genre_sales = create_genre_sales_chart(connection)
+    if not genre_sales:
+        st.warning("No data available to show.")
+    else:
+        st.altair_chart(genre_sales, use_container_width=True)
