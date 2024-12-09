@@ -86,8 +86,8 @@ def generate_comparison_section(pdf, current_data, previous_data, date):
 
     headers = ["Metric", f"{date}", "Previous Day", "Change (%)"]
     comparison_data = [
-        ["Total Sales", f"${total_sales:.2f}", f"${
-            previous_sales:.2f}", f"{sales_change:.1f}%"],
+        ["Total Sales", f"${total_sales:.2f}", f"""${
+            previous_sales:.2f}""", f"{sales_change:.1f}%"],
         ["Total Transactions", total_transactions,
             previous_transactions, f"{transactions_change:.1f}%"]
     ]
@@ -175,8 +175,8 @@ def format_pdf(current_data: dict, previous_data: dict, output_file: str, date: 
         pdf.add_page()
 
         pdf.set_font("Arial", 'B', 16)
-        pdf.cell(200, 10, txt=f"Daily Sales Report ({
-                 date})", ln=True, align='C')
+        pdf.cell(200, 10, txt=f"""Daily Sales Report ({
+                 date})""", ln=True, align='C')
         pdf.ln(10)
 
         generate_summary_section(pdf, current_data)

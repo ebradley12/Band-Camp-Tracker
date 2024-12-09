@@ -1,5 +1,5 @@
 boto3
-psycopg2
+psycopg2-binary
 fpdf
 python-dotenv
 matplotlib
