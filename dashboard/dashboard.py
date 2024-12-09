@@ -9,7 +9,6 @@ import streamlit as st
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
-from streamlit_graphs.top_artist_sales import visualize_sales_per_artist_over_time
 
 
 def get_connection() -> psycopg2.connect:
@@ -155,10 +154,6 @@ def trends_page() -> None:
     """Creates trends page on dashboard."""
     st.title("Trends Page")
     st.write("Explore trends on this page.")
-
-    connection = get_connection()
-
-    visualize_sales_per_artist_over_time(connection)
 
 
 def report_download_page() -> None:

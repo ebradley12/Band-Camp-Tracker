@@ -1,6 +1,6 @@
 """Script to show the line graph of total sales over time."""
 from os import environ
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import streamlit as st
 import psycopg2
@@ -106,8 +106,8 @@ def visualize_sales_per_hour(connection: extensions.connection) -> None:
     """
     Visualizes sales per hour within a date range for the Streamlit dashboard.
     """
-    default_start = datetime(2024, 12, 1)
-    default_end = datetime(2024, 12, 6)
+    default_end = datetime.now()
+    default_start = default_end - timedelta(days=7)
 
     date_range = st.date_input(
         "Select Date Range:",
