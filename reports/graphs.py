@@ -49,7 +49,10 @@ def generate_sales_over_time_chart(data: list, title: str) -> io.BytesIO:
         plt.plot(hours, sales, marker="o", linestyle="-",
                  color="#2596be", label="Sales")
         plt.xticks(range(0, 24))
-        plt.yticks(range(int(min(sales)) - 10, int(max(sales)) + 20, 10))
+        sales_min, sales_max = int(min(sales)), int(max(sales))
+        y_range = sales_max - sales_min
+        y_tick_step = max(10, y_range // 10)
+        plt.yticks(range(sales_min - 10, sales_max + y_tick_step, y_tick_step))
     else:
         plt.plot([], [], label="No Data", color="gray")
         plt.xticks(range(0, 24))

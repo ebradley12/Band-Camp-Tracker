@@ -33,19 +33,25 @@ resource "aws_iam_policy" "c14-bandcamp-reports-policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow"
+        Effect   = "Allow",
         Action   = [
           "s3:PutObject",
           "s3:GetObject",
-          "s3:ListBucket",
-          "ses:SendEmail",
-          "ses:SendRawEmail",
-          "rds-db:connect",
-          "logs:*"
-        ]
+          "s3:ListBucket"
+        ],
         Resource = [
           "arn:aws:s3:::${var.s3_bucket_name}",
           "arn:aws:s3:::${var.s3_bucket_name}/*"
+        ]
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "ses:SendEmail",
+          "ses:SendRawEmail"
+        ],
+        Resource = [
+          "arn:aws:ses:eu-west-2:129033205317:identity/bandcamp.notifier@gmail.com"
         ]
       },
       {
@@ -61,6 +67,7 @@ resource "aws_iam_policy" "c14-bandcamp-reports-policy" {
   })
 }
 
+
 # Attach Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "c14-bandcamp-reports-policy-attachment" {
   role       = aws_iam_role.c14-bandcamp-reports-lambda-role.name
@@ -72,7 +79,7 @@ resource "aws_lambda_function" "c14-bandcamp-reports-lambda-function" {
   function_name = "c14-bandcamp-reports-lambda"
   role          = aws_iam_role.c14-bandcamp-reports-lambda-role.arn
   package_type  = "Image"
-  image_uri     = "INSERT ECR IMAGE URI HERE"
+  image_uri     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c14-bandcamp-reports-ecr@sha256:764679d2fb62e228d4679e2aa95850515c678b8d7ef4cafb9a2579b7baa5cd6b"
   timeout       = 900
   memory_size   = 512
   environment {
@@ -84,7 +91,6 @@ resource "aws_lambda_function" "c14-bandcamp-reports-lambda-function" {
       DB_PORT         = var.db_port
       S3_BUCKET       = var.s3_bucket_name
       SENDER_EMAIL    = var.sender_email
-      RECIPIENT_EMAIL = var.recipient_email
     }
   }
 }

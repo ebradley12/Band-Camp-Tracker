@@ -1,4 +1,4 @@
-# ECR to store the pipeline docker image
+# ECR repository to store the pipeline docker image
 resource "aws_ecr_repository" "c14-bandcamp-pipeline-ecr" {
   name                 = "c14-bandcamp-pipeline-ecr"
   image_tag_mutability = "MUTABLE"
@@ -31,3 +31,5 @@ resource "aws_ecr_lifecycle_policy" "c14-bandcamp-pipeline-ecr-lifecycle-policy"
 }
 EOF
 }
+
+

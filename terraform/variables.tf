@@ -36,7 +36,12 @@ variable "sender_email" {
   type        = string
 }
 
-variable "recipient_email" {
-  description = "Email address to receive the daily reports"
+variable "aws_access_key_id" {
+  description = "Access Key ID"
+  type        = string
+}
+
+variable "aws_secret_access_key" {
+  description = "Secret Access Key ID"
   type        = string
 }

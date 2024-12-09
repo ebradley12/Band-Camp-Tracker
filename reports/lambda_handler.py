@@ -27,24 +27,36 @@ def lambda_handler(event: dict, context=None) -> dict:
     AWS Lambda function to generate a PDF report, upload it to S3, and email it to subscribers.
     """
     configure_logging()
+
+    sender_email = environ.get("SENDER_EMAIL")
+    if not sender_email:
+        logging.error("Environment variable SENDER_EMAIL is not set.")
+        return {"statusCode": 500, "body": "Internal Server Error: Missing SENDER_EMAIL configuration."}
+
     try:
 
         pdf_file = generate_daily_report()
+        logging.info("PDF report generated: %s", pdf_file)
 
         s3_bucket = environ.get("S3_BUCKET")
         s3_object = f"reports/{pdf_file.split('/')[-1]}"
         upload_to_s3(pdf_file, s3_bucket, s3_object)
+        logging.info("PDF report uploaded to S3: %s/%s", s3_bucket, s3_object)
 
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
+                logging.info(
+                    """Fetching report subscriber emails from the database.""")
                 recipients = get_report_subscriber_emails(cursor)
 
         if recipients:
+            logging.info("Sending emails to %d recipients.", len(recipients))
             send_email_with_attachment(
                 pdf_file=pdf_file,
                 recipient_emails=recipients,
                 subject="Daily Sales Report",
-                body_text="Please find attached the daily sales report."
+                body_text="Please find attached the daily sales report.",
+                sender_email=sender_email
             )
             logging.info("Emails sent successfully.")
         else:

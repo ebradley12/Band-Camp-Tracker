@@ -10,7 +10,7 @@ import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
-from queries import get_subscriber_emails, get_db_connection
+from queries import get_report_subscriber_emails, get_db_connection
 
 load_dotenv()
 
@@ -26,14 +26,13 @@ def config_log() -> None:
 
 
 def send_email_with_attachment(pdf_file: str, recipient_emails: list,
-                               subject: str, body_text: str) -> None:
+                               subject: str, body_text: str, sender_email: str) -> None:
     """
     Send an email with a PDF attachment to multiple recipients using AWS SES.
     """
     try:
         ses_client = boto3.client(
             'ses', region_name=environ.get('AWS_REGION', 'eu-west-2'))
-        sender_email = environ['SENDER_EMAIL']
 
         with open(pdf_file, "rb") as file:
             pdf_data = file.read()
@@ -79,7 +78,7 @@ if __name__ == "__main__":
     with get_db_connection() as conn:
         with conn.cursor() as cursor:
             logging.info("Retrieving subscriber emails for PDF reports.")
-            subscriber_emails = get_subscriber_emails(
+            subscriber_emails = get_report_subscriber_emails(
                 cursor)
 
     if subscriber_emails:
@@ -87,8 +86,8 @@ if __name__ == "__main__":
             pdf_file=report_file,
             recipient_emails=subscriber_emails,
             subject="Daily Sales Report",
-            body_text=f"Please find attached the daily sales report for {
-                formatted_date}."
+            body_text=f"""Please find attached the daily sales report for {
+                formatted_date}."""
         )
         logging.info("All emails sent successfully.")
     else:
