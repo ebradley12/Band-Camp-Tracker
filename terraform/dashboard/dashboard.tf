@@ -8,12 +8,6 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
-# Create an ECR repository
-resource "aws_ecr_repository" "c14_bandcamp_dashboard_repo" {
-  name = "c14-bandcamp-dashboard-repo"
-}
-
-
 # Security group for Application Load Balancer (ALB)
 resource "aws_security_group" "c14_bandcamp_alb_sg" {
   name_prefix = "c14-bandcamp-alb-sg-"
@@ -139,7 +133,7 @@ resource "aws_ecs_task_definition" "c14_bandcamp_dashboard_task" {
 
   container_definitions = jsonencode([{
     name      = "c14-bandcamp-dashboard-container"
-    image     = "${aws_ecr_repository.c14_bandcamp_dashboard_repo.repository_url}:latest"
+    image     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c14-bandcamp-dashboard-ecr:latest"
     cpu       = 256
     memory    = 512
     essential = true
