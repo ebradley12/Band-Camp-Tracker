@@ -61,11 +61,8 @@ def send_email_with_attachment(pdf_file: str, recipient_emails: list,
             )
             logging.info("Email sent successfully to %s: %s",
                          recipient_email, response)
-    except ClientError as e:
+    except (ClientError, Exception) as e:
         logging.error("Failed to send email: %s", e)
-        raise
-    except Exception as e:
-        logging.error("Error sending emails: %s", e)
         raise
 
 
