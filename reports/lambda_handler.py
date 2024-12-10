@@ -12,7 +12,7 @@ from emailer import send_email_with_attachment
 from queries import get_db_connection, get_report_subscriber_emails
 
 
-def configure_logging():
+def configure_logging() -> None:
     """
     Terminal logs configuration.
     """
