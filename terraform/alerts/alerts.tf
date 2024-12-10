@@ -20,7 +20,7 @@ resource "aws_lambda_function" "c14-bandcamp-alerts-lambda-function" {
   function_name = "c14-band-camp-alerts-lambda"
   role          = aws_iam_role.c14-bandcamp-alerts-lambda-role.arn
   package_type  = "Image"
-  image_uri     = "INSERT IMAGE URI HERE"
+  image_uri     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c14-bandcamp-alerts-ecr@sha256:ef461388386ec62852c2630784c27af589c559a32429aa131a7417dabcfb8c22"
   timeout       = 900 
   memory_size   = 512
   environment {
@@ -42,13 +42,13 @@ resource "aws_cloudwatch_event_rule" "c14-bandcamp-alerts-rule" {
 }
 
 # Eventbridge target for lambda
-resource "aws_cloudwatch_event_target" "c14-bandcamp-events-target" {
-  rule      = aws_cloudwatch_event_rule.c14-bandcamp-events-rule.name
-  arn       = aws_lambda_function.c14-bandcamp-events-lambda-function.arn
+resource "aws_cloudwatch_event_target" "c14-bandcamp-alerts-target" {
+  rule      = aws_cloudwatch_event_rule.c14-bandcamp-alerts-rule.name
+  arn       = aws_lambda_function.c14-bandcamp-alerts-lambda-function.arn
 }
 
 # Lambda permission - allows eventbridge to trigger lambda
-resource "aws_lambda_permission" "c14-bandcamp-events-lambda-permission" {
+resource "aws_lambda_permission" "c14-bandcamp-alerts-lambda-permission" {
   statement_id  = "AllowEventBridgeInvokeAlerts"
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
