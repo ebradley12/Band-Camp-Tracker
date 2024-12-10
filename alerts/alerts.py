@@ -8,7 +8,7 @@ from os import environ
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from utilities import config_log, validate_env_vars, ALERT_INTERVAL, COMPARISON_PERIOD, GENRE_NOTIFICATION_THRESHOLD
-from queries import get_connection, get_cursor, get_general_subscriber_emails, get_genre_subscriber_emails, get_subscribed_genres, get_top_artist, get_historic_top_artist, get_top_genre, get_historic_top_genre, get_genre_sales, get_historic_genre_sales
+from queries import get_connection, get_cursor, get_general_subscriber_emails, get_genre_subscriber_emails, get_subscribed_genres, get_top_artist, get_historic_top_artist, get_top_genre, get_historic_top_genre, get_genre_top_artists, get_genre_sales, get_historic_genre_sales
 
 
 def send_email(recipient: str, subject: str, body: str) -> None:
@@ -59,13 +59,16 @@ def send_top_genre_alert(email: str, genre: str) -> None:
     send_email(email, email_subject, email_body)
 
 
-def send_chosen_genre_alert(email: str, genre: str, sales_delta: float) -> None:
+def send_chosen_genre_alert(email: str, genre: str, sales_delta: float, top_artists: dict) -> None:
     """
     Sends an alert about the subscribed genre changing to the given email.
     """
     email_subject = f"{genre.title()} Growth Alert"
 
-    email_body = f"Your subscribed genre '{genre}' has seen a {sales_delta:.1f}% increase in sales in the last {ALERT_INTERVAL} minutes!"
+    top_artists_formatted = ""
+    for artist in top_artists:
+        top_artists_formatted += f"  - {artist['artist_name']}: ${artist['total_sales']:.2f}\n"
+    email_body = f"Your subscribed genre '{genre}' has seen a {sales_delta:.1f}% increase in sales in the last {ALERT_INTERVAL} minutes!\n\nThe current top selling artists in {genre} are:\n{top_artists_formatted}"
     send_email(email, email_subject, email_body)
 
 
@@ -128,7 +131,8 @@ def alert_subscribed_genres(cursor: RealDictCursor) -> None:
     """
     Checks each subscribed genre for if it has grown in popularity
     past the notification threshold recently, and sends alerts
-    for each one that has to those who are subscribed.
+    for each one that has to those who are subscribed, along with
+    the current top artists for that genre.
     """
     logging.info(
         "Checking for increases in subscribed genre sales above the alert threshold")
@@ -139,9 +143,10 @@ def alert_subscribed_genres(cursor: RealDictCursor) -> None:
         if sales_delta > GENRE_NOTIFICATION_THRESHOLD:
             logging.info(
                 "Alert threshold surpassed for '%s': Alerting subscribers", genre)
+            top_artists = get_genre_top_artists(cursor, genre)
             emails = get_genre_subscriber_emails(cursor, genre)
             for email in emails:
-                send_chosen_genre_alert(email, genre, sales_delta)
+                send_chosen_genre_alert(email, genre, sales_delta, top_artists)
             logging.info("All '%s' alerts sent successfully", genre)
         else:
             logging.info(
