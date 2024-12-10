@@ -7,7 +7,7 @@ import logging
 from alerts import main
 
 
-def configure_logging():
+def configure_logging() -> None:
     """
     Terminal logs configuration.
     """
