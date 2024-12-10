@@ -56,3 +56,13 @@ variable "ecs_cluster_name" {
   type        = string
   default     = "c14-ecs-cluster"
 }
+
+variable "vpc_id" {
+  description = "The id of the vpc on aws"
+  type = string
+}
+
+variable "subnet_ids" {
+  description = "The ids of the subnets that match vpc id"
+  type = string
+}

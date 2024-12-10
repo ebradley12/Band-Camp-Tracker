@@ -1,13 +1,3 @@
-# Variables for VPC and Subnets
-variable "vpc_id" {
-  description = "The ID of the existing VPC"
-}
-
-variable "subnet_ids" {
-  description = "The IDs of the existing subnets"
-  type        = list(string)
-}
-
 # Security group for Application Load Balancer (ALB)
 resource "aws_security_group" "c14_bandcamp_alb_sg" {
   name_prefix = "c14-bandcamp-alb-sg-"
@@ -119,7 +109,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
   role       = aws_iam_role.ecs_task_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
-   
 
 # Create the ECS task definition
 resource "aws_ecs_task_definition" "c14_bandcamp_dashboard_task" {
@@ -166,3 +155,4 @@ resource "aws_ecs_service" "c14_bandcamp_dashboard_service" {
 
   depends_on = [aws_lb_listener.c14_bandcamp_http_listener]
 }
+
