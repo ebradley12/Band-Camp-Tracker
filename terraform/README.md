@@ -70,7 +70,9 @@ terraform/
     - Security groups and IAM roles specific to the dashboard.
 
 7. **`alerts.tf`**
-    ...
+    - Sets up an AWS Lambda function to process alerts and notify subscribers based on their preferences (e.g., specific genres).
+    - Configures Amazon EventBridge rules to trigger the Lambda function for sending alerts at predefined intervals or upon specific events.
+    - Uses Amazon SNS (Simple Notification Service) to handle subscriber notifications via email, SMS, or push notifications.
 
 ---
 
