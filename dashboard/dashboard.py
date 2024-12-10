@@ -5,7 +5,10 @@
 import re
 import logging
 import time
+from os import environ
+from datetime import datetime, date
 import streamlit as st
+import boto3
 from dotenv import load_dotenv
 from subscribe_page_commands import (
     get_genres_from_db,
@@ -37,6 +40,23 @@ def trends_page() -> None:
     st.write("Explore trends on this page.")
 
 
+def download_reports_from_s3(s3: boto3.client, bucket_name: str) -> list[str]:
+    """
+    Downloads PDF reports from S3 bucket 
+    onto local directory 'daily_reports',
+    returning a list of filenames downloaded.
+    """
+    downloaded_reports = []
+    for object_name in s3.list_objects(Bucket=bucket_name, Prefix='reports')['Contents']:
+        object_key = object_name['Key']
+        report_filename = object_key.split("/")[1]
+        s3.download_file(bucket_name, object_key,
+                         f"daily_reports/{report_filename}")
+        downloaded_reports.append(report_filename)
+
+    return downloaded_reports
+
+
 def report_download_page() -> None:
     """
     Creates reports page where user can
@@ -45,23 +65,55 @@ def report_download_page() -> None:
     st.title("Report Download Page")
     st.write("Download reports from this page.")
 
-    s3 = boto3.client('s3', aws_access_key_id=environ.get(
-        "aws_access_key_id"), aws_secret_access_key=environ.get("aws_secret_access_key"))
-    downloaded_reports = download_reports_from_s3(s3, 'c14-bandcamp-reports')
+    default_start_date = date(2024, 12, 5)
+    default_end_date = date.today()
 
-    if downloaded_reports:
-        for report_filename in downloaded_reports:
-            with open(f'./daily_reports/{report_filename}', 'rb') as report:
-                report_bytes = report.read()
+    date_range = st.date_input(
+        "Select a date range:",
+        value=(default_start_date, default_end_date),  # Default range
+        min_value=date(2024, 12, 5),  # Earliest selectable date
+        max_value=date.today()       # Latest selectable date
+    )
 
-            st.download_button(
-                label=report_filename,
-                data=report_bytes,
-                file_name=report_filename,
-                mime="application/octet-stream"
-            )
+    if isinstance(date_range, tuple):
+        if len(date_range) == 2:
+            start_date, end_date = date_range
+            st.write(f"Start Date: {start_date}")
+            st.write(f"End Date: {end_date}")
+        else:
+            # allow user to select just one date
+            start_date = date_range[0]
+            end_date = date_range[0]
+            st.write(f"Selected Date: {start_date}")
+
+        s3 = boto3.client('s3', aws_access_key_id=environ.get(
+            "aws_access_key_id"), aws_secret_access_key=environ.get("aws_secret_access_key"))
+        downloaded_reports = download_reports_from_s3(
+            s3, 'c14-bandcamp-reports')
+
+        if downloaded_reports:
+            reports_in_range = False
+            for report_filename in downloaded_reports:
+                # get date of report from filename string
+                report_date = report_filename.split("_")[3].split(".")[0]
+                report_format_date = datetime.strptime(
+                    report_date, "%Y-%m-%d").date()
+
+                if (start_date <= report_format_date <= end_date):
+                    reports_in_range = True
+                    with open(f"daily_reports/{report_filename}", 'rb') as report:
+                        report_bytes = report.read()
+
+                    st.download_button(
+                        label=report_filename,
+                        data=report_bytes,
+                        file_name=report_filename,
+                        mime="application/octet-stream"
+                    )
+        if not reports_in_range:
+            st.info("No reports available in the selected date range.")
     else:
-        st.info("No reports currently available for download.")
+        st.error("Please select a valid date range.")
 
 
 def subscribe_page() -> None:
@@ -161,6 +213,7 @@ def subscribe_page() -> None:
 
 def run_dashboard() -> None:
     """Sets up pages and runs the dashboard."""
+    load_dotenv()
     page_names_to_funcs = {
         "Main Overview": main_overview,
         "Trends": trends_page,
