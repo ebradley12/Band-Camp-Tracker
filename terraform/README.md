@@ -25,6 +25,8 @@ terraform/
     ├── pipeline/
     ├── rds/
     ├── reports/
+    ├── provider.tf
+    ├── variables.tf
 ```
 
 ### **Scripts**
