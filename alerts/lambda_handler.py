@@ -17,7 +17,7 @@ def configure_logging() -> None:
     )
 
 
-def lambda_handler(event: dict, context=None):
+def lambda_handler(event: dict, context=None) -> dict:
     """
     AWS Lambda handler for sending artist and genre-based alerts.
     """
