@@ -10,6 +10,9 @@ This folder contains the Terraform scripts that define the complete infrastructu
 
 ## **Contents**
 
+### **File Structure**
+The terraform files are organised based on their function. The full file structure can be seen below.
+
 ### **Scripts**
 1. **`pipeline.tf`**
     - Configure IAM roles and policies to grant permissions for Lambda and other AWS services.
@@ -36,7 +39,9 @@ This folder contains the Terraform scripts that define the complete infrastructu
     - Ensures secure handling of sensitive data with defaults where applicable, like the database port.
 
 6. **`dashboard.tf`**
-    ...
+    - Application Load Balancer (ALB) for routing traffic.
+    - ECS service for running the dashboard application.
+    - Security groups and IAM roles specific to the dashboard.
 
 7. **`alerts.tf`**
     ...
@@ -48,7 +53,7 @@ This folder contains the Terraform scripts that define the complete infrastructu
 ### **Prerequisites**
 - Terraform 1.5 or later installed.
 - AWS CLI installed and configured with appropriate credentials.
-- `.tfvars` file in the root directory containing the necessary variable values:
+- The `.tfvars` file in the root directory containing the necessary variable values:
     ```
     db_user = "<Your RDS Username>"
     db_password = "<Your RDS Password>"
@@ -62,6 +67,7 @@ This folder contains the Terraform scripts that define the complete infrastructu
 # **Steps**
 
 1. **Initialise Terraform**
+Navigate to the desired folder within the terraform folder.
 Prepare the working directory and download provider plugins:
 ```
 terraform init
@@ -76,17 +82,17 @@ terraform validate
 3. **Plan the Deployment:**
 Generate an execution plan to preview the infrastructure changes:
 ```
-terraform plan -var-file="your-vars-file.tfvars"
+terraform plan
 ```
 
 4. **Apply the Configuration:**
 Deploy the infrastructure to your AWS account:
 ```
-terraform apply -var-file="your-vars-file.tfvars"
+terraform apply
 ```
 
 5. **Destroy the Infrastructure (if needed):**
 Tear down the deployed resources:
 ```
-terraform destroy -var-file="your-vars-file.tfvars"
+terraform destroy
 ```
