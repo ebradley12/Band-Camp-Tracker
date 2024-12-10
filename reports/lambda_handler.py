@@ -14,7 +14,7 @@ from queries import get_db_connection, get_report_subscriber_emails
 
 def configure_logging():
     """
-    Configure logging settings for the application.
+    Terminal logs configuration.
     """
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(message)s",
