@@ -45,6 +45,24 @@ def report_download_page() -> None:
     st.title("Report Download Page")
     st.write("Download reports from this page.")
 
+    s3 = boto3.client('s3', aws_access_key_id=environ.get(
+        "aws_access_key_id"), aws_secret_access_key=environ.get("aws_secret_access_key"))
+    downloaded_reports = download_reports_from_s3(s3, 'c14-bandcamp-reports')
+
+    if downloaded_reports:
+        for report_filename in downloaded_reports:
+            with open(f'./daily_reports/{report_filename}', 'rb') as report:
+                report_bytes = report.read()
+
+            st.download_button(
+                label=report_filename,
+                data=report_bytes,
+                file_name=report_filename,
+                mime="application/octet-stream"
+            )
+    else:
+        st.info("No reports currently available for download.")
+
 
 def subscribe_page() -> None:
     """
