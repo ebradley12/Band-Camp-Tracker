@@ -4,7 +4,12 @@
 
 ## **Overview**
 
-This folder contains the Terraform scripts that define the complete infrastructure for the Band Camp Tracker project. The scripts provision essential resources such as AWS Lambda functions for executing the ETL pipeline and report generation, an EventBridge rule for scheduling pipeline runs, and an Amazon ECR repository to store the Lambda Docker images. Additionally, the infrastructure includes an RDS instance for database storage, an S3 bucket for storing reports, and security groups to control access to services. IAM roles and policies are configured to ensure secure and appropriate permissions for all resources. The infrastructure is designed to be efficient, scalable, and maintainable, utilizing serverless technologies and managed services to minimize operational overhead.
+This folder contains the Terraform scripts that define the complete infrastructure for the Band Camp Tracker project. The infrastructure is designed to collect data from the BandCamp website and API, process it through an ETL pipeline, store it in a database, generate PDF reports, and provide a dashboard for users to interact with and visualize the data.
+The key components defined in the Terraform folder are AWS lambda functions for the  ETL pipeline, report generation which uses EventBridge and SES to send daily reports, the dashboard which is hosted on AWS Fargate and utilises a Load Balancer for scalability, Amazon RDS, Amazon S3, Amazon ECR and AWS security features.
+### Design Philosophy:
+- **Efficiency**: Serverless technologies like Lambda and managed services like RDS reduce operational overhead.
+- **Scalability**: Resources such as Fargate, S3, and ALB are highly scalable to handle varying workloads.
+- **Maintainability**: Modular Terraform scripts allow independent management of different components, enabling easier updates and deployment.
 
 ---
 
