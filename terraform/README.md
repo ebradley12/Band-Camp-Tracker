@@ -12,7 +12,7 @@ This folder contains the Terraform scripts that define the complete infrastructu
 
 ### **File Structure**
 The terraform files are organised based on their function. The overall file structure can be seen below.
-'''
+```
 terraform/ 
     ├── dashboard/ 
     ├── ecr/  
@@ -20,7 +20,7 @@ terraform/
     ├── pipeline/
     ├── rds/
     ├── reports/
-'''
+```
 
 ### **Scripts**
 1. **`pipeline.tf`**
