@@ -64,5 +64,5 @@ variable "vpc_id" {
 
 variable "subnet_ids" {
   description = "The ids of the subnets that match vpc id"
-  type = string
+  type = list
 }
