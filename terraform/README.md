@@ -5,7 +5,17 @@
 ## **Overview**
 
 This folder contains the Terraform scripts that define the complete infrastructure for the Band Camp Tracker project. The infrastructure is designed to collect data from the BandCamp website and API, process it through an ETL pipeline, store it in a database, generate PDF reports, send alerts based on trending and popular music genres and provide a dashboard for users to interact with and visualize the data.
-The key components defined in the Terraform folder are AWS lambda functions for the  ETL pipeline, report generation which uses EventBridge and SES to send daily reports, the dashboard which is hosted on AWS Fargate and utilises a Load Balancer for scalability, alerts which utilise AWS lambda which triggers via EventBridge once per hour, Amazon RDS, Amazon S3, Amazon ECR and AWS security features.
+### Key Components
+The key components defined in the Terraform folder are:
+- AWS Lambda functions for the  ETL pipeline 
+- Report generation which uses EventBridge and SES to send daily reports 
+- The dashboard which is hosted on AWS Fargate and utilises a Load Balancer for scalability 
+- Alerts which utilise AWS Lambda which triggers via EventBridge once per hour
+- Amazon RDS
+- Amazon S3 
+- Amazon ECR
+- AWS security features
+
 ### Design Philosophy:
 - **Efficiency**: Serverless technologies like Lambda and managed services like RDS reduce operational overhead.
 - **Scalability**: Resources such as Fargate, S3, and ALB are highly scalable to handle varying workloads.
@@ -77,11 +87,11 @@ terraform/
     db_host = "<Your RDS Endpoint>"
     s3_bucket_name = "<Your S3 Bucket Name>"
     sender_email = "<Your SES Sender Email>"
-    recipient_email = "<Your SES Recipient Email>"
     ```
 
 ### **Provisioning ECRs and Configuring Components**
-Before proceeding with the deployment, ensure that Elastic Container Registries (ECRs) are provisioned, using the steps below. This step is necessary as each component’s deployment depends on pre-provisioned ECRs. Once the ECRs are ready, navigate to the respective subfolder within the Terraform directory and use the same process to configure and apply the deployment for each component individually.
+1. Before proceeding with the deployment, ensure that Elastic Container Registries (ECRs) are provisioned, using the steps below. This step is necessary as each component’s deployment depends on pre-provisioned ECRs. Once the ECRs are ready, navigate to the respective subfolder within the Terraform directory and use the same process to configure and apply the deployment for each component individually.
+2. Before deploying `reports.tf` or `alerts.tf`, the respective Docker images must be created, pushed to the ECR and the corresponding URLs added to the Terraform configuration before executing the below steps.
 
 # **Steps**
 
