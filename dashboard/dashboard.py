@@ -40,14 +40,14 @@ def trends_page() -> None:
     st.write("Explore trends on this page.")
 
 
-def download_reports_from_s3(s3: boto3.client, bucket_name: str) -> list[str]:
+def download_reports_from_s3(s3: boto3.client, bucket_name: str, subfolder: str) -> list[str]:
     """
     Downloads PDF reports from S3 bucket 
     onto local directory 'daily_reports',
     returning a list of filenames downloaded.
     """
     downloaded_reports = []
-    for object_name in s3.list_objects(Bucket=bucket_name, Prefix='reports')['Contents']:
+    for object_name in s3.list_objects(Bucket=bucket_name, Prefix=subfolder)['Contents']:
         object_key = object_name['Key']
         report_filename = object_key.split("/")[1]
         s3.download_file(bucket_name, object_key,
@@ -89,7 +89,7 @@ def report_download_page() -> None:
         s3 = boto3.client('s3', aws_access_key_id=environ.get(
             "aws_access_key_id"), aws_secret_access_key=environ.get("aws_secret_access_key"))
         downloaded_reports = download_reports_from_s3(
-            s3, 'c14-bandcamp-reports')
+            s3, environ.get("S3_bucket"), environ.get("S3_folder"))
 
         if downloaded_reports:
             reports_in_range = False
