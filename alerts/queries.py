@@ -122,6 +122,7 @@ def get_top_artist(cursor: RealDictCursor) -> str:
             JOIN release AS r ON s.release_id = r.release_id
             JOIN artist AS a ON r.artist_id = a.artist_id
             WHERE s.sale_date >= {comp_period}
+            AND a.artist_name != 'Various Artists'
             GROUP BY a.artist_name
             ORDER BY COUNT(s.sale_id) DESC
             LIMIT 1;
@@ -156,6 +157,7 @@ def get_historic_top_artist(cursor: RealDictCursor) -> str:
             JOIN release AS r ON s.release_id = r.release_id
             JOIN artist AS a ON r.artist_id = a.artist_id
             WHERE s.sale_date BETWEEN {comp_period} AND {alert_interval}
+            AND a.artist_name != 'Various Artists'
             GROUP BY a.artist_name
             ORDER BY COUNT(s.sale_id) DESC
             LIMIT 1;
@@ -191,6 +193,7 @@ def get_genre_top_artists(cursor: RealDictCursor, genre: str) -> list[str]:
             JOIN release_genre AS rg ON r.release_id = rg.release_id
             JOIN genre AS g ON rg.genre_id = g.genre_id
             WHERE s.sale_date >= {comp_period}
+            AND a.artist_name != 'Various Artists'
             AND g.genre_name = '{genre}'
             GROUP BY a.artist_name
             ORDER BY SUM(s.sale_price) DESC
