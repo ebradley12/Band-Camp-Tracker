@@ -51,7 +51,7 @@ def get_release_type_count(connection: extensions.connection) -> pd.DataFrame:
     return pd.read_sql_query(query, connection)
 
 
-def create_release_type_pie_chart(connection):
+def create_release_type_pie_chart(connection: psycopg2.connect) -> alt.Chart:
     """
     Creates and returns a pie chart showing the count of 
     each release type (Albums and Tracks).

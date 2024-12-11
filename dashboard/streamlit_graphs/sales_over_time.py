@@ -33,7 +33,7 @@ def get_connection() -> extensions.connection | None:
         return None
 
 
-def fetch_sales_within_date_range(connection, start_date, end_date) -> pd.DataFrame | None:
+def fetch_sales_within_date_range(connection: psycopg2.connect, start_date: date, end_date: date) -> pd.DataFrame | None:
     """
     Fetches sales data aggregated by hour for a given date range.
     """
@@ -72,8 +72,8 @@ def fetch_sales_within_date_range(connection, start_date, end_date) -> pd.DataFr
         return None
 
 
-def plot_sales_per_hour(connection: extensions.connection,
-                        start_date: datetime, end_date=None) -> alt.Chart | None:
+def plot_sales_per_hour(connection: psycopg2.connect,
+                        start_date: date, end_date=None) -> alt.Chart | None:
     """
     Plots a line graph of sales per hour for the current day.
     """
@@ -120,7 +120,7 @@ def plot_sales_per_hour(connection: extensions.connection,
     return chart
 
 
-def visualize_sales_per_hour(connection: extensions.connection) -> None:
+def visualize_sales_per_hour(connection: psycopg2.connect) -> None:
     """
     Visualizes sales per hour within a date range for the Streamlit dashboard.
     """
