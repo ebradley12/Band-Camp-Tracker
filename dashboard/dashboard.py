@@ -11,6 +11,7 @@ import streamlit as st
 import boto3
 from dotenv import load_dotenv
 from subscribe_page_commands import (
+    get_connection,
     get_genres_from_db,
     check_if_email_exists,
     add_subscriber_info_to_db,
@@ -19,6 +20,11 @@ from subscribe_page_commands import (
     get_existing_subscriber_preferences,
     update_existing_subscriber_info
 )
+from streamlit_graphs.release_type_chart import visualize_release_types
+from streamlit_graphs.sales_by_country import visualize_country_sales
+from streamlit_graphs.sales_over_time import visualize_sales_per_hour
+from streamlit_graphs.top_artist_sales import visualize_sales_per_artist_over_time
+from streamlit_graphs.top_genre_sales import visualize_genre_sales
 
 
 def is_valid_email(email: str) -> bool:
@@ -33,11 +39,20 @@ def main_overview() -> None:
     st.write("https://bandcamp.com/")
     st.write("Welcome to the Main Overview Page.")
 
+    conn = get_connection()
+    visualize_release_types(conn)
+    visualize_sales_per_hour(conn)
+
 
 def trends_page() -> None:
     """Creates trends page on dashboard."""
     st.title("Trends Page")
     st.write("Explore trends on this page.")
+
+    conn = get_connection()
+    visualize_sales_per_artist_over_time(conn)
+    visualize_genre_sales(conn)
+    visualize_country_sales(conn)
 
 
 def download_reports_from_s3(s3: boto3.client, bucket_name: str, subfolder: str) -> list[str]:
