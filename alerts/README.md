@@ -60,7 +60,7 @@ alerts/
     - Sending alert emails via AWS SES.
 
 ### **Installing Dependencies**
-#### **For Alerts Folder Only**
+#### **For the Alerts Folder Only**
 To install dependencies specific to the alerts functionality:
 ```
 pip install -r requirements.txt
