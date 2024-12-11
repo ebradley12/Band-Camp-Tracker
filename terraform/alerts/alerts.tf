@@ -20,7 +20,7 @@ resource "aws_lambda_function" "c14-bandcamp-alerts-lambda-function" {
   function_name = "c14-band-camp-alerts-lambda"
   role          = aws_iam_role.c14-bandcamp-alerts-lambda-role.arn
   package_type  = "Image"
-  image_uri     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c14-bandcamp-alerts-ecr@sha256:ef461388386ec62852c2630784c27af589c559a32429aa131a7417dabcfb8c22"
+  image_uri     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c14-bandcamp-alerts-ecr@sha256:ad2e2286069f7c15fe4b18b5637de80cb1da2cec3835ffd62a5b920937ac85fa"
   timeout       = 900 
   memory_size   = 512
   environment {
