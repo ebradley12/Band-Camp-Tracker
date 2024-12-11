@@ -87,6 +87,7 @@ def query_top_artists(cursor, date: str) -> list:
         JOIN artist AS a ON r.artist_id = a.artist_id
         WHERE DATE(s.sale_date) = %s
         AND a.artist_name != 'Various Artists'
+        AND a.artist_name != 'Various'
         GROUP BY a.artist_name
         ORDER BY SUM(s.sale_price) DESC
         LIMIT 5;
