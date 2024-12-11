@@ -30,8 +30,8 @@ alerts/
 ### **Scripts**
 1. **`alerts.py`**
    - The script monitors changes in top artists, genres, and specific subscribed genres on Bandcamp, generating alerts for significant shifts, such as changes in top rankings or spikes in sales, and sends notifications to subscribers via email.
-   - It sends personalized email alerts for various scenarios, including a change in the top artist or genre, and sales growth in user-subscribed genres, using SMTP for reliable email delivery.
-   - By utilizing SQL queries through a database connection, the script fetches real-time and historical data to calculate metrics like sales deltas and identify changes, ensuring alerts are based on accurate and up-to-date information.
+   - It sends personalised email alerts for various scenarios, including a change in the top artist or genre, and sales growth in user-subscribed genres, using SMTP for reliable email delivery.
+   - By utilising SQL queries through a database connection, the script fetches real-time and historical data to calculate metrics like sales deltas and identify changes, ensuring alerts are based on accurate and up-to-date information.
 2. **`lambda_handler.py`**
    - This script serves as the entry point for an AWS Lambda function, enabling serverless execution for monitoring sales data and sending email alerts about top artists and genres.
    - It configures logging for detailed runtime insights and includes exception handling to ensure smooth execution and proper reporting of any errors.
