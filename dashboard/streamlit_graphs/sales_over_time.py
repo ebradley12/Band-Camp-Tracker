@@ -73,7 +73,7 @@ def fetch_sales_within_date_range(connection: psycopg2.connect, start_date: date
 
 
 def plot_sales_per_hour(connection: psycopg2.connect,
-                        start_date: date, end_date=None) -> alt.Chart | None:
+                        start_date: date, end_date: date = None) -> alt.Chart | None:
     """
     Plots a line graph of sales per hour for the current day.
     """
@@ -81,11 +81,11 @@ def plot_sales_per_hour(connection: psycopg2.connect,
         sales_data = fetch_sales_within_date_range(
             connection, start_date, end_date)
         if sales_data.empty:
-            st.error("EMPTY - No data available to display")
+            st.error("No data available to display")
             return None
 
     except AttributeError as e:
-        st.error("AE - No data available to display")
+        st.error("No data available to display")
 
     if not end_date:
         chart_title = f"Sales on {str(start_date)}"
@@ -125,12 +125,12 @@ def visualize_sales_per_hour(connection: psycopg2.connect) -> None:
     Visualizes sales per hour within a date range for the Streamlit dashboard.
     """
     default_end = datetime.now()
-    default_start = date(2024, 12, 5)
+    default_start = date(2024, 12, 5)  # the first day of data collection
 
     date_range = st.date_input(
         "Select a date range:",
         value=(default_start, default_end),  # Default range
-        min_value=date(2024, 12, 5),  # Earliest selectable date
+        min_value=default_start,  # Earliest selectable date
         max_value=date.today()       # Latest selectable date
     )
 
