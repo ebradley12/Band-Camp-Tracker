@@ -7,6 +7,7 @@ import logging
 import time
 import streamlit as st
 from dotenv import load_dotenv
+from embeddings import show_embeds
 from subscribe_page_commands import (
     get_genres_from_db,
     check_if_email_exists,
@@ -35,6 +36,7 @@ def trends_page() -> None:
     """Creates trends page on dashboard."""
     st.title("Trends Page")
     st.write("Explore trends on this page.")
+    show_embeds()
 
 
 def report_download_page() -> None:
