@@ -44,9 +44,8 @@ def create_release_type_pie_chart(connection: psycopg2.connect) -> alt.Chart:
             height=400
         )
         .configure_title(
-            fontSize=20,
+            fontSize=24,
             anchor="start",
-            font="Arial"
         )
     )
 

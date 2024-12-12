@@ -39,14 +39,13 @@ def plot_top_artists_by_units(sales_data: pd.DataFrame, start_date: date, end_da
             ]
         )
         .properties(
-            title="Top 5 Artists by Total Sales.",
+            title="Top 5 Artists by Total Sales",
             width=600,
             height=400
         )
         .configure_title(
-            fontSize=20,
-            anchor="start",
-            font="Arial"
+            fontSize=24,
+            anchor="start"
         )
     )
     return chart

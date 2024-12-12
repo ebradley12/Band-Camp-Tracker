@@ -29,48 +29,47 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             str(end_date - timedelta(days=1))} inclusive'
 
     chart = (
-        alt.Chart(sales_data)
-        .mark_line(color="#8c52ff")
-        .encode(
-            x=alt.X(
-                'sale_hour:T',
-                title='Hour of the Day',
-                axis=alt.Axis(format='%H:%M', titleFontSize=12)
+        alt.layer(
+            alt.Chart(sales_data)
+            .mark_line(color="#8c52ff")
+            .encode(
+                x=alt.X(
+                    'sale_hour:T',
+                    title='Hour of the Day',
+                    axis=alt.Axis(format='%H:%M', titleFontSize=12)
+                ),
+                y=alt.Y(
+                    'total_sales:Q',
+                    title='Total Sales',
+                    axis=alt.Axis(titleFontSize=12)
+                ),
+                tooltip=[
+                    alt.Tooltip('sale_hour:T', title="Date of Sale"),
+                    alt.Tooltip('total_sales:Q', title="Total Sales")
+                ]
             ),
-            y=alt.Y(
-                'total_sales:Q',
-                title='Total Sales',
-                axis=alt.Axis(titleFontSize=12)
-            ),
-            tooltip=[
-                alt.Tooltip('sale_hour:T', title="Date of Sale"),
-                alt.Tooltip('total_sales:Q', title="Total Sales")
-            ]
+            alt.Chart(sales_data)
+            .mark_point(color='#4682B4')
+            .encode(
+                x=alt.X('sale_hour:T', title='Hour of the Day'),
+                y=alt.Y('total_sales:Q', title='Total Sales'),
+            )
         )
         .properties(
             title="Total Sales per Hour",
-            width=700,
+            width=600,
             height=400
-        ) + alt.Chart(sales_data)
-        .mark_point(color='#4682B4')
-        .encode(
-            x=alt.X(
-                'sale_hour:T',
-                title='Hour of the Day',
-                axis=alt.Axis(format='%H:%M', titleFontSize=12)
-            ),
-            y=alt.Y(
-                'total_sales:Q',
-                title='Total Sales',
-                axis=alt.Axis(titleFontSize=12)
-            ))
+        )
+        .configure_title(
+            fontSize=24,
+            anchor="start",
+        )
+        .configure_axis(
+            titleFontSize=14,
+            labelFontSize=12
+        )
     )
 
-    chart.configure_title(
-        fontSize=20,
-        anchor="start",
-        font="Arial"
-    )
     return chart
 
 

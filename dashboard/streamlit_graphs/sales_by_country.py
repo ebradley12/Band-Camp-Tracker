@@ -9,7 +9,7 @@ from streamlit_graphs.queries import get_top_country_sales
 
 def create_country_sales_chart(connection: extensions.connection, start_date: date, end_date: date) -> alt.Chart | None:
     """
-    Generates a bar chart for genre sales data with a transparent background.
+    Generates a bar chart for country sales data with a transparent background.
     """
     adjusted_end_date = end_date + timedelta(days=1)
 
@@ -29,8 +29,15 @@ def create_country_sales_chart(connection: extensions.connection, start_date: da
         alt.Chart(sales_data)
         .mark_bar()
         .encode(
-            x=alt.X("country_name:O", title="Country",
-                    axis=alt.Axis(labelAngle=0)),
+            x=alt.X(
+                "country_name:O",
+                title="Country",
+                sort=alt.EncodingSortField(
+                    field="total_sales",
+                    order="descending"
+                ),
+                axis=alt.Axis(labelAngle=0)
+            ),
             y=alt.Y("total_sales:Q", title="Total Sales (USD)"),
             color=alt.Color(
                 "rank:O",
@@ -45,7 +52,7 @@ def create_country_sales_chart(connection: extensions.connection, start_date: da
             ]
         )
         .properties(
-            title="Top 5 Countries by Total Sales.",
+            title="Top 5 Countries by Total Sales",
             width=600,
             height=400
         )

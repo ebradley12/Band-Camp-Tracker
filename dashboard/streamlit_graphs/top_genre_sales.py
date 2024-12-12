@@ -30,8 +30,15 @@ def create_genre_sales_chart(connection: extensions.connection, start_date: date
         alt.Chart(sales_data)
         .mark_bar()
         .encode(
-            x=alt.X("genre_name:O", title="Genre",
-                    axis=alt.Axis(labelAngle=0)),
+            x=alt.X(
+                "genre_name:O",
+                title="Genre",
+                axis=alt.Axis(labelAngle=0),
+                sort=alt.EncodingSortField(
+                    field="total_sales",  # Sort by the 'total_sales' field
+                    order="descending"   # Descending order
+                )
+            ),
             y=alt.Y("total_sales:Q", title="Total Sales (USD)"),
             color=alt.Color(
                 "rank:O",
@@ -51,11 +58,11 @@ def create_genre_sales_chart(connection: extensions.connection, start_date: date
             height=400
         )
         .configure_title(
-            fontSize=20,
-            anchor="start",
-            font="Arial"
+            fontSize=24,
+            anchor="start"
         )
     )
+
     return chart
 
 

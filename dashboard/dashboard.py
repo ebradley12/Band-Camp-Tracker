@@ -37,6 +37,9 @@ from streamlit_graphs.top_genre_sales import visualise_genre_sales
 
 from dashboard_formatting import glamourize_dashboard
 from embeddings import show_embeds
+import os
+
+image_path = os.path.abspath("BandScout_logo.png")
 
 
 def is_valid_email(email: str) -> bool:
@@ -49,11 +52,10 @@ def main_overview() -> None:
     """Creates main overview page on dashboard."""
     connection = get_connection()
     st.title("BandCamp Tracker")
-    st.markdown("[Visit BandCamp](https://bandcamp.com/)")
 
-    st.header("🌟 Overview of Top Metrics Today")
+    st.header("Top Metrics Today")
 
-    col1, col2 = st.columns([0.5, 0.5])
+    col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
     with col1:
         total_sales = get_total_sales(connection)
         st.markdown(
@@ -68,35 +70,7 @@ def main_overview() -> None:
             st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_genre['genre_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
-    st.divider()
-
-    col3, col4 = st.columns([0.5, 0.5])
     with col3:
-        top_artist = get_top_artist(connection)
-        if not top_artist.empty:
-            st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎤 Top Artist</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_artist['artist_name'].iloc[0]}</p>""",
-                        unsafe_allow_html=True)
-    with col4:
-        top_track = get_top_track(connection)
-        if not top_track.empty:
-            st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎵 Top Track</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_track['release_name'].iloc[0]}</p>""",
-                        unsafe_allow_html=True)
-
-    st.divider()
-
-    col5, col6 = st.columns([0.5, 0.5])
-    with col5:
-        top_album = get_top_album(connection)
-        if not top_album.empty:
-            st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>💽 Top Album</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_album['album_name'].iloc[0]}</p>""",
-                        unsafe_allow_html=True)
-    with col6:
         top_country = get_top_country(connection)
         if not top_country.empty:
             st.markdown(
@@ -105,8 +79,34 @@ def main_overview() -> None:
                         unsafe_allow_html=True)
 
     st.divider()
+
+    col4, col5, col6 = st.columns([0.33, 0.33, 0.33])
+    with col4:
+        top_artist = get_top_artist(connection)
+        if not top_artist.empty:
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎤 Top Artist</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_artist['artist_name'].iloc[0]}</p>""",
+                        unsafe_allow_html=True)
+    with col5:
+        top_track = get_top_track(connection)
+        if not top_track.empty:
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎵 Top Track</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_track['release_name'].iloc[0]}</p>""",
+                        unsafe_allow_html=True)
+
+    with col6:
+        top_album = get_top_album(connection)
+        if not top_album.empty:
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>💽 Top Album</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_album['album_name'].iloc[0]}</p>""",
+                        unsafe_allow_html=True)
+
+    st.divider()
     with st.container():
-        st.subheader("🔥 Hottest Tracks")
+        st.subheader("Freshest Tracks")
         show_embeds()
 
     connection.close()
@@ -338,7 +338,7 @@ def run_dashboard() -> None:
 
     query_params = st.query_params
     default_page = query_params.get("page", "Main Overview")
-
+    st.sidebar.image("BandScout_logo.png", width=200)
     selected_page = st.sidebar.radio(
         "",
         list(page_names_to_funcs.keys()),
