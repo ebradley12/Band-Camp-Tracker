@@ -22,36 +22,54 @@ def plot_sales_per_hour(connection: psycopg2.connect,
     except AttributeError as e:
         st.error("No data available to display")
 
+    if not end_date:
+        chart_title = f"Sales on {str(start_date)}"
+    else:
+        chart_title = f'Sales between {str(start_date)} and {
+            str(end_date - timedelta(days=1))} inclusive'
+
     chart = (
-        alt.Chart(sales_data)
-        .mark_line(point=True)
-        .encode(
-            x=alt.X(
-                'sale_hour:T',
-                title='Hour of the Day',
-                axis=alt.Axis(format='%H:%M', titleFontSize=12)
+        alt.layer(
+            alt.Chart(sales_data)
+            .mark_line(color="#8c52ff")
+            .encode(
+                x=alt.X(
+                    'sale_hour:T',
+                    title='Hour of the Day',
+                    axis=alt.Axis(format='%H:%M', titleFontSize=12)
+                ),
+                y=alt.Y(
+                    'total_sales:Q',
+                    title='Total Sales',
+                    axis=alt.Axis(titleFontSize=12)
+                ),
+                tooltip=[
+                    alt.Tooltip('sale_hour:T', title="Date of Sale"),
+                    alt.Tooltip('total_sales:Q', title="Total Sales")
+                ]
             ),
-            y=alt.Y(
-                'total_sales:Q',
-                title='Total Sales',
-                axis=alt.Axis(titleFontSize=12)
-            ),
-            tooltip=[
-                alt.Tooltip('sale_hour:T', title="Date of Sale"),
-                alt.Tooltip('total_sales:Q', title="Total Sales")
-            ]
+            alt.Chart(sales_data)
+            .mark_point(color='#4682B4')
+            .encode(
+                x=alt.X('sale_hour:T', title='Hour of the Day'),
+                y=alt.Y('total_sales:Q', title='Total Sales'),
+            )
         )
         .properties(
             title="Total Sales per Hour",
-            width=700,
+            width=600,
             height=400
         )
         .configure_title(
-            fontSize=20,
+            fontSize=24,
             anchor="start",
-            font="Arial"
+        )
+        .configure_axis(
+            titleFontSize=14,
+            labelFontSize=12
         )
     )
+
     return chart
 
 

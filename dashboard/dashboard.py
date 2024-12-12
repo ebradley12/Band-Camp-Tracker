@@ -35,6 +35,12 @@ from streamlit_graphs.sales_over_time import visualise_sales_per_hour
 from streamlit_graphs.top_artist_sales import visualise_sales_per_artist_over_time
 from streamlit_graphs.top_genre_sales import visualise_genre_sales
 
+from dashboard_formatting import glamourize_dashboard
+from embeddings import show_embeds
+import os
+
+image_path = os.path.abspath("BandScout_logo.png")
+
 
 def is_valid_email(email: str) -> bool:
     """Validates inputted user email address."""
@@ -46,71 +52,62 @@ def main_overview() -> None:
     """Creates main overview page on dashboard."""
     connection = get_connection()
     st.title("BandCamp Tracker")
-    st.markdown("[Visit BandCamp](https://bandcamp.com/)")
 
-    st.header("🌟 Overview of Top Metrics Today")
+    st.header("Top Metrics Today")
 
-    total_sales = get_total_sales(connection)
-    st.markdown(
-        "<p style='font-size:20px; font-weight:bold;'>💵 Total Sales</p>", unsafe_allow_html=True)
-    st.markdown(f"""<p style='font-size:24px; font-weight:normal;'>${
-        total_sales:,.2f}</p>""", unsafe_allow_html=True)
-
-    st.divider()
-
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
     with col1:
+        total_sales = get_total_sales(connection)
+        st.markdown(
+            "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>💵 Total Sales</p>", unsafe_allow_html=True)
+        st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>${
+                    total_sales:,.2f}</p>""", unsafe_allow_html=True)
+    with col2:
         top_genre = get_top_genre(connection)
         if not top_genre.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold;'>🎼 Top Genre</p>",
-                unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal;'>{
-                        top_genre['genre_name'].iloc[0]}</p>""",
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎼 Top Genre</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_genre['genre_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
-    with col2:
-        top_artist = get_top_artist(connection)
-        if not top_artist.empty:
+    with col3:
+        top_country = get_top_country(connection)
+        if not top_country.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold;'>🎤 Top Artist</p>",
-                unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal;'>{
-                        top_artist['artist_name'].iloc[0]}</p>""",
-                        unsafe_allow_html=True)
-
-    col4 = st.columns(1)[0]
-    with col4:
-        top_track = get_top_track(connection)
-        if not top_track.empty:
-            st.markdown(
-                "<p style='font-size:20px; font-weight:bold;'>🎵 Top Track</p>",
-                unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal;'>{
-                        top_track['release_name'].iloc[0]}</p>""",
-                        unsafe_allow_html=True)
-
-    col5 = st.columns(1)[0]
-    with col5:
-        top_album = get_top_album(connection)
-        if not top_album.empty:
-            st.markdown(
-                "<p style='font-size:20px; font-weight:bold;'>💽 Top Album</p>",
-                unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal;'>{
-                        top_album['album_name'].iloc[0]}</p>""",
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🌍 Top Country</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_country['country_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
     st.divider()
 
-    top_country = get_top_country(connection)
-    if not top_country.empty:
-        st.markdown(
-            "<p style='font-size:20px; font-weight:bold;'>🌍 Top Country</p>",
-            unsafe_allow_html=True)
-        st.markdown(f"""<p style='font-size:24px; font-weight:normal;'>{
-                    top_country['country_name'].iloc[0]}</p>""",
-                    unsafe_allow_html=True)
+    col4, col5, col6 = st.columns([0.33, 0.33, 0.33])
+    with col4:
+        top_artist = get_top_artist(connection)
+        if not top_artist.empty:
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎤 Top Artist</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_artist['artist_name'].iloc[0]}</p>""",
+                        unsafe_allow_html=True)
+    with col5:
+        top_track = get_top_track(connection)
+        if not top_track.empty:
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎵 Top Track</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_track['release_name'].iloc[0]}</p>""",
+                        unsafe_allow_html=True)
+
+    with col6:
+        top_album = get_top_album(connection)
+        if not top_album.empty:
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>💽 Top Album</p>", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_album['album_name'].iloc[0]}</p>""",
+                        unsafe_allow_html=True)
+
+    st.divider()
+    with st.container():
+        st.subheader("Freshest Tracks")
+        show_embeds()
 
     connection.close()
 
@@ -315,6 +312,7 @@ def subscribe_page() -> None:
 
 def run_dashboard() -> None:
     """Sets up pages and runs the dashboard."""
+    glamourize_dashboard()
     load_dotenv()
 
     st.markdown(
@@ -340,7 +338,7 @@ def run_dashboard() -> None:
 
     query_params = st.query_params
     default_page = query_params.get("page", "Main Overview")
-
+    st.sidebar.image("BandScout_logo.png", width=200)
     selected_page = st.sidebar.radio(
         "",
         list(page_names_to_funcs.keys()),

@@ -16,8 +16,7 @@ def plot_top_artists_by_units(sales_data: pd.DataFrame, start_date: date, end_da
     sales_data['rank'] = sales_data['total_units_sold'].rank(
         ascending=False, method='first')
 
-    custom_colors = ["#2596be", "#51abcb",
-                     "#7cc0d8", "#a8d5e5", "#d3eaf2"]
+    custom_colors = ["#8c52ff", "#8076f9", "#749af2", "#68beec", "#5ce1e6"]
 
     chart = (
         alt.Chart(sales_data)
@@ -40,14 +39,13 @@ def plot_top_artists_by_units(sales_data: pd.DataFrame, start_date: date, end_da
             ]
         )
         .properties(
-            title="Top 5 Artists by Total Sales.",
+            title="Top 5 Artists by Total Sales",
             width=600,
             height=400
         )
         .configure_title(
-            fontSize=20,
-            anchor="start",
-            font="Arial"
+            fontSize=24,
+            anchor="start"
         )
     )
     return chart
