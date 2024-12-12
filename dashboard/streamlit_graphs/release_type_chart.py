@@ -72,7 +72,9 @@ def create_release_type_pie_chart(connection: psycopg2.connect) -> alt.Chart:
                 field="type_name",
                 type="nominal",
                 title="Release Type",
-                legend=alt.Legend(title="Release Types")
+                legend=alt.Legend(title="Release Types"),
+                scale=alt.Scale(domain=["album", "track"], range=[
+                                "#8c52ff", "#68beec"])
             ),
             tooltip=[
                 alt.Tooltip("type_name:N", title="Release Type"),

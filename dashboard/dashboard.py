@@ -10,6 +10,7 @@ from datetime import datetime, date
 import streamlit as st
 import boto3
 from dotenv import load_dotenv
+from embeddings import show_embeds
 from subscribe_page_commands import (
     get_connection,
     get_genres_from_db,
@@ -25,6 +26,7 @@ from streamlit_graphs.sales_by_country import visualize_country_sales
 from streamlit_graphs.sales_over_time import visualize_sales_per_hour
 from streamlit_graphs.top_artist_sales import visualize_sales_per_artist_over_time
 from streamlit_graphs.top_genre_sales import visualize_genre_sales
+from dashboard_formatting import glamourize_dashboard
 
 
 def is_valid_email(email: str) -> bool:
@@ -53,6 +55,8 @@ def trends_page() -> None:
     visualize_sales_per_artist_over_time(conn)
     visualize_genre_sales(conn)
     visualize_country_sales(conn)
+
+    show_embeds()
 
 
 def download_reports_from_s3(s3: boto3.client, bucket_name: str, subfolder: str) -> list[str]:
@@ -228,6 +232,7 @@ def subscribe_page() -> None:
 
 def run_dashboard() -> None:
     """Sets up pages and runs the dashboard."""
+    glamourize_dashboard()
     load_dotenv()
     page_names_to_funcs = {
         "Main Overview": main_overview,
@@ -235,7 +240,6 @@ def run_dashboard() -> None:
         "Report Download": report_download_page,
         "Subscribe": subscribe_page,
     }
-
     selected_page = st.sidebar.selectbox(
         "Navigate", page_names_to_funcs.keys())
     page_names_to_funcs[selected_page]()

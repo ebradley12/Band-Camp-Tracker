@@ -90,11 +90,12 @@ def plot_sales_per_hour(connection: psycopg2.connect,
     if not end_date:
         chart_title = f"Sales on {str(start_date)}"
     else:
-        chart_title = f'Sales between {str(start_date)} and {str(end_date - timedelta(days=1))} inclusive'
+        chart_title = f'Sales between {str(start_date)} and {
+            str(end_date - timedelta(days=1))} inclusive'
 
     chart = (
         alt.Chart(sales_data)
-        .mark_line(point=True)
+        .mark_line(color="#8c52ff")
         .encode(
             x=alt.X(
                 'sale_hour:T',
@@ -115,6 +116,19 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             title=chart_title,
             width=700,
             height=400
+        ) + alt.Chart(sales_data)  # Add another chart for points
+        .mark_point(color='#4682B4')  # Set the color of the points
+        .encode(
+            x=alt.X(
+                'sale_hour:T',
+                title='Hour of the Day',
+                axis=alt.Axis(format='%H:%M', titleFontSize=12)
+            ),
+            y=alt.Y(
+                'total_sales:Q',
+                title='Total Sales',
+                axis=alt.Axis(titleFontSize=12)
+            )
         )
     )
     return chart

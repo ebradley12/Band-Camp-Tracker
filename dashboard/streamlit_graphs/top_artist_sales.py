@@ -66,8 +66,7 @@ def plot_top_artists_by_units(sales_data: pd.DataFrame) -> alt.Chart:
     sales_data['rank'] = sales_data['total_units_sold'].rank(
         ascending=False, method='first')
 
-    custom_colors = ["#2596be", "#51abcb",
-                     "#7cc0d8", "#a8d5e5", "#d3eaf2"]
+    custom_colors = ["#8c52ff", "#8076f9", "#749af2", "#68beec", "#5ce1e6"]
 
     chart = (
         alt.Chart(sales_data)

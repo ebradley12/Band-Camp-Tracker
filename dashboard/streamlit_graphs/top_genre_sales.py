@@ -73,8 +73,7 @@ def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | N
     sales_data = sales_data.sort_values("total_sales", ascending=False)
     sales_data["rank"] = range(1, len(sales_data) + 1)
 
-    custom_colors = ["#2596be", "#51abcb",
-                     "#7cc0d8", "#a8d5e5", "#d3eaf2"]
+    custom_colors = ["#8c52ff", "#8076f9", "#749af2", "#68beec", "#5ce1e6"]
 
     chart = (
         alt.Chart(sales_data)

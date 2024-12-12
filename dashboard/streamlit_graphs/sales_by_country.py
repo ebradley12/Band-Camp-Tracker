@@ -57,9 +57,8 @@ def get_top_country_sales(connection: extensions.connection) -> pd.DataFrame:
 
 def create_country_sales_chart(connection: extensions.connection) -> alt.Chart | None:
     """
-    Generates a bar chart for genre sales data.
+    Generates a bar chart for genre sales data with a transparent background.
     """
-
     sales_data = get_top_country_sales(connection)
 
     if sales_data.empty:
@@ -69,8 +68,7 @@ def create_country_sales_chart(connection: extensions.connection) -> alt.Chart |
     sales_data = sales_data.sort_values("total_sales", ascending=False)
     sales_data["rank"] = range(1, len(sales_data) + 1)
 
-    custom_colors = ["#2596be", "#51abcb",
-                     "#7cc0d8", "#a8d5e5", "#d3eaf2"]
+    custom_colors = ["#8c52ff", "#8076f9", "#749af2", "#68beec", "#5ce1e6"]
 
     chart = (
         alt.Chart(sales_data)
