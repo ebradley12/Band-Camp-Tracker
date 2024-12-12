@@ -69,3 +69,39 @@ dashboard/
 ## Setting Up
 
 ### Prerequisites
+- Python 3.8 or higher
+- Access to the database (RDS or local setup) with the required schema.
+
+### Installing Dependencies
+
+#### For This Folder Only
+To install dependencies specific to the dashboard generation functionality:
+```bash
+pip install -r requirements.txt
+```
+
+#### For the Entire Project
+If you need to set up dependencies for the entire project:
+```bash
+pip install -r ../requirements.txt
+```
+
+## Running the Script
+
+### Generate the Dashboard:
+```bash
+python3 dashboard.py
+```
+
+## Configurations
+
+Ensure the following environment variables are set up:
+
+### Database Credentials:
+- `DB_HOST` - The host address of the database.
+- `DB_PORT` - The port used to access the database.
+- `DB_USER` - The user associated with the database.
+- `DB_PASSWORD` -  The password for accessing the database.
+- `DB_NAME` - The name of the database being accessed.
+
+---
