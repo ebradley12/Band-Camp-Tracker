@@ -14,4 +14,4 @@ terraform.*
 *.csv
 *.png
 *.terraform.tfvars
-daily_reports/
+*.pdf
