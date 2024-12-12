@@ -31,15 +31,20 @@ variable "s3_bucket_name" {
   type        = string
 }
 
+variable "s3_folder" {
+  description = "Name of the S3 folder for storing reports"
+  type        = string
+}
+
 variable "sender_email" {
   description = "Email address used to send reports via SES"
   type        = string
 }
 
-variable "recipient_email" {
-  description = "Email address to receive the daily reports"
-  type        = string
-}
+# variable "recipient_email" {
+#   description = "Email address to receive the daily reports"
+#   type        = string
+# }
 
 variable "aws_access_key_id" {
   description = "Access key for aws"
