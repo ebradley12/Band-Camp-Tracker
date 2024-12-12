@@ -84,6 +84,7 @@ The Trends Page of the dashboard is dedicated to visualising key metrics through
 The Report Download Page provides users with the ability to easily access and download historical reports. It features a date range selector, allowing users to choose specific dates or define a range of dates to retrieve the relevant daily summary reports. This functionality gives users the flexibility to find reports from different time periods, making it easier to track and analyze past performance.
 ### Subscribe Page
 The Subscribe Page allows users to manage their subscription preferences. Users can register by entering their email address, and once logged in, they can choose to subscribe to daily reports and alerts for specific genres. The page provides checkboxes for subscribing to general alerts, daily summary reports, and genre-specific notifications. If users opt for genre alerts, they can select their preferred genres from a list. Additionally, users have the option to unsubscribe by clicking a button, which removes their email from the subscription list.
+
 ---
 
 ## Setting Up
