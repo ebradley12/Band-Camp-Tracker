@@ -1,65 +1,20 @@
 """Script to make the bar chart of sales by country."""
-from os import environ
-import logging
 import streamlit as st
-import psycopg2
 from psycopg2 import extensions
-import pandas as pd
 import altair as alt
-from dotenv import load_dotenv
+from datetime import date, timedelta
 
-logger = logging.getLogger('streamlit')
-logger.setLevel(logging.CRITICAL)
-
-
-load_dotenv()
+from streamlit_graphs.queries import get_top_country_sales
 
 
-def get_connection() -> extensions.connection | None:
-    """
-    Tries to connect to the RDS database.
-    """
-    try:
-        connection = psycopg2.connect(
-            host=environ["DB_HOST"],
-            port=environ["DB_PORT"],
-            user=environ["DB_USER"],
-            password=environ["DB_PASSWORD"],
-            database=environ["DB_NAME"]
-        )
-        return connection
-    except psycopg2.OperationalError:
-        return None
-
-
-def get_top_country_sales(connection: extensions.connection) -> pd.DataFrame:
-    """
-    Returns the total sales of the top
-    5 countries with the most sales.
-    """
-    query = """
-    SELECT
-        c.country_name,
-        SUM(s.sale_price) AS total_sales    
-    FROM
-        sale s
-    JOIN
-        country c ON s.country_id = c.country_id
-    GROUP BY
-        c.country_name
-    ORDER BY
-        total_sales DESC
-    LIMIT 5;
-    """
-
-    return pd.read_sql_query(query, connection)
-
-
-def create_country_sales_chart(connection: extensions.connection) -> alt.Chart | None:
+def create_country_sales_chart(connection: extensions.connection, start_date: date, end_date: date) -> alt.Chart | None:
     """
     Generates a bar chart for genre sales data with a transparent background.
     """
-    sales_data = get_top_country_sales(connection)
+    adjusted_end_date = end_date + timedelta(days=1)
+
+    sales_data = get_top_country_sales(
+        connection, start_date, adjusted_end_date)
 
     if sales_data.empty:
         st.warning("No data available to display.")
@@ -90,7 +45,7 @@ def create_country_sales_chart(connection: extensions.connection) -> alt.Chart |
             ]
         )
         .properties(
-            title="Top 5 Countries by Total Sales (USD)",
+            title="Top 5 Countries by Total Sales.",
             width=600,
             height=400
         )
@@ -102,13 +57,20 @@ def create_country_sales_chart(connection: extensions.connection) -> alt.Chart |
     return chart
 
 
-def visualize_country_sales(connection: extensions.connection) -> None:
+def visualise_country_sales(connection: extensions.connection, start_date: date, end_date: date) -> None:
     """
     Produces the visualization of the sales 
     of the top 5 genres for the Streamlit Dashboard.
     """
-    genre_sales = create_country_sales_chart(connection)
-    if not genre_sales:
+
+    if start_date > end_date:
+        st.error("Start date must be before or equal to the end date.")
+        return
+    adjusted_end_date = end_date + timedelta(days=1)
+
+    country_sales = create_country_sales_chart(
+        connection, start_date, adjusted_end_date)
+    if not country_sales:
         st.warning("No data available to show.")
     else:
-        st.altair_chart(genre_sales, use_container_width=True)
+        st.altair_chart(country_sales, use_container_width=True)

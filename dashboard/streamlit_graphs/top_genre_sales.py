@@ -1,70 +1,21 @@
 """Script to make the bar chart of sales of the top 5 genres."""
-from os import environ
-import logging
 import streamlit as st
-import psycopg2
 from psycopg2 import extensions
 import pandas as pd
 import altair as alt
-from dotenv import load_dotenv
+from datetime import date, timedelta
 
-logger = logging.getLogger('streamlit')
-logger.setLevel(logging.CRITICAL)
-
-
-load_dotenv()
+from streamlit_graphs.queries import get_top_genre_sales
 
 
-def get_connection() -> extensions.connection | None:
-    """
-    Tries to connect to the RDS database.
-    """
-    try:
-        connection = psycopg2.connect(
-            host=environ["DB_HOST"],
-            port=environ["DB_PORT"],
-            user=environ["DB_USER"],
-            password=environ["DB_PASSWORD"],
-            database=environ["DB_NAME"]
-        )
-        return connection
-    except psycopg2.OperationalError:
-        return None
-
-
-def get_top_genre_sales(connection: extensions.connection) -> pd.DataFrame:
-    """
-    Returns the total sales of the top
-    5 performing genres as a dataframe.
-    """
-    query = """
-    SELECT
-        g.genre_name,
-        SUM(s.sale_price) AS total_sales
-    FROM
-        sale s
-    JOIN
-        release r ON s.release_id = r.release_id
-    JOIN
-        release_genre rg ON r.release_id = rg.release_id
-    JOIN
-        genre g ON rg.genre_id = g.genre_id
-    GROUP BY
-        g.genre_name
-    ORDER BY
-        total_sales DESC
-    LIMIT 5;
-    """
-
-    return pd.read_sql_query(query, connection)
-
-
-def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | None:
+def create_genre_sales_chart(connection: extensions.connection, start_date: date, end_date: date) -> alt.Chart | None:
     """
     Generates a bar chart for genre sales data.
     """
 
-    sales_data = get_top_genre_sales(connection)
+    adjusted_end_date = end_date + timedelta(days=1)
+
+    sales_data = get_top_genre_sales(connection, start_date, adjusted_end_date)
 
     if sales_data.empty:
         st.warning("No data available to display.")
@@ -100,20 +51,28 @@ def create_genre_sales_chart(connection: extensions.connection) -> alt.Chart | N
             height=400
         )
         .configure_title(
-            fontSize=24,
-            anchor="start"
+            fontSize=20,
+            anchor="start",
+            font="Arial"
         )
     )
     return chart
 
 
-def visualize_genre_sales(connection: extensions.connection) -> None:
+def visualise_genre_sales(connection: extensions.connection, start_date: date, end_date: date) -> None:
     """
     Produces the visualization of the sales 
     of the top 5 genres for the Streamlit Dashboard.
     """
-    genre_sales = create_genre_sales_chart(connection)
-    if not genre_sales:
+    if start_date > end_date:
+        st.error("Start date must be before or equal to the end date.")
+        return
+
+    adjusted_end_date = end_date + timedelta(days=1)
+
+    genre_sales_chart = create_genre_sales_chart(
+        connection, start_date, adjusted_end_date)
+    if not genre_sales_chart:
         st.warning("No data available to show.")
     else:
-        st.altair_chart(genre_sales, use_container_width=True)
+        st.altair_chart(genre_sales_chart, use_container_width=True)

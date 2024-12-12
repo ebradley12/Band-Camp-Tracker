@@ -1,64 +1,14 @@
 """Script that to make the bar chart of the top 5 artists by units sold."""
-from os import environ
-import logging
 import streamlit as st
-import psycopg2
 from psycopg2 import extensions
 import pandas as pd
 import altair as alt
-from dotenv import load_dotenv
+from datetime import date, timedelta
 
-logger = logging.getLogger('streamlit')
-logger.setLevel(logging.CRITICAL)
-
-
-load_dotenv()
+from streamlit_graphs.queries import get_top_artists_by_units
 
 
-def get_connection() -> extensions.connection | None:
-    """
-    Tries to connect to the RDS database.
-    """
-    try:
-        connection = psycopg2.connect(
-            host=environ["DB_HOST"],
-            port=environ["DB_PORT"],
-            user=environ["DB_USER"],
-            password=environ["DB_PASSWORD"],
-            database=environ["DB_NAME"]
-        )
-        return connection
-    except psycopg2.OperationalError:
-        return None
-
-
-def get_top_artists_by_units(connection: extensions.connection) -> pd.DataFrame:
-    """
-    Returns the top 5 artists based on the total number of units sold.
-    """
-    query = """
-    SELECT
-        a.artist_name,
-    COUNT(s.sale_id) AS total_units_sold
-    FROM
-        artist a
-    JOIN
-        release r ON a.artist_id = r.artist_id
-    JOIN
-        sale s ON s.release_id = r.release_id
-    WHERE
-        a.artist_name != 'Various Artists'
-    GROUP BY
-        a.artist_name
-    ORDER BY
-        total_units_sold DESC
-    LIMIT 5;
-    """
-
-    return pd.read_sql_query(query, connection)
-
-
-def plot_top_artists_by_units(sales_data: pd.DataFrame) -> alt.Chart:
+def plot_top_artists_by_units(sales_data: pd.DataFrame, start_date: date, end_date: date) -> alt.Chart:
     """
     Creates a bar chart showing the top 5 artists by total units sold.
     The artist names are colored based on their rank.
@@ -89,23 +39,37 @@ def plot_top_artists_by_units(sales_data: pd.DataFrame) -> alt.Chart:
             ]
         )
         .properties(
-            title="Top 5 Artists by Units Sold",
-            width=700,
+            title="Top 5 Artists by Total Sales.",
+            width=600,
             height=400
+        )
+        .configure_title(
+            fontSize=20,
+            anchor="start",
+            font="Arial"
         )
     )
     return chart
 
 
-def visualize_sales_per_artist_over_time(connection: extensions.connection) -> None:
+def visualise_sales_per_artist_over_time(connection: extensions.connection, start_date: date, end_date: date) -> None:
     """
     Fetches and visualizes sales data over time for the top 5 artists.
+    Handles single date or date range selection.
     """
-    sales_data = get_top_artists_by_units(connection)
+    if start_date > end_date:
+        st.error("Start date must be before or equal to the end date.")
+        return
+
+    adjusted_end_date = end_date + timedelta(days=1)
+
+    sales_data = get_top_artists_by_units(
+        connection, start_date, adjusted_end_date)
 
     if sales_data.empty:
         st.warning("No sales data available.")
         return
 
-    chart = plot_top_artists_by_units(sales_data)
+    chart = plot_top_artists_by_units(
+        sales_data, start_date, adjusted_end_date)
     st.altair_chart(chart, use_container_width=True)
