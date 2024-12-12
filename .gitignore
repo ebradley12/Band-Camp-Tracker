@@ -12,6 +12,5 @@ __pycache__
 terraform.*
 .DS_Store
 *.csv
-*.png
 *.terraform.tfvars
 *.pdf
