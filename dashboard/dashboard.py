@@ -35,6 +35,8 @@ from streamlit_graphs.sales_over_time import visualise_sales_per_hour
 from streamlit_graphs.top_artist_sales import visualise_sales_per_artist_over_time
 from streamlit_graphs.top_genre_sales import visualise_genre_sales
 
+from dashboard_formatting import glamourize_dashboard
+
 
 def is_valid_email(email: str) -> bool:
     """Validates inputted user email address."""
@@ -315,6 +317,7 @@ def subscribe_page() -> None:
 
 def run_dashboard() -> None:
     """Sets up pages and runs the dashboard."""
+    glamourize_dashboard()
     load_dotenv()
 
     st.markdown(
