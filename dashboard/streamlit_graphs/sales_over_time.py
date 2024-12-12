@@ -56,7 +56,19 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             fontSize=20,
             anchor="start",
             font="Arial"
-        )
+        ) + alt.Chart(sales_data)  # Add another chart for points
+        .mark_point(color='#4682B4')  # Set the color of the points
+        .encode(
+            x=alt.X(
+                'sale_hour:T',
+                title='Hour of the Day',
+                axis=alt.Axis(format='%H:%M', titleFontSize=12)
+            ),
+            y=alt.Y(
+                'total_sales:Q',
+                title='Total Sales',
+                axis=alt.Axis(titleFontSize=12)
+            ))
     )
     return chart
 
