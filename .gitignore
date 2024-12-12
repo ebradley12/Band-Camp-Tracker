@@ -14,3 +14,4 @@ terraform.*
 *.csv
 *.png
 *.terraform.tfvars
+*.pdf

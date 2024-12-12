@@ -122,6 +122,8 @@ def get_top_artist(cursor: RealDictCursor) -> str:
             JOIN release AS r ON s.release_id = r.release_id
             JOIN artist AS a ON r.artist_id = a.artist_id
             WHERE s.sale_date >= {comp_period}
+            AND a.artist_name != 'Various Artists'
+            AND a.artist_name != 'Various'
             GROUP BY a.artist_name
             ORDER BY COUNT(s.sale_id) DESC
             LIMIT 1;
@@ -156,6 +158,8 @@ def get_historic_top_artist(cursor: RealDictCursor) -> str:
             JOIN release AS r ON s.release_id = r.release_id
             JOIN artist AS a ON r.artist_id = a.artist_id
             WHERE s.sale_date BETWEEN {comp_period} AND {alert_interval}
+            AND a.artist_name != 'Various Artists'
+            AND a.artist_name != 'Various'
             GROUP BY a.artist_name
             ORDER BY COUNT(s.sale_id) DESC
             LIMIT 1;
@@ -174,6 +178,44 @@ def get_historic_top_artist(cursor: RealDictCursor) -> str:
     logging.info("Historic top artist fetched successfully")
 
     return top_artist["artist_name"]
+
+
+def get_genre_top_artists(cursor: RealDictCursor, genre: str) -> list[str]:
+    """
+    Get the top three artists and their sales figures for a given
+    genre within the last comparison period.
+    """
+    comp_period = convert_mins_to_sql_time(COMPARISON_PERIOD)
+
+    query = f"""
+            SELECT a.artist_name, SUM(s.sale_price) AS total_sales
+            FROM sale AS s
+            JOIN release AS r ON s.release_id = r.release_id
+            JOIN artist AS a ON r.artist_id = a.artist_id
+            JOIN release_genre AS rg ON r.release_id = rg.release_id
+            JOIN genre AS g ON rg.genre_id = g.genre_id
+            WHERE s.sale_date >= {comp_period}
+            AND a.artist_name != 'Various Artists'
+            AND a.artist_name != 'Various'
+            AND g.genre_name = '{genre}'
+            GROUP BY a.artist_name
+            ORDER BY SUM(s.sale_price) DESC
+            LIMIT 3;
+            """
+
+    logging.info("Fetching '%s' top artists", genre)
+
+    try:
+        cursor.execute(query)
+        top_genre_artists = cursor.fetchall()
+
+    except psycopg2.Error as e:
+        logging.error("Failed to fetch top artists for '%s': %s", genre, e)
+        raise
+
+    logging.info("Top '%s' artists fetched successfully", genre)
+
+    return top_genre_artists
 
 
 def get_top_genre(cursor: RealDictCursor) -> str:
