@@ -1,6 +1,6 @@
 # Dashboard
 
-This folder contains the script and resources necessary for creating the dashboard for the Band Camp Tracker Project. The dashboard, hosted on Streamlit, features several key sections: a Main Overview, Trends Analysis, Report Download, and a Subscribe section. The Subscriber Page allows users to customize their preferences, including genre interests and notification settings, ensuring they receive updates tailored to their chosen genres.
+This folder contains the script and resources necessary for creating the dashboard for the Band Camp Tracker Project. The dashboard, hosted on Streamlit, features several key sections: a Main Overview, Trends Analysis, Report Download, and a Subscribe section. The Subscriber Page allows users to customise their preferences, including genre interests and notification settings, ensuring they receive updates tailored to their chosen genres.
 
 ## Files in This Directory
 
@@ -49,7 +49,7 @@ dashboard/
 **Description**: Defines the environment and steps required to containerize the Streamlit dashboard application.
 
 **Key Features**:
-- Utilizes Python 3.10 as the base image for compatibility with the dashboard.
+- Utilises Python 3.10 as the base image for compatibility with the dashboard.
 - Installs all required dependencies specified in requirements.txt.
 - Adds .env file support by installing python-dotenv.
 - Defines the default command to execute the dashboard.py script upon container startup.
