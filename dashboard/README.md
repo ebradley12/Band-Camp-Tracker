@@ -18,6 +18,7 @@ dashboard/
     ├── Dockerfile
     ├── subscribe_page_commands.py
     ├── wireframe-design.png
+    ├── requirements.txt
 
 ```
 ### 1. `streamlit_graphs/`
@@ -47,3 +48,24 @@ dashboard/
 - Adds .env file support by installing python-dotenv.
 - Defines the default command to execute the dashboard.py script upon container startup.
 
+### 4. `subscribe_page_commands.py`
+**Description**: Contains database operations and commands for managing subscriber data in the Band Camp Tracker application.
+
+**Key Features**:
+- Establishes secure connections to the RDS PostgreSQL database using environment variables.
+- Provides functionality to add new subscribers and update existing preferences, including genre-specific alerts.
+- Supports user unsubscription by removing their data from the database.
+- Retrieves and converts genre data for user preferences to ensure seamless user interaction with the dashboard.
+
+### 5. `wireframe-design.png`
+**Description**: A visual representation outlining the layout and structure of the Band Camp Tracker dashboard, illustrating key components and navigation flow.
+
+### 6. `requirements.txt`
+**Description**: Contains the Python dependencies required specifically for the dashboard generation functionality.
+**Note**: Use this file if you're installing dependencies only for the for the scripts in this folder.
+
+---
+
+## Setting Up
+
+### Prerequisites
