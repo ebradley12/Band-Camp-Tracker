@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup, Comment
 import aiohttp
 import requests
 import streamlit as st
+import json
 
 ALBUM_ID_PATTERN = re.compile(r"album id (\d+)")
 TRACK_ID_PATTERN = re.compile(r"track id (\d+)")
@@ -23,6 +24,13 @@ def config_log() -> None:
         datefmt="%Y-%m-%d %H:%M",
         level=logging.INFO,
     )
+
+
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            # Read response text
+            return await response.json()
 
 
 async def fetch_html(url: str) -> str | None:
@@ -94,22 +102,15 @@ def get_sales_information() -> dict:
     Retrieve sales information from the Bandcamp API.
     """
     logging.info("Retrieving Sales Data")
-    try:
-        response = requests.get(SALES_URL, timeout=10)
-        if response.status_code != 200:
-            logging.warning(
-                "Couldn't retrieve Sales Data. Status Code %s", response.status_code
-            )
-            return {}
-        sales_data = response.json()
-        logging.info("Sales Data retrieved.")
-        return sales_data
-    except requests.exceptions.Timeout:
-        logging.warning("Request to retrieve Sales Data timed out.")
+    response = asyncio.run(fetch_data(SALES_URL))
+    if not response:
+        logging.warning(
+            "HERE - Couldn't retrieve Sales Data. Status Code"
+        )
         return {}
-    except requests.exceptions.RequestException as e:
-        logging.error("An error occurred: %s", e)
-        return {}
+    sales_data = response
+    logging.info("Sales Data retrieved.")
+    return sales_data
 
 
 def generate_album_embed(title: str, url: str, album_id: str) -> str:

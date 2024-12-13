@@ -32,16 +32,6 @@ def get_sales_information() -> dict:
     logging.info("Retrieving Sales Data")
     sales_url = "https://bandcamp.com/api/salesfeed/1/get_initial"
 
-    # try:
-    # response = requests.get(sales_url, timeout=1000)
-    # if response.status_code != 200:
-    #     print(response.text)
-    #     logging.warning(
-    #         "Couldn't retrieve Sales Data. Status Code %s", response.status_code)
-    #     return {}
-    # sales_data = response.json()
-    # logging.info("Sales Data retrieved.")
-    # return sales_data
     sales_data = asyncio.run(fetch_data(sales_url))
     if sales_data:
         logging.info("Sales Data retrieved.")
@@ -49,16 +39,6 @@ def get_sales_information() -> dict:
 
     logging.warning("Could not fetch sales data from API.")
     raise Exception("Error fetching data from API.")
-
-    # except requests.exceptions.Timeout:
-    #     logging.warning("Request to retrieve Sales Data timed out.")
-    #     return {}
-    # except requests.exceptions.ConnectionError:
-    #     logging.warning("Failed to connect to retrieve Sales Data.")
-    #     return {}
-    # except requests.exceptions.RequestException as e:
-    #     logging.error("An error occurred: %s", e)
-    #     return {}
 
 
 def main_extract() -> dict:
