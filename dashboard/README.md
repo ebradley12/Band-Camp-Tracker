@@ -2,10 +2,10 @@
 
 This folder contains the script and resources necessary for creating the dashboard for the Band Camp Tracker Project. The dashboard, hosted on Streamlit, features several key sections: a Main Overview, Trends Analysis, Report Download, and a Subscribe section. The Subscriber Page allows users to customise their preferences, including genre interests and notification settings, ensuring they receive updates tailored to their chosen genres.
 
-## Wireframe Design**:  
+## Wireframe Design:  
 
 The layout and functionality of the dashboard are illustrated in the wireframe design:  
-![Wireframe Design](./images/wireframe-design.png)
+![Wireframe Design](../images/wireframe-design.png)
 
 
 ## Files in This Directory

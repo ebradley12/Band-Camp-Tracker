@@ -57,6 +57,9 @@ This folder contains the script and resources required to generate the daily sal
 **Description**: Contains the Python dependencies required specifically for the report generation functionality.
 **Note**: Use this file if you're installing dependencies only for the for the scripts in this folder.
 
+### 7. `test_report_generator.py`
+**Description**: Contains tests for report_generator.py to ensure normal, working functionality.
+
 ---
 
 ## Setting Up
