@@ -21,9 +21,9 @@ def config_log() -> None:
     )
 
 
-def add_table_to_pdf(pdf, headers, data, column_widths, row_height=8):
+def add_table_to_pdf(pdf: FPDF, headers: list[str], data: list, column_widths: list[int], row_height: int = 8):
     """
-    Add a table to the PDF report.
+    Adds a table to the PDF report.
     """
     pdf.set_font("Arial", 'B', 12)
     for i, header in enumerate(headers):
@@ -37,7 +37,7 @@ def add_table_to_pdf(pdf, headers, data, column_widths, row_height=8):
         pdf.ln(row_height)
 
 
-def generate_summary_section(pdf, current_data):
+def generate_summary_section(pdf: FPDF, current_data: list):
     """
     Add the summary section to the PDF report.
     """
@@ -66,7 +66,7 @@ def generate_summary_section(pdf, current_data):
     pdf.ln(10)
 
 
-def generate_comparison_section(pdf, current_data, previous_data, date):
+def generate_comparison_section(pdf: FPDF, current_data: list, previous_data: list, date: str):
     """
     Add the comparison section to the PDF report.
     """
@@ -95,7 +95,7 @@ def generate_comparison_section(pdf, current_data, previous_data, date):
     pdf.ln(20)
 
 
-def add_top_genres_graph(pdf, current_data):
+def add_top_genres_graph(pdf: FPDF, current_data: list):
     """
     Add the Top Genres by Revenue graph to the PDF report.
     """
@@ -113,7 +113,7 @@ def add_top_genres_graph(pdf, current_data):
         pdf.ln(10)
 
 
-def add_top_artists_graph(pdf, current_data):
+def add_top_artists_graph(pdf: FPDF, current_data: list):
     """
     Add the Top Artists by Revenue graph to the PDF report.
     """
@@ -131,7 +131,7 @@ def add_top_artists_graph(pdf, current_data):
         pdf.ln(10)
 
 
-def add_top_countries_graph(pdf, current_data):
+def add_top_countries_graph(pdf: FPDF, current_data):
     """
     Add the Top Countries by Revenue graph to the PDF report.
     """
