@@ -1,10 +1,10 @@
-# **Band Camp Tracker Project**
+# **Band Scout Project**
 
 ---
 
 ## **Overview**
 
-The **Band Camp Tracker** is a data-driven project designed to provide insights into trending genres and artists in the music industry. By addressing the challenges of identifying trends in a fragmented and complex market, this project helps uncover what genres are popular and which artists are gaining traction before they become mainstream.
+Our **Band Scout Project** is a data-driven project designed to provide insights into trending genres and artists in the music industry. By addressing the challenges of identifying trends in a fragmented and complex market, this project helps uncover what genres are popular and which artists are gaining traction before they become mainstream.
 
 The solution regularly collects and processes sales and genre data from the BandCamp platform, presenting it via a dashboard and automated reports and alerts. 
 
@@ -30,11 +30,13 @@ Refer to the **[Architecture Diagram](./docs/architecture-diagram.png)** for a d
 ### **Dashboard**
 The interactive Streamlit dashboard provides:
 - **Real-time insights** into sales trends by genre, artist, and region.
-- **Dynamic filtering options** for detailed analysis.
-- **Visualisations** such as bar charts, line graphs, and heatmaps for intuitive exploration.
+- **Dynamic filtering options by date** for detailed analysis.
+- **Visualisations** such as bar charts and line graphs for intuitive exploration.
+- **Reports Page** where users can download detailed reports.
+- **Subscribe Page** allowing users to subscribe to daily reports and specific or general genre alerts.
 
 The dashboard wireframe provides a visual blueprint of its layout and features.  
-Refer to the **[Wireframe Design](./dashboard/wireframe-design.png)** for details.
+Refer to the **[Wireframe Design](./images/wireframe-design.png)** for details.
 
 ### **Reports**
 Automated daily PDF reports summarising:
@@ -47,70 +49,54 @@ Reports are sent via email with an attachment for the previous day's data at 09:
 
 ### **Alerts**
 Automated notifications for:
-- Significant increases or decreases in sales by genre or artist.
-- Identification of new or emerging trends.
+- Alerts for significant changes to the top artist or genre in the last hour compared to the last 48 hours.
+- Specific genre alerts for over a 20% increase in sales in the last hour compared to the last 48 hours. These alerts also include the top 3 artists within that genre to help subscribers discover trending artists.
 
-Notifications are triggered by AWS Lambda and sent via email to designated recipients.
+Subscribers can customise alerts for specific genres or receive general notifications, ensuring they stay informed about emerging trends and shifts in sales performance.
 
 ---
 
-## **Project Files**
+## **Project Structure Overview**
 
 - **ETL Pipelines**:
   - [Pipeline README](./pipeline/README.md)  
-    Includes information on the extract, transform, load scripts, and the main ETL pipeline.
-  - **Files**:
-    - `extract.py`: Data extraction script.
-    - `transform.py`: Data transformation script.
-    - `load_to_rds.py`: Data loading script.
-    - `etl.py`: Main script orchestrating the entire ETL pipeline.
-    - `test_etl.py`: Tests for extract, transform and load pipeline script.
-    - `requirements.txt`: Python dependencies specific for the pipeline.
+    Provides comprehensive details on the extract, transform, load scripts, and the main ETL pipeline workflow.
+    - **Folder Contents**: Scripts and configurations for orchestrating the ETL pipeline, including testing, dependency management, and containerisation.
 
 - **Streamlit Dashboard**:
   - [Dashboard README](./dashboard/README.md)  
-    Documentation for the Streamlit application and its configuration.
-  - **Files**:
-    - `wireframe-design.png`: Dashboard wireframe design.
-    - `app.py`: Streamlit app for visualising data.
-    - `requirements.txt`: Python dependencies specific for the dashboard.
-  
+    Contains documentation for the Streamlit application, including its setup and configuration.
+  - **Folder Contents**: 
+    Visualisation modules, data queries, branding resources, and formatting helpers for building an interactive data dashboard.
+
 - **Reports**:
   - [Reports README](./reports/README.md)  
-    Documentation for the report generation system.
-  - **Files**:
-    - `report_generation.py`: Generates daily PDF reports, uploads them to S3, and sends email notifications.
-    - `requirements.txt`: Python dependencies specific to the report generation.
-  
+    Documentation for the report generation system, detailing its functionality and workflows.
+  - **Folder Contents**: Components for generating daily reports, creating visualisations, and handling notifications.
+
+
 - **Alerts**:
   - [Reports README](./alerts/README.md)  
     Documentation for the alerts system.
-  - **Files**:
-    - `alerts.py`: Script for triggering notifications based on key sales trends.
-    - `requirements.txt`: Python dependencies specific to alerts.
+  - **Folder Contents**: Scripts and logic for monitoring key trends and triggering notifications.
 
 - **Terraform Infrastructure**:
   - [Terraform README](./infrastructure/README.md)  
-    Details the AWS setup scripts for RDS, ECS, EventBridge, and Lambda.
-  - **Files**:
-    - `main.tf`: Main Terraform configuration file.
-    - `variables.tf`: Terraform variables.
-    - `outputs.tf`: Terraform outputs.
+    Provides details about the AWS setup scripts, including RDS, ECS, EventBridge, and Lambda configurations.
+  - `variables.tf`: Terraform variables needed for all AWS configuration.
+  - **Subfolders**:
+    - `alerts`: Terraform configurations for the alerts system.
+    - `dashboard`: Terraform configurations for the dashboard.
+    - `ecr`: Terraform configurations for managing ECS containers.
+    - `pipeline`: Terraform configurations for the data pipeline.
+    - `rds`: Terraform configurations for the Amazon RDS database.
+    - `reports`: Terraform configurations for the reports system.
 
-- **Documentation**:
-  - **Files**:
-    - `architecture-diagram.png`: Architecture diagram.
-    - `erd.png`: Entity Relationship Diagram (ERD).
-
-- **Docker Files**:
-  - **Files**:
-    - `Dockerfile`: Docker configuration for the ETL pipeline.
-    - `docker-compose.yml`: Docker Compose setup for local development.
 
 - **GitHub Workflows**:
-  - **Files**:
     - `quality_check.yaml`: Workflow for testing and linting.
-    - `deploy.yaml`: Workflow for deployment.
+
+Each folder contains specific README files offering detailed insights and instructions for setup and usage. Please refer to them for a deeper understanding of each component.
 
 ---
 
@@ -155,11 +141,16 @@ Notifications are triggered by AWS Lambda and sent via email to designated recip
 3. **Set Up Environment Variables**:
    Create a `.env` file in the project root with the following content:
    ```env
-   API_KEY=<Your BandCamp API Key>
-   DB_USER=<Your RDS Username>
-   DB_PASSWORD=<Your RDS Password>
-   DB_HOST=<Your RDS Endpoint>
+   DB_USER=<RDS Username>
+   DB_PASSWORD=<RDS Password>
+   DB_HOST=<RDS Endpoint>
    DB_NAME=<Database Name>
+   S3_BUCKET=<S3 Bucket Name>
+   SENDER_EMAIL=bandcamp.notifier@gmail.com
+   S3_FOLDER=<S3 Folder >
+   ACCESS_KEY_ID=<Your AWS Access Key ID>
+   SECRET_ACCESS_KEY=<Your AWS Secret Access Key>
+
    ```
 
 4. **Run the ETL Pipeline**:
@@ -181,19 +172,19 @@ Notifications are triggered by AWS Lambda and sent via email to designated recip
 
 ---
 
-## **Documentation**
+## **Images**
 
 1. **Architecture Diagram**:  
    The high-level system design is visualised below:  
-   ![Architecture Diagram](./docs/architecture-diagram.png)
+   ![Architecture Diagram](./images/architecture-diagram.png)
 
 2. **Entity-Relationship Diagram (ERD)**:  
    The database schema and relationships are detailed here:  
-   ![Entity-Relationship Diagram](./docs/erd.png)
+   ![Entity-Relationship Diagram](./images/erd.png)
 
 3. **Wireframe Design**:  
    The layout and functionality of the dashboard are illustrated in the wireframe design:  
-   ![Wireframe Design](./dashboard/wireframe-design.png)
+   ![Wireframe Design](./images/wireframe-design.png)
 
 ---
 ## **Contributors**
@@ -211,9 +202,26 @@ This project was made possible thanks to the collaborative efforts of the follow
 ---
 
 ## Assumptions
-- 
+- **Albums and Singles Contribute Equally to Sales**: 
+Assumes that the sales impact of albums and singles is identical, regardless of pricing, promotion strategies, or release popularity. This simplifies analysis but might overlook variations in consumer behaviour or artist-specific trends.
+- **Assuming Artist Names on Bandcamp are Unique**:
+Relies on the assumption that no duplicate or overlapping artist names exist on Bandcamp, which could cause inaccuracies in mapping or aggregating artist-related data.
 
 ---
 
 ## Future Improvements
-- 
+
+- Links to Top Tracks:
+  Provide easy access to top-performing tracks for each artist or genre, integrating streaming or purchase links to encourage user interaction and potential sales. 
+
+- Subscription Alerts Page
+  Implement a feature to allow users to subscribe to alerts for new releases or updates from their favourite artists, enhancing user engagement and retention.
+
+- Advanced Analytics and Insights for Record Labels
+  Develop a service tailored for record labels, offering advanced analytics and insights. This could include partnerships to provide customised data packages, helping labels discover emerging talent early and refine their market strategies.
+
+- Integration with Other Music Outlets:
+  Expand integrations to platforms like Spotify, Apple Music, and Bandcamp to pull live streaming data. This would enrich insights into trends and ensure the platform reflects the global music ecosystem dynamically.
+
+- Music Forecasting Tool:
+  Introduce a forecasting tool leveraging historical data and machine learning to predict the future popularity of genres and artists. This would enable artists, fans, and record labels to anticipate trends and make proactive decisions in the competitive music industry.
