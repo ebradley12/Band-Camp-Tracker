@@ -1,5 +1,5 @@
 """Script to show the line graph of total sales over time."""
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 import streamlit as st
 import psycopg2
 import altair as alt
@@ -19,7 +19,7 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             st.error("No data available to display")
             return None
 
-    except AttributeError as e:
+    except AttributeError:
         st.error("No data available to display")
 
     chart = (
@@ -55,7 +55,8 @@ def plot_sales_per_hour(connection: psycopg2.connect,
     return chart
 
 
-def visualise_sales_per_hour(connection: psycopg2.connect, start_date: date, end_date: date) -> None:
+def visualise_sales_per_hour(connection: psycopg2.connect,
+                             start_date: date, end_date: date) -> None:
     """
     Visualises sales per hour within a date range for the Streamlit dashboard.
     """

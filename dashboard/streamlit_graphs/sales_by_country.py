@@ -1,13 +1,14 @@
 """Script to make the bar chart of sales by country."""
+from datetime import date, timedelta
 import streamlit as st
 from psycopg2 import extensions
 import altair as alt
-from datetime import date, timedelta
 
 from streamlit_graphs.queries import get_top_country_sales
 
 
-def create_country_sales_chart(connection: extensions.connection, start_date: date, end_date: date) -> alt.Chart | None:
+def create_country_sales_chart(connection: extensions.connection,
+                               start_date: date, end_date: date) -> alt.Chart | None:
     """
     Generates a bar chart for genre sales data.
     """
@@ -58,7 +59,8 @@ def create_country_sales_chart(connection: extensions.connection, start_date: da
     return chart
 
 
-def visualise_country_sales(connection: extensions.connection, start_date: date, end_date: date) -> None:
+def visualise_country_sales(connection: extensions.connection,
+                            start_date: date, end_date: date) -> None:
     """
     Produces the visualization of the sales 
     of the top 5 genres for the Streamlit Dashboard.
