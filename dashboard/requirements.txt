@@ -3,3 +3,6 @@ watchdog
 python-dotenv
 psycopg2-binary
 boto3
+aiohttp
+requests
+beautifulsoup4

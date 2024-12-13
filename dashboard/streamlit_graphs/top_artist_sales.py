@@ -1,14 +1,14 @@
 """Script that to make the bar chart of the top 5 artists by units sold."""
+from datetime import date, timedelta
 import streamlit as st
 from psycopg2 import extensions
 import pandas as pd
 import altair as alt
-from datetime import date, timedelta
 
 from streamlit_graphs.queries import get_top_artists_by_units
 
 
-def plot_top_artists_by_units(sales_data: pd.DataFrame, start_date: date, end_date: date) -> alt.Chart:
+def plot_top_artists_by_units(sales_data: pd.DataFrame) -> alt.Chart:
     """
     Creates a bar chart showing the top 5 artists by total units sold.
     The artist names are colored based on their rank.
@@ -51,7 +51,8 @@ def plot_top_artists_by_units(sales_data: pd.DataFrame, start_date: date, end_da
     return chart
 
 
-def visualise_sales_per_artist_over_time(connection: extensions.connection, start_date: date, end_date: date) -> None:
+def visualise_sales_per_artist_over_time(connection: extensions.connection,
+                                         start_date: date, end_date: date) -> None:
     """
     Fetches and visualizes sales data over time for the top 5 artists.
     Handles single date or date range selection.
@@ -69,6 +70,5 @@ def visualise_sales_per_artist_over_time(connection: extensions.connection, star
         st.warning("No sales data available.")
         return
 
-    chart = plot_top_artists_by_units(
-        sales_data, start_date, adjusted_end_date)
+    chart = plot_top_artists_by_units(sales_data)
     st.altair_chart(chart, use_container_width=True)

@@ -1,8 +1,8 @@
-"""This is the script to load sales data into the database"""
+"""This is the script to load sales data into the database."""
+
 from os import environ
 from datetime import datetime
 import logging
-import ast
 import pandas as pd
 import psycopg2
 from psycopg2 import extensions
@@ -34,7 +34,7 @@ def validate_env_vars() -> None:
             f"Missing required environment variables: {missing_vars}")
 
 
-def get_connection() -> extensions.connection | None:
+def get_connection() -> extensions.connection:
     """
     Tries to connect to the RDS database.
     """
@@ -60,13 +60,13 @@ def get_cursor(connection: extensions.connection) -> extensions.cursor:
     """
     try:
         return connection.cursor()
-    except Exception as e:
+    except psycopg2.OperationalError as e:
         logging.error("Unable to retrieve cursor for connection: %s", str(e))
         raise
 
 
 def get_id_from_table(search_value: str, table_name: str,
-                      cursor: extensions.cursor) -> int | None:
+                      cursor: extensions.cursor) -> int:
     """
     Retrieves the id of a given value from a specified table.
     """
@@ -76,14 +76,14 @@ def get_id_from_table(search_value: str, table_name: str,
         cursor.execute(query, (search_value,))
         result = cursor.fetchone()
         return result[0] if result else None
-    except Exception as e:
+    except psycopg2.OperationalError as e:
         logging.error("Error querying %s: %s", table_name, str(e))
         return None
 
 
 def get_id_from_release_info(release_name: str, release_date: datetime,
                              artist_id: int, type_id: int,
-                             cursor: extensions.cursor) -> int | None:
+                             cursor: extensions.cursor) -> int:
     """
     Retrieves the release id of the
     release with given information.
@@ -146,7 +146,7 @@ def insert_artist(artist_name: str, cursor: extensions.cursor) -> None:
         logging.error("Error inserting artist: '%s'", artist_name)
 
 
-def insert_genres(genre_name: str, cursor: extensions.cursor) -> int | None:
+def insert_genres(genre_name: str, cursor: extensions.cursor) -> int:
     """
     Inserts genres into the database if it doesn't already exist.
     """
@@ -174,7 +174,7 @@ def insert_genres(genre_name: str, cursor: extensions.cursor) -> int | None:
 
 def insert_release(release_name: str, release_date: datetime,
                    release_type: str, artist_name: str,
-                   cursor: extensions.cursor) -> int | None:
+                   cursor: extensions.cursor) -> int:
     """
     Inserts a release into the database if it doesn't already exist.
     """
@@ -301,7 +301,7 @@ def main_load(sales_df: pd.DataFrame) -> None:
         connection.close()
 
         logging.info("Data loaded successfully.")
-    except Exception as e:
+    except psycopg2.OperationalError as e:
         logging.error("Error during data loading: %s", str(e))
 
 

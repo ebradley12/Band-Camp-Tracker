@@ -1,9 +1,11 @@
 # **Band Scout Project**
+# **Band Scout Project**
 
 ---
 
 ## **Overview**
 
+Our **Band Scout Project** is a data-driven project designed to provide insights into trending genres and artists in the music industry. By addressing the challenges of identifying trends in a fragmented and complex market, this project helps uncover what genres are popular and which artists are gaining traction before they become mainstream.
 Our **Band Scout Project** is a data-driven project designed to provide insights into trending genres and artists in the music industry. By addressing the challenges of identifying trends in a fragmented and complex market, this project helps uncover what genres are popular and which artists are gaining traction before they become mainstream.
 
 The solution regularly collects and processes sales and genre data from the BandCamp platform, presenting it via a dashboard and automated reports and alerts. 
@@ -30,6 +32,10 @@ Refer to the **[Architecture Diagram](./docs/architecture-diagram.png)** for a d
 ### **Dashboard**
 The interactive Streamlit dashboard provides:
 - **Real-time insights** into sales trends by genre, artist, and region.
+- **Dynamic filtering options by date** for detailed analysis.
+- **Visualisations** such as bar charts and line graphs for intuitive exploration.
+- **Reports Page** where users can download detailed reports.
+- **Subscribe Page** allowing users to subscribe to daily reports and specific or general genre alerts.
 - **Dynamic filtering options by date** for detailed analysis.
 - **Visualisations** such as bar charts and line graphs for intuitive exploration.
 - **Reports Page** where users can download detailed reports.
@@ -82,21 +88,25 @@ Subscribers can customise alerts for specific genres or receive general notifica
 
 - **Terraform Infrastructure**:
   - [Terraform README](./infrastructure/README.md)  
-    Provides details about the AWS setup scripts, including RDS, ECS, EventBridge, and Lambda configurations.
-  - `variables.tf`: Terraform variables needed for all AWS configuration.
-  - **Subfolders**:
-    - `alerts`: Terraform configurations for the alerts system.
-    - `dashboard`: Terraform configurations for the dashboard.
-    - `ecr`: Terraform configurations for managing ECS containers.
-    - `pipeline`: Terraform configurations for the data pipeline.
-    - `rds`: Terraform configurations for the Amazon RDS database.
-    - `reports`: Terraform configurations for the reports system.
+    Details the AWS setup scripts for RDS, ECS, EventBridge, and Lambda.
+  - **Files**:
+    - `main.tf`: Main Terraform configuration file.
+    - `variables.tf`: Terraform variables.
+    - `outputs.tf`: Terraform outputs.
 
+- **Documentation**:
+  - **Files**:
+    - `architecture-diagram.png`: Architecture diagram.
+    - `erd.png`: Entity Relationship Diagram (ERD).
+
+- **Docker Files**:
+  - **Files**:
+    - `Dockerfile`: Docker configuration for the ETL pipeline.
+    - `docker-compose.yml`: Docker Compose setup for local development.
 
 - **GitHub Workflows**:
     - `quality_check.yaml`: Workflow for testing and linting.
-
-Each folder contains specific README files offering detailed insights and instructions for setup and usage. Please refer to them for a deeper understanding of each component.
+    - `deploy.yaml`: Workflow for deployment.
 
 ---
 
@@ -210,18 +220,4 @@ Relies on the assumption that no duplicate or overlapping artist names exist on 
 ---
 
 ## Future Improvements
-
-- Links to Top Tracks:
-  Provide easy access to top-performing tracks for each artist or genre, integrating streaming or purchase links to encourage user interaction and potential sales. 
-
-- Subscription Alerts Page
-  Implement a feature to allow users to subscribe to alerts for new releases or updates from their favourite artists, enhancing user engagement and retention.
-
-- Advanced Analytics and Insights for Record Labels
-  Develop a service tailored for record labels, offering advanced analytics and insights. This could include partnerships to provide customised data packages, helping labels discover emerging talent early and refine their market strategies.
-
-- Integration with Other Music Outlets:
-  Expand integrations to platforms like Spotify, Apple Music, and Bandcamp to pull live streaming data. This would enrich insights into trends and ensure the platform reflects the global music ecosystem dynamically.
-
-- Music Forecasting Tool:
-  Introduce a forecasting tool leveraging historical data and machine learning to predict the future popularity of genres and artists. This would enable artists, fans, and record labels to anticipate trends and make proactive decisions in the competitive music industry.
+- 

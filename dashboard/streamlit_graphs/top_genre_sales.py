@@ -1,14 +1,14 @@
 """Script to make the bar chart of sales of the top 5 genres."""
+from datetime import date, timedelta
 import streamlit as st
 from psycopg2 import extensions
-import pandas as pd
 import altair as alt
-from datetime import date, timedelta
 
 from streamlit_graphs.queries import get_top_genre_sales
 
 
-def create_genre_sales_chart(connection: extensions.connection, start_date: date, end_date: date) -> alt.Chart | None:
+def create_genre_sales_chart(connection: extensions.connection,
+                             start_date: date, end_date: date) -> alt.Chart:
     """
     Generates a bar chart for genre sales data.
     """
@@ -35,8 +35,8 @@ def create_genre_sales_chart(connection: extensions.connection, start_date: date
                 title="Genre",
                 axis=alt.Axis(labelAngle=0),
                 sort=alt.EncodingSortField(
-                    field="total_sales",  # Sort by the 'total_sales' field
-                    order="descending"   # Descending order
+                    field="total_sales",
+                    order="descending"
                 )
             ),
             y=alt.Y("total_sales:Q", title="Total Sales (USD)"),
@@ -66,7 +66,8 @@ def create_genre_sales_chart(connection: extensions.connection, start_date: date
     return chart
 
 
-def visualise_genre_sales(connection: extensions.connection, start_date: date, end_date: date) -> None:
+def visualise_genre_sales(connection: extensions.connection,
+                          start_date: date, end_date: date) -> None:
     """
     Produces the visualization of the sales 
     of the top 5 genres for the Streamlit Dashboard.

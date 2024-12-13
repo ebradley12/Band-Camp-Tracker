@@ -1,5 +1,5 @@
 """Script to show the line graph of total sales over time."""
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 import streamlit as st
 import psycopg2
 import altair as alt
@@ -8,7 +8,7 @@ from streamlit_graphs.queries import fetch_sales_within_date_range
 
 
 def plot_sales_per_hour(connection: psycopg2.connect,
-                        start_date: date, end_date: date = None) -> alt.Chart | None:
+                        start_date: date, end_date: date = None) -> alt.Chart:
     """
     Plots a line graph of sales per hour for the current day or date range.
     """
@@ -19,14 +19,14 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             st.error("No data available to display")
             return None
 
-    except AttributeError as e:
+    except AttributeError:
         st.error("No data available to display")
 
     if not end_date:
         chart_title = f"Sales on {str(start_date)}"
     else:
-        chart_title = f'Sales between {str(start_date)} and {
-            str(end_date - timedelta(days=1))} inclusive'
+        chart_title = f"""Sales between {str(start_date)} and {
+            str(end_date - timedelta(days=1))} inclusive"""
 
     chart = (
         alt.layer(
@@ -56,7 +56,7 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             )
         )
         .properties(
-            title="Total Sales per Hour",
+            title=chart_title,
             width=600,
             height=400
         )
@@ -73,7 +73,8 @@ def plot_sales_per_hour(connection: psycopg2.connect,
     return chart
 
 
-def visualise_sales_per_hour(connection: psycopg2.connect, start_date: date, end_date: date) -> None:
+def visualise_sales_per_hour(connection: psycopg2.connect,
+                             start_date: date, end_date: date) -> None:
     """
     Visualises sales per hour within a date range for the Streamlit dashboard.
     """
@@ -85,7 +86,6 @@ def visualise_sales_per_hour(connection: psycopg2.connect, start_date: date, end
     sales_chart = plot_sales_per_hour(
         connection, start_date, adjusted_end_date)
     if sales_chart is None:
-        st.warning(
-            "No sales data available for the selected date range.")
+        st.warning("No sales data available for the selected date range.")
     else:
         st.altair_chart(sales_chart, use_container_width=True)

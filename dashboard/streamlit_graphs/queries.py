@@ -14,7 +14,7 @@ logger.setLevel(logging.ERROR)
 load_dotenv()
 
 
-def get_connection() -> extensions.connection | None:
+def get_connection() -> extensions.connection:
     """
     Tries to connect to the RDS database.
     """
@@ -165,7 +165,7 @@ def get_top_country(connection: extensions.connection) -> pd.DataFrame:
 
 def get_release_type_count(connection: extensions.connection) -> pd.DataFrame:
     """
-    Returns the count of each type of release; Albums and Tracks
+    Returns the count of each type of release; Albums and Tracks.
     """
     query = """
     SELECT
@@ -182,9 +182,11 @@ def get_release_type_count(connection: extensions.connection) -> pd.DataFrame:
     return pd.read_sql_query(query, connection)
 
 
-def get_top_country_sales(connection: extensions.connection, start_date: date, end_date: date = None) -> pd.DataFrame:
+def get_top_country_sales(connection: extensions.connection,
+                          start_date: date, end_date: date = None) -> pd.DataFrame:
     """
-    Returns the total sales of the top 5 countries with the most sales for a given date or date range.
+    Returns the total sales of the top 5 countries with the
+    most sales for a given date or date range.
     """
     if end_date is None or start_date == end_date:
         query = """
@@ -226,7 +228,8 @@ def get_top_country_sales(connection: extensions.connection, start_date: date, e
     return pd.read_sql_query(query, connection, params=params)
 
 
-def fetch_sales_within_date_range(connection: psycopg2.connect, start_date: date, end_date: date = None) -> pd.DataFrame:
+def fetch_sales_within_date_range(connection: psycopg2.connect,
+                                  start_date: date, end_date: date = None) -> pd.DataFrame:
     """
     Fetches sales data aggregated by hour for a given date range or single date.
     """
@@ -259,12 +262,13 @@ def fetch_sales_within_date_range(connection: psycopg2.connect, start_date: date
             return sale_data
 
         return None
-    except Exception as e:
+    except psycopg2.OperationalError as e:
         logging.error("Error fetching sales data: %s", e)
         return None
 
 
-def get_top_artists_by_units(connection: extensions.connection, start_date: date, end_date: date = None) -> pd.DataFrame:
+def get_top_artists_by_units(connection: extensions.connection,
+                             start_date: date, end_date: date = None) -> pd.DataFrame:
     """
     Returns the top 5 artists based on the total number of units sold within the given date range.
     """
@@ -316,9 +320,11 @@ def get_top_artists_by_units(connection: extensions.connection, start_date: date
     return pd.read_sql_query(query, connection, params=params)
 
 
-def get_top_genre_sales(connection: extensions.connection, start_date: date, end_date: date = None) -> pd.DataFrame:
+def get_top_genre_sales(connection: extensions.connection,
+                        start_date: date, end_date: date = None) -> pd.DataFrame:
     """
-    Returns the total sales of the top 5 performing genres within the given date range or single date.
+    Returns the total sales of the top 5 performing 
+    genres within the given date range or single date.
     """
     if start_date == end_date or end_date is None:
         query = """

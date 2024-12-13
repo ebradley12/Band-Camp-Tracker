@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument
 """
 This script is designed to be the entry point for an AWS Lambda function.
 The purpose of the Lambda function is to to monitor sales data, detect changes
@@ -30,8 +31,8 @@ def lambda_handler(event: dict, context=None) -> dict:
             "statusCode": 200,
             "body": "Alerts sent successfully."
         }
-    except Exception as e:
-        logging.error(f"Error during alerts processing: {e}")
+    except ValueError as e:
+        logging.error("Error during alerts processing: %s", e)
         return {
             "statusCode": 500,
             "body": "An error occurred while processing alerts."

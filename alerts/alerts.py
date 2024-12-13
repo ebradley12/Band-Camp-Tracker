@@ -7,13 +7,17 @@ import logging
 from os import environ
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
-from utilities import config_log, validate_env_vars, ALERT_INTERVAL, COMPARISON_PERIOD, GENRE_NOTIFICATION_THRESHOLD
-from queries import get_connection, get_cursor, get_general_subscriber_emails, get_genre_subscriber_emails, get_subscribed_genres, get_top_artist, get_historic_top_artist, get_top_genre, get_historic_top_genre, get_genre_top_artists, get_genre_sales, get_historic_genre_sales
+from utilities import (config_log, validate_env_vars, ALERT_INTERVAL,
+                       COMPARISON_PERIOD, GENRE_NOTIFICATION_THRESHOLD)
+from queries import (get_connection, get_cursor, get_general_subscriber_emails,
+                     get_genre_subscriber_emails, get_subscribed_genres, get_top_artist,
+                     get_historic_top_artist, get_top_genre, get_historic_top_genre,
+                     get_genre_top_artists, get_genre_sales, get_historic_genre_sales)
 
 
 def send_email(recipient: str, subject: str, body: str) -> None:
     """
-    Sends an email from the bandcamp notifier email to a given email.
+    Sends an email from the Bandcamp notifier email to a given email.
     """
     sender_email = environ.get("EMAIL_NAME")
 
@@ -42,7 +46,8 @@ def send_top_artist_alert(email: str, artist: str) -> None:
     """
     email_subject = "Top Artist Change Alert"
 
-    email_body = f"The artist with the most sales in the last {COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 artist is {artist}."
+    email_body = f"""The artist with the most sales in the last {
+        COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 artist is {artist}."""
 
     send_email(email, email_subject, email_body)
 
@@ -54,7 +59,8 @@ def send_top_genre_alert(email: str, genre: str) -> None:
 
     email_subject = "Top Genre Change Alert"
 
-    email_body = f"The genre with the most sales in the last {COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 genre is '{genre}'."
+    email_body = f"""The genre with the most sales in the last {
+        COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 genre is '{genre}'."""
 
     send_email(email, email_subject, email_body)
 
@@ -67,12 +73,16 @@ def send_chosen_genre_alert(email: str, genre: str, sales_delta: float, top_arti
 
     top_artists_formatted = ""
     for artist in top_artists:
-        top_artists_formatted += f"  - {artist['artist_name']}: ${artist['total_sales']:.2f}\n"
-    email_body = f"Your subscribed genre '{genre}' has seen a {sales_delta:.1f}% increase in sales in the last {ALERT_INTERVAL} minutes!\n\nThe current top selling artists in {genre} are:\n{top_artists_formatted}"
+        top_artists_formatted += f"""  - {artist['artist_name']
+                                          }: ${artist['total_sales']:.2f}\n"""
+    email_body = f"""Your subscribed genre '{genre}' has seen a
+        {sales_delta:.1f}% increase in sales in the last {
+        ALERT_INTERVAL} minutes!\n\nThe current top selling artists
+        in {genre} are:\n{top_artists_formatted}"""
     send_email(email, email_subject, email_body)
 
 
-def calculate_genre_sales_delta(cursor, genre) -> float:
+def calculate_genre_sales_delta(cursor: RealDictCursor, genre: str) -> float:
     """
     Calculates the percentage difference in sales numbers for a given genre
     within the last alert interval compared to the comparison period.
@@ -154,7 +164,7 @@ def alert_subscribed_genres(cursor: RealDictCursor) -> None:
 
 
 def main() -> None:
-    """The main function that generates and sends all alerts"""
+    """The main function that generates and sends all alerts."""
     load_dotenv()
     validate_env_vars()
     config_log()

@@ -1,4 +1,5 @@
-"""Script for transforming data from the Bandcamp API"""
+"""Script for transforming data from the Bandcamp API."""
+
 import logging
 import re
 import asyncio
@@ -11,14 +12,12 @@ from bs4 import BeautifulSoup
 from extract import main_extract
 
 
-async def fetch_data(url):
+async def fetch_data(url) -> json:
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            # Read response text
             if response.headers.get('Content-Type') == 'application/json':
                 return await response.json()
             else:
-                # Handle non-JSON response
                 return await response.text()
 
 
@@ -52,7 +51,7 @@ def config_log() -> None:
         format="{asctime} - {levelname} - {message}",
         style="{",
         datefmt="%Y-%m-%d %H:%M",
-        level=logging.INFO,
+        level=logging.INFO
     )
 
 
@@ -147,8 +146,6 @@ def get_sale_information(sales_dict: dict) -> list[dict]:
         if not items["album_title"]:
             items["album_title"] = "None"
 
-        # sale_date = convert_from_unix_to_datetime(items["utc_date"])
-        # formatted_sale_date = convert_date_format(sale_date)
         formatted_sale_date = datetime.now()
 
         event_information = {"release_type": items["item_type"],
