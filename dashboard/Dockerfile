@@ -8,6 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY streamlit_graphs ./streamlit_graphs
 COPY dashboard.py .
 COPY subscribe_page_commands.py .
+COPY embeddings.py .
+COPY dashboard_formatting.py .
+COPY bandscout_logo.png .
 
 RUN mkdir ./daily_reports
 

@@ -97,19 +97,19 @@ resource "aws_ecs_task_definition" "c14_bandcamp_dashboard_task" {
         value = var.db_name
       },
       {
-        name  = "S3_bucket"
+        name  = "S3_BUCKET"
         value = var.s3_bucket_name
       },
       {
-        name  = "S3_folder"
+        name  = "S3_FOLDER"
         value = var.s3_folder
       },
       {
-        name  = "aws_access_key_id"
+        name  = "ACCESS_KEY_ID"
         value = var.aws_access_key_id
       },
       {
-        name  = "aws_secret_access_key"
+        name  = "SECRET_ACCESS_KEY"
         value = var.aws_secret_access_key
       }
     ]
