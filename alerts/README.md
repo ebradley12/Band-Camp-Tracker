@@ -25,6 +25,7 @@ alerts/
     ├── queries.py
     ├── utilities.py
     ├── requirements.txt
+    ├── test_alerts.py
 ```
 
 ### **Scripts**
@@ -48,6 +49,8 @@ alerts/
    - It installs Python dependencies listed in `requirements.txt` using `pip` with the `--no-cache-dir` flag to minimize image size and optimize build efficiency.
 6. **`requirements.txt`**
    - Lists all the Python libraries and their specific versions required by the project, ensuring consistent and predictable behavior across different environments.
+7. **`test_alerts.py`**
+   - Tests the alerts.py script to ensure normal, working functionality using Pylint.
 
 ---
 
