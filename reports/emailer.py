@@ -2,6 +2,7 @@
 This script extracts subscriber emails from the
 database and sends the PDF Report via email with AWS SES.
 """
+
 import base64
 import logging
 from datetime import datetime, timedelta
@@ -9,7 +10,6 @@ from os import environ
 import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-
 from queries import get_report_subscriber_emails, get_db_connection
 
 load_dotenv()
