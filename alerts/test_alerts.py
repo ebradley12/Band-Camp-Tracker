@@ -23,6 +23,24 @@ def test_send_email(mock_smtp):
     )
     mock_smtp.return_value.sendmail.assert_called_once()
 
+@patch("smtplib.SMTP", autospec=True)
+def test_invalid_email_format(mock_smtp):
+    send_email("invalid@@example.com", "Test Subject", "Test Body")
+    mock_smtp.assert_called()
+
+@patch("smtplib.SMTP")
+def test_empty_subject(mock_smtp):
+    mock_server = mock_smtp.return_value
+    send_email("recipient@example.com", "", "Test Body")
+    mock_server.sendmail.assert_called()
+
+@patch("smtplib.SMTP")
+def test_empty_body(mock_smtp):
+    mock_server = mock_smtp.return_value
+    send_email("recipient@example.com", "Test Subject", "")
+    mock_server.sendmail.assert_called()
+
+
 def test_calculate_genre_sales_delta():
     with patch("alerts.get_genre_sales") as mock_get_genre_sales, \
          patch("alerts.get_historic_genre_sales") as mock_get_historic_genre_sales:
