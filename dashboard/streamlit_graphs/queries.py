@@ -14,7 +14,7 @@ logger.setLevel(logging.ERROR)
 load_dotenv()
 
 
-def get_connection() -> extensions.connection | None:
+def get_connection() -> extensions.connection:
     """
     Tries to connect to the RDS database.
     """
@@ -165,7 +165,7 @@ def get_top_country(connection: extensions.connection) -> pd.DataFrame:
 
 def get_release_type_count(connection: extensions.connection) -> pd.DataFrame:
     """
-    Returns the count of each type of release; Albums and Tracks
+    Returns the count of each type of release; Albums and Tracks.
     """
     query = """
     SELECT
@@ -262,7 +262,7 @@ def fetch_sales_within_date_range(connection: psycopg2.connect,
             return sale_data
 
         return None
-    except Exception as e:
+    except psycopg2.OperationalError as e:
         logging.error("Error fetching sales data: %s", e)
         return None
 

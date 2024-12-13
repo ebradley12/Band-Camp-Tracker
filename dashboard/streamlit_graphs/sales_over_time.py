@@ -8,7 +8,7 @@ from streamlit_graphs.queries import fetch_sales_within_date_range
 
 
 def plot_sales_per_hour(connection: psycopg2.connect,
-                        start_date: date, end_date: date = None) -> alt.Chart | None:
+                        start_date: date, end_date: date = None) -> alt.Chart:
     """
     Plots a line graph of sales per hour for the current day or date range.
     """
@@ -56,7 +56,7 @@ def plot_sales_per_hour(connection: psycopg2.connect,
             )
         )
         .properties(
-            title="Total Sales per Hour",
+            title=chart_title,
             width=600,
             height=400
         )
@@ -86,7 +86,6 @@ def visualise_sales_per_hour(connection: psycopg2.connect,
     sales_chart = plot_sales_per_hour(
         connection, start_date, adjusted_end_date)
     if sales_chart is None:
-        st.warning(
-            "No sales data available for the selected date range.")
+        st.warning("No sales data available for the selected date range.")
     else:
         st.altair_chart(sales_chart, use_container_width=True)

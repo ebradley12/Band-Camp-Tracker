@@ -8,7 +8,7 @@ from streamlit_graphs.queries import get_top_country_sales
 
 
 def create_country_sales_chart(connection: extensions.connection,
-                               start_date: date, end_date: date) -> alt.Chart | None:
+                               start_date: date, end_date: date) -> alt.Chart:
     """
     Generates a bar chart for country sales data with a transparent background.
     """

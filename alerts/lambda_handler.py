@@ -31,7 +31,7 @@ def lambda_handler(event: dict, context=None) -> dict:
             "statusCode": 200,
             "body": "Alerts sent successfully."
         }
-    except Exception as e:
+    except ValueError as e:
         logging.error("Error during alerts processing: %s", e)
         return {
             "statusCode": 500,

@@ -1,4 +1,4 @@
-"""Script to make the pie chart of album to track releases"""
+"""Script to make the pie chart of album to track releases."""
 import streamlit as st
 import psycopg2
 from psycopg2 import extensions

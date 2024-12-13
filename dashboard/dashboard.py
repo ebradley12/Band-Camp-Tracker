@@ -1,9 +1,9 @@
-# pylint: disable=no-member
-# pylint: disable=logging-fstring-interpolation
 """Streamlit Dashboard main script."""
+
 import re
 import logging
 import time
+import os
 from os import environ
 from datetime import datetime, date, timedelta
 import streamlit as st
@@ -18,7 +18,6 @@ from subscribe_page_commands import (
     get_existing_subscriber_preferences,
     update_existing_subscriber_info
 )
-
 from streamlit_graphs.queries import (
     get_connection,
     get_top_genre,
@@ -28,18 +27,28 @@ from streamlit_graphs.queries import (
     get_total_sales,
     get_top_country,
 )
-
 from streamlit_graphs.release_type_chart import visualise_release_types
 from streamlit_graphs.sales_by_country import visualise_country_sales
 from streamlit_graphs.sales_over_time import visualise_sales_per_hour
 from streamlit_graphs.top_artist_sales import visualise_sales_per_artist_over_time
 from streamlit_graphs.top_genre_sales import visualise_genre_sales
-
 from dashboard_formatting import glamourize_dashboard
 from embeddings import show_embeds
-import os
 
 image_path = os.path.abspath("BandScout_logo.png")
+
+
+def config_log() -> None:
+    """
+    Terminal logs configuration.
+    """
+    logging.basicConfig(
+        format="{asctime} - {levelname} - {message}",
+        style="{",
+        datefmt="%Y-%m-%d %H:%M",
+        level=logging.INFO,
+        handlers=[logging.StreamHandler()]
+    )
 
 
 def is_valid_email(email: str) -> bool:
@@ -59,23 +68,28 @@ def main_overview() -> None:
     with col1:
         total_sales = get_total_sales(connection)
         st.markdown(
-            "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>💵 Total Sales</p>", unsafe_allow_html=True)
+            """<p style='font-size:20px; font-weight:bold;
+             word-wrap: break-word;'>💵 Total Sales</p>""", unsafe_allow_html=True)
         st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>${
                     total_sales:,.2f}</p>""", unsafe_allow_html=True)
     with col2:
         top_genre = get_top_genre(connection)
         if not top_genre.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎼 Top Genre</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_genre['genre_name'].iloc[0]}</p>""",
+                """<p style='font-size:20px; font-weight:bold; word-wrap:
+                 break-word;'>🎼 Top Genre</p>""", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap:
+             break-word;'>{top_genre['genre_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
     with col3:
         top_country = get_top_country(connection)
         if not top_country.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🌍 Top Country</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_country['country_name'].iloc[0]}</p>""",
+                """<p style='font-size:20px; font-weight:bold; word-wrap:
+                 break-word;'>🌍 Top Country</p>""", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap:
+             break-word;'>{top_country['country_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
     st.divider()
@@ -85,23 +99,29 @@ def main_overview() -> None:
         top_artist = get_top_artist(connection)
         if not top_artist.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎤 Top Artist</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_artist['artist_name'].iloc[0]}</p>""",
+                """<p style='font-size:20px; font-weight:bold; word-wrap:
+                 break-word;'>🎤 Top Artist</p>""", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal;
+             word-wrap: break-word;'>{top_artist['artist_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
     with col5:
         top_track = get_top_track(connection)
         if not top_track.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>🎵 Top Track</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_track['release_name'].iloc[0]}</p>""",
+                """<p style='font-size:20px; font-weight:bold; word-wrap:
+                 break-word;'>🎵 Top Track</p>""", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal;
+             word-wrap: break-word;'>{top_track['release_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
     with col6:
         top_album = get_top_album(connection)
         if not top_album.empty:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; word-wrap: break-word;'>💽 Top Album</p>", unsafe_allow_html=True)
-            st.markdown(f"""<p style='font-size:24px; font-weight:normal; word-wrap: break-word;'>{top_album['album_name'].iloc[0]}</p>""",
+                """<p style='font-size:20px; font-weight:bold; word-wrap:
+                 break-word;'>💽 Top Album</p>""", unsafe_allow_html=True)
+            st.markdown(f"""<p style='font-size:24px; font-weight:normal;
+             word-wrap: break-word;'>{top_album['album_name'].iloc[0]}</p>""",
                         unsafe_allow_html=True)
 
     st.divider()
@@ -213,8 +233,8 @@ def report_download_page() -> None:
                         mime="application/octet-stream"
                     )
 
-        if not reports_in_range:
-            st.info("No reports available in the selected date range.")
+            if not reports_in_range:
+                st.info("No reports available in the selected date range.")
     else:
         st.error("Please select a valid date range.")
 
@@ -254,9 +274,8 @@ def subscribe_page() -> None:
             sub_genre_ids = []
         else:
             st.success("Welcome back!")
-            sub_id, general_alerts_check, daily_reports_check,
-            sub_genre_ids = get_existing_subscriber_preferences(
-                email)
+            (sub_id, general_alerts_check,
+             daily_reports_check, sub_genre_ids) = get_existing_subscriber_preferences(email)
 
         genre_names_selected = []
 
@@ -314,7 +333,6 @@ def subscribe_page() -> None:
 def run_dashboard() -> None:
     """Sets up pages and runs the dashboard."""
     glamourize_dashboard()
-    load_dotenv()
 
     st.markdown(
         """
@@ -350,9 +368,6 @@ def run_dashboard() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[logging.StreamHandler()]
-    )
+    config_log()
     load_dotenv()
     run_dashboard()

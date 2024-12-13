@@ -2,6 +2,7 @@
 This script extracts subscriber emails from the
 database and sends the PDF Report via email with AWS SES.
 """
+
 import base64
 import logging
 from datetime import datetime, timedelta
@@ -9,7 +10,6 @@ from os import environ
 import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-
 from queries import get_report_subscriber_emails, get_db_connection
 
 load_dotenv()
@@ -65,9 +65,8 @@ def send_email_with_attachment(pdf_file: str, recipient_emails: list,
         raise
 
 
-if __name__ == "__main__":
-
-    config_log()
+def main_emailer() -> None:
+    """The main logic for the emailer script."""
 
     yesterday = datetime.now() - timedelta(days=1)
     formatted_date = yesterday.strftime("%Y-%m-%d")
@@ -92,3 +91,8 @@ if __name__ == "__main__":
         logging.info("All emails sent successfully.")
     else:
         logging.info("No subscribers opted in for the PDF report.")
+
+
+if __name__ == "__main__":
+    config_log()
+    main_emailer()
