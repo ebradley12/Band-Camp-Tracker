@@ -46,8 +46,8 @@ def send_top_artist_alert(email: str, artist: str) -> None:
     """
     email_subject = "Top Artist Change Alert"
 
-    email_body = f"The artist with the most sales in the last {
-        COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 artist is {artist}."
+    email_body = f"""The artist with the most sales in the last {
+        COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 artist is {artist}."""
 
     send_email(email, email_subject, email_body)
 
@@ -59,8 +59,8 @@ def send_top_genre_alert(email: str, genre: str) -> None:
 
     email_subject = "Top Genre Change Alert"
 
-    email_body = f"The genre with the most sales in the last {
-        COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 genre is '{genre}'."
+    email_body = f"""The genre with the most sales in the last {
+        COMPARISON_PERIOD/60} hours has changed!\nThe new number 1 genre is '{genre}'."""
 
     send_email(email, email_subject, email_body)
 
@@ -73,8 +73,8 @@ def send_chosen_genre_alert(email: str, genre: str, sales_delta: float, top_arti
 
     top_artists_formatted = ""
     for artist in top_artists:
-        top_artists_formatted += f"  - {artist['artist_name']
-                                        }: ${artist['total_sales']:.2f}\n"
+        top_artists_formatted += f"""  - {artist['artist_name']
+                                          }: ${artist['total_sales']:.2f}\n"""
     email_body = f"""Your subscribed genre '{genre}' has seen a
         {sales_delta:.1f}% increase in sales in the last {
         ALERT_INTERVAL} minutes!\n\nThe current top selling artists
