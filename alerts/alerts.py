@@ -17,7 +17,7 @@ from queries import (get_connection, get_cursor, get_general_subscriber_emails,
 
 def send_email(recipient: str, subject: str, body: str) -> None:
     """
-    Sends an email from the bandcamp notifier email to a given email.
+    Sends an email from the Bandcamp notifier email to a given email.
     """
     sender_email = environ.get("EMAIL_NAME")
 
@@ -82,7 +82,7 @@ def send_chosen_genre_alert(email: str, genre: str, sales_delta: float, top_arti
     send_email(email, email_subject, email_body)
 
 
-def calculate_genre_sales_delta(cursor, genre) -> float:
+def calculate_genre_sales_delta(cursor: RealDictCursor, genre: str) -> float:
     """
     Calculates the percentage difference in sales numbers for a given genre
     within the last alert interval compared to the comparison period.
@@ -164,7 +164,7 @@ def alert_subscribed_genres(cursor: RealDictCursor) -> None:
 
 
 def main() -> None:
-    """The main function that generates and sends all alerts"""
+    """The main function that generates and sends all alerts."""
     load_dotenv()
     validate_env_vars()
     config_log()

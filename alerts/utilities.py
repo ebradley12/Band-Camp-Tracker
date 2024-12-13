@@ -9,7 +9,7 @@ ALERT_INTERVAL = 60
 # The period of time we use to assess historic trends in minutes
 COMPARISON_PERIOD = 2880
 # The percentage value a genre has to have grown in popularity before alerting the user
-GENRE_NOTIFICATION_THRESHOLD = 20
+GENRE_NOTIFICATION_THRESHOLD = 1
 
 
 def config_log() -> None:
