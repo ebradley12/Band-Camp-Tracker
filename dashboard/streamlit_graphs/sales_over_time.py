@@ -25,8 +25,8 @@ def plot_sales_per_hour(connection: psycopg2.connect,
     if not end_date:
         chart_title = f"Sales on {str(start_date)}"
     else:
-        chart_title = f'Sales between {str(start_date)} and {
-            str(end_date - timedelta(days=1))} inclusive'
+        chart_title = f"""Sales between {str(start_date)} and {
+            str(end_date - timedelta(days=1))} inclusive"""
 
     chart = (
         alt.layer(

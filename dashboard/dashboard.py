@@ -5,7 +5,7 @@ import re
 import logging
 import time
 from os import environ
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import streamlit as st
 import boto3
 from dotenv import load_dotenv
@@ -51,7 +51,7 @@ def is_valid_email(email: str) -> bool:
 def main_overview() -> None:
     """Creates main overview page on dashboard."""
     connection = get_connection()
-    st.title("BandCamp Tracker")
+    st.title("Welcome to BandScout")
 
     st.header("Top Metrics Today")
 
@@ -169,13 +169,13 @@ def report_download_page() -> None:
     st.write("Download reports from this page.")
 
     default_start_date = date(2024, 12, 5)
-    default_end_date = date.today()
+    default_end_date = date.today() - timedelta(days=1)
 
     date_range = st.date_input(
         "Select a date range:",
         value=(default_start_date, default_end_date),
         min_value=date(2024, 12, 5),
-        max_value=date.today()
+        max_value=default_end_date
     )
 
     if isinstance(date_range, tuple):
@@ -338,11 +338,11 @@ def run_dashboard() -> None:
 
     query_params = st.query_params
     default_page = query_params.get("page", "Main Overview")
-    st.sidebar.image("BandScout_logo.png", width=200)
+    st.sidebar.image("bandscout_logo.png", width=200)
     selected_page = st.sidebar.radio(
         "",
         list(page_names_to_funcs.keys()),
-        index=list(page_names_to_funcs.keys()).index(default_page),
+        index=0,
     )
 
     st.query_params = {"page": selected_page}
