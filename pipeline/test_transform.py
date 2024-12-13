@@ -1,3 +1,5 @@
+"""Tests for the transform script."""
+
 from unittest.mock import patch, MagicMock
 from datetime import datetime
 import pytest
@@ -12,6 +14,7 @@ from transform import (
     create_sales_dataframe,
 )
 
+
 @pytest.mark.parametrize("unix_input,expected", [
     ("1633036800", "01-10-2021"),
     ("invalid", "None"),
@@ -19,6 +22,7 @@ from transform import (
 def test_convert_unix_to_datetime(unix_input, expected):
     """Test for convert_from_unix_to_datetime function."""
     assert convert_from_unix_to_datetime(unix_input) == expected
+
 
 @pytest.mark.parametrize("date_input,expected", [
     ("1 October 2021", "01-10-2021"),
@@ -28,6 +32,7 @@ def test_convert_date_format(date_input, expected):
     """Test for convert_date_format function."""
     assert convert_date_format(date_input) == expected
 
+
 @pytest.mark.parametrize("url_input,expected", [
     ("http://example.com", "http://example.com"),
     ("//example.com", "https://example.com"),
@@ -35,6 +40,7 @@ def test_convert_date_format(date_input, expected):
 def test_convert_to_full_url(url_input, expected):
     """Test for convert_to_full_url function."""
     assert convert_to_full_url(url_input) == expected
+
 
 @pytest.mark.parametrize("item_type,expected", [
     ("a", True),
@@ -44,6 +50,7 @@ def test_convert_to_full_url(url_input, expected):
 def test_validate_album_and_track(item_type, expected):
     """Test for validate_album_and_track function."""
     assert validate_album_and_track(item_type) == expected
+
 
 @patch("transform.requests.get")
 def test_get_genres_from_url(mock_get):
@@ -57,6 +64,7 @@ def test_get_genres_from_url(mock_get):
     assert set(result) == {"Rock", "Pop"}
     mock_get.side_effect = Exception("Network Error")
     assert get_genres_from_url("//example.com", locations) == []
+
 
 @patch("transform.requests.get")
 def test_get_release_date_from_url(mock_get):
@@ -72,6 +80,7 @@ def test_get_release_date_from_url(mock_get):
     assert get_release_date_from_url("//example.com") == ""
     mock_get.side_effect = Exception("Network Error")
     assert get_release_date_from_url("//example.com") == ""
+
 
 def test_create_sales_dataframe():
     """Test for create_sales_dataframe function."""

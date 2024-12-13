@@ -6,8 +6,10 @@ from transform import main_transform
 from load import main_load
 
 
-def lambda_handler(event, context):
-    """The main pipeline script that fully extract, transforms and loads the bandcamp data."""
+def lambda_handler(event: dict, context=None) -> dict:
+    """
+    The main pipeline script that fully extract, transforms and loads the Bandcamp data.
+    """
     config_log()
     logging.info("\n --- Running The Pipeline --- \n")
     logging.info("\n --- Starting Extract --- \n")

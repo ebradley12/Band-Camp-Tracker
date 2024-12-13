@@ -1,4 +1,5 @@
-"""test_etl.py: Unit tests for the ETL process.
+"""
+test_etl.py: Unit tests for the ETL process.
 
 This script tests the entire ETL process:
 - Extraction of sales data from the API.
@@ -33,13 +34,15 @@ from load import (
     main_load,
 )
 
+
 class TestExtract:
     """Tests for the extract phase of the ETL process."""
 
     @patch("extract.requests.get")
     def test_extract_get_sales_information_success(self, mock_get):
         """Verify successful data extraction from the API."""
-        mock_response = MagicMock(status_code=200, json=lambda: {"sales": "data"})
+        mock_response = MagicMock(
+            status_code=200, json=lambda: {"sales": "data"})
         mock_get.return_value = mock_response
 
         result = get_sales_information()
@@ -57,7 +60,7 @@ class TestExtract:
         result = get_sales_information()
         assert result == {}
         mock_get.assert_called_once()
-    
+
     @patch("extract.requests.get")
     def test_extract_get_sales_information_invalid_json(self, mock_get):
         """Verify handling of an invalid JSON response."""
@@ -70,7 +73,7 @@ class TestExtract:
         mock_get.assert_called_once_with(
             "https://bandcamp.com/api/salesfeed/1/get_initial", timeout=1000
         )
-    
+
     @patch("extract.requests.get")
     def test_extract_get_sales_information_timeout(self, mock_get):
         """Verify handling of a request timeout."""
@@ -81,7 +84,7 @@ class TestExtract:
         mock_get.assert_called_once_with(
             "https://bandcamp.com/api/salesfeed/1/get_initial", timeout=1000
         )
-    
+
     @patch("extract.requests.get")
     def test_extract_get_sales_information_connection_error(self, mock_get):
         """Verify handling of a connection error."""
@@ -92,6 +95,7 @@ class TestExtract:
         mock_get.assert_called_once_with(
             "https://bandcamp.com/api/salesfeed/1/get_initial", timeout=1000
         )
+
 
 class TestTransform:
     """Tests for the transform phase of the ETL process."""
@@ -105,15 +109,14 @@ class TestTransform:
         assert convert_from_unix_to_datetime(unix_input) == expected
 
     @pytest.mark.parametrize("date_input,expected", [
-    ("01-10-2021", "2021-10-01"),
-    ("31-12-2020", "2020-12-31"),
-    ("1 October 2021", "None"),
-    ("invalid date", "None"),
-    ("32-01-2021", "None"),
-    ("01-13-2021", "None"),
-    ("", "None"),
+        ("01-10-2021", "2021-10-01"),
+        ("31-12-2020", "2020-12-31"),
+        ("1 October 2021", "None"),
+        ("invalid date", "None"),
+        ("32-01-2021", "None"),
+        ("01-13-2021", "None"),
+        ("", "None"),
     ])
-
     def test_transform_convert_date_format(self, date_input, expected):
         """Test date format conversion."""
         assert convert_date_format(date_input) == expected
@@ -138,7 +141,8 @@ class TestTransform:
     @patch("transform.requests.get")
     def test_transform_get_genres_from_url(self, mock_get):
         """Test genre extraction from a URL."""
-        mock_response = MagicMock(status_code=200, text='<a class="tag">Rock</a><a class="tag">Pop</a>')
+        mock_response = MagicMock(
+            status_code=200, text='<a class="tag">Rock</a><a class="tag">Pop</a>')
         mock_get.return_value = mock_response
         locations = ["us", "rockville"]
 
@@ -148,11 +152,11 @@ class TestTransform:
         mock_get.side_effect = Exception("Network Error")
         assert get_genres_from_url("//example.com", locations) == []
 
-
     @patch("transform.requests.get")
     def test_transform_get_release_date_from_url(self, mock_get):
         """Test release date extraction from a URL."""
-        mock_response = MagicMock(status_code=200, text='<meta name="description" content="released 1 October 2021">')
+        mock_response = MagicMock(
+            status_code=200, text='<meta name="description" content="released 1 October 2021">')
         mock_get.return_value = mock_response
         assert get_release_date_from_url("//example.com") == "2021-10-01"
         mock_response.text = '<meta name="description" content="No release date">'
@@ -202,7 +206,7 @@ class TestTransform:
         assert len(df) == 1
         assert "release_type" in df.columns
         assert df.iloc[0]["release_type"] == "t"
-    
+
     def test_transform_fill_out_album_and_track(self):
         test_data = {
             "release_type": ["a", "t", "a", "t", "x"],
@@ -255,7 +259,6 @@ class TestLoad:
         assert cursor is not None
         mock_connection.cursor.assert_called_once()
 
-
     def test_load_insert_country_existing(self, mock_cursor):
         """Test insertion of an existing country."""
         mock_cursor.fetchone.return_value = (True,)
@@ -283,27 +286,27 @@ class TestLoad:
         mock_cursor.fetchone.side_effect = [None, (1,)]
         genre_id = insert_genres("NewGenre", mock_cursor)
         assert genre_id == 1
-    
+
     def test_load_get_id_from_table_found(self, mock_cursor):
         """Test retrieving an existing ID from the table."""
         mock_cursor.fetchone.return_value = (123,)
         result = get_id_from_table("TestValue", "test_table", mock_cursor)
         assert result == 123
         mock_cursor.execute.assert_called_once_with(
-            "SELECT test_table_id FROM test_table WHERE test_table_name = %s;", 
+            "SELECT test_table_id FROM test_table WHERE test_table_name = %s;",
             ("TestValue",)
         )
 
     def test_load_get_id_from_table_not_found(self, mock_cursor):
         """Test handling of a value not found in the table."""
         mock_cursor.fetchone.return_value = None
-        result = get_id_from_table("NonExistentValue", "test_table", mock_cursor)
+        result = get_id_from_table(
+            "NonExistentValue", "test_table", mock_cursor)
         assert result is None
         mock_cursor.execute.assert_called_once_with(
-            "SELECT test_table_id FROM test_table WHERE test_table_name = %s;", 
+            "SELECT test_table_id FROM test_table WHERE test_table_name = %s;",
             ("NonExistentValue",)
         )
-
 
     @patch.dict("os.environ", {
         "DB_HOST": "localhost",
@@ -368,7 +371,9 @@ class TestLoad:
     def test_load_main_failure(self, mock_get_connection):
         """Test the behavior of main_load when the connection fails."""
         mock_get_connection.return_value = None
-        sales_df = pd.DataFrame({"column1": [1, 2, 3], "column2": ["A", "B", "C"]})
+        sales_df = pd.DataFrame(
+            {"column1": [1, 2, 3], "column2": ["A", "B", "C"]})
         with patch("logging.error") as mock_log_error:
             main_load(sales_df)
-        mock_log_error.assert_called_with("Database connection failed. Exiting.")
+        mock_log_error.assert_called_with(
+            "Database connection failed. Exiting.")

@@ -1,4 +1,5 @@
-"""Tests for the extract script"""
+"""Tests for the extract script."""
+
 from unittest.mock import patch, Mock
 import pytest
 from extract import get_sales_information
