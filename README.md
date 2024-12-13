@@ -219,17 +219,17 @@ Relies on the assumption that no duplicate or overlapping artist names exist on 
 ---
 
 ## Future Improvements
-- Links to Top Tracks:
+- **Links to Top Tracks**:
   Provide easy access to top-performing tracks for each artist or genre, integrating streaming or purchase links to encourage user interaction and potential sales. 
 
-- Subscription Alerts Page
+- **Subscription Alerts Page**:
   Implement a feature to allow users to subscribe to alerts for new releases or updates from their favourite artists, enhancing user engagement and retention.
 
-- Advanced Analytics and Insights for Record Labels
+- **Advanced Analytics and Insights for Record Labels**:
   Develop a service tailored for record labels, offering advanced analytics and insights. This could include partnerships to provide customised data packages, helping labels discover emerging talent early and refine their market strategies.
 
-- Integration with Other Music Outlets:
+- **Integration with Other Music Outlets**:
   Expand integrations to platforms like Spotify, Apple Music, and Bandcamp to pull live streaming data. This would enrich insights into trends and ensure the platform reflects the global music ecosystem dynamically.
 
-- Music Forecasting Tool:
+- **Music Forecasting Tool**:
   Introduce a forecasting tool leveraging historical data and machine learning to predict the future popularity of genres and artists. This would enable artists, fans, and record labels to anticipate trends and make proactive decisions in the competitive music industry.
