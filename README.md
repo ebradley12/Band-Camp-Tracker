@@ -1,9 +1,11 @@
 # **Band Scout Project**
+# **Band Scout Project**
 
 ---
 
 ## **Overview**
 
+Our **Band Scout Project** is a data-driven project designed to provide insights into trending genres and artists in the music industry. By addressing the challenges of identifying trends in a fragmented and complex market, this project helps uncover what genres are popular and which artists are gaining traction before they become mainstream.
 Our **Band Scout Project** is a data-driven project designed to provide insights into trending genres and artists in the music industry. By addressing the challenges of identifying trends in a fragmented and complex market, this project helps uncover what genres are popular and which artists are gaining traction before they become mainstream.
 
 The solution regularly collects and processes sales and genre data from the BandCamp platform, presenting it via a dashboard and automated reports and alerts. 
@@ -34,6 +36,10 @@ The interactive Streamlit dashboard provides:
 - **Visualisations** such as bar charts and line graphs for intuitive exploration.
 - **Reports Page** where users can download detailed reports.
 - **Subscribe Page** allowing users to subscribe to daily reports and specific or general genre alerts.
+- **Dynamic filtering options by date** for detailed analysis.
+- **Visualisations** such as bar charts and line graphs for intuitive exploration.
+- **Reports Page** where users can download detailed reports.
+- **Subscribe Page** allowing users to subscribe to daily reports and specific or general genre alerts.
 
 The dashboard wireframe provides a visual blueprint of its layout and features.  
 Refer to the **[Wireframe Design](./images/wireframe-design.png)** for details.
@@ -56,82 +62,51 @@ Subscribers can customise alerts for specific genres or receive general notifica
 
 ---
 
-## **Project Files**
+## **Project Structure Overview**
 
 - **ETL Pipelines**:
   - [Pipeline README](./pipeline/README.md)  
-    Includes information on the extract, transform, load scripts, and the main ETL pipeline.
-  - **Files**:
-    - `extract.py`: Data extraction script.
-    - `transform.py`: Data transformation script.
-    - `load.py`: Data loading script.
-    - `etl.py`: Main script orchestrating the entire ETL pipeline.
-    - `test_etl.py`: Tests for extract, transform and load pipeline script.
-    - `requirements.txt`: Python dependencies specific for the pipeline.
-    - `Dockerfile`: Docker configuration for the ETL pipeline.
+    Provides comprehensive details on the extract, transform, load scripts, and the main ETL pipeline workflow.
+    - **Folder Contents**: Scripts and configurations for orchestrating the ETL pipeline, including testing, dependency management, and containerisation.
 
 - **Streamlit Dashboard**:
   - [Dashboard README](./dashboard/README.md)  
-    Documentation for the Streamlit application and its configuration.
-  - **Files**:
-    - **Daily Reports**:
-      - `daily_reports/daily_sales_report_<date>.pdf`: Generated daily sales reports.
-    - **Streamlit Graphs**:
-      - `streamlit_graphs/__init__.py`: Initialisation file for graphs module.
-      - `streamlit_graphs/queries.py`: SQL queries for data retrieval.
-      - `streamlit_graphs/release_type_changes.py`: Visualisation for release type trends.
-      - `streamlit_graphs/sales_by_country.py`: Visualisation for sales by country.
-      - `streamlit_graphs/streamlit_graphs/sales_over_time.py`: Visualisation for sales trends over time.
-      - `streamlit_graphs/top_artist_sales.py`: Visualisation for top artists.
-      - `streamlit_graphs/top_genre_sales.py`: Visualisation for top genres.
-    - `bandscout_logo.png`: DProject logo for dashboard branding.
-    - `dashboard_formatting.py`: Helper functions for dashboard formatting.\
-    - `dashboard.py`: Main Streamlit app for visualising data.
-    - `embeddings.py`: File for embeddings-related processing.
-    - `subscribe_page_content.py`: Script for handling subscribe page logic.
-    - `requirements.txt`: Python dependencies specific for the dashboard.
-    - `Dockerfile`: Docker configuration for the dashboard.
-    - `wireframe-design.png`: The wireframe design for the dashboard.
-  
+    Contains documentation for the Streamlit application, including its setup and configuration.
+  - **Folder Contents**: 
+    Visualisation modules, data queries, branding resources, and formatting helpers for building an interactive data dashboard.
+
 - **Reports**:
   - [Reports README](./reports/README.md)  
-    Documentation for the report generation system.
-  - **Files**:
-    - `report_generation.py`: Generates daily PDF reports, uploads them to S3, and sends email notifications.
-    - `graphs.py`: Contains visualisation logic for reports.
-    - `emailer.py`: Handles email notifications for reports.
-    - `queries.py`: SQL queries used for data retrieval in reports.
-    - `lambda_handler.py`: Lambda function handler for the reports workflow.
-    - `Dockerfile`: Configuration file for containerising the reports system.
-    - `requirements.txt`: Python dependencies specific to the report generation.
-  
+    Documentation for the report generation system, detailing its functionality and workflows.
+  - **Folder Contents**: Components for generating daily reports, creating visualisations, and handling notifications.
+
+
 - **Alerts**:
   - [Reports README](./alerts/README.md)  
     Documentation for the alerts system.
-  - **Files**:
-    - `alerts.py`: Script for triggering notifications based on key sales trends.
-    - `queries.py`: SQL queries used for data retrieval in the alerts system.
-    - `lambda_handler.py`: Lambda function handler for the alerts workflow.
-    - `utilities.py`: Helper functions for the alerts system.
-    - `Dockerfile`: Configuration file for containerising the alerts system.
-    - `requirements.txt`: Python dependencies specific to alerts.
+  - **Folder Contents**: Scripts and logic for monitoring key trends and triggering notifications.
 
 - **Terraform Infrastructure**:
   - [Terraform README](./infrastructure/README.md)  
     Details the AWS setup scripts for RDS, ECS, EventBridge, and Lambda.
-  - `variables.tf`: Terraform variables needed for all AWS configuration.
-  - **Subfolders**:
-    - `alerts`: Terraform configurations for the alerts system.
-    - `dashboard`: Terraform configurations for the dashboard.
-    - `ecr`: Terraform configurations for managing ECS containers.
-    - `pipeline`: Terraform configurations for the data pipeline.
-    - `rds`: Terraform configurations for the Amazon RDS database.
-    - `reports`: Terraform configurations for the reports system.
+  - **Files**:
+    - `main.tf`: Main Terraform configuration file.
+    - `variables.tf`: Terraform variables.
+    - `outputs.tf`: Terraform outputs.
 
+- **Documentation**:
+  - **Files**:
+    - `architecture-diagram.png`: Architecture diagram.
+    - `erd.png`: Entity Relationship Diagram (ERD).
+
+- **Docker Files**:
+  - **Files**:
+    - `Dockerfile`: Docker configuration for the ETL pipeline.
+    - `docker-compose.yml`: Docker Compose setup for local development.
 
 - **GitHub Workflows**:
-  - **Files**:
     - `quality_check.yaml`: Workflow for testing and linting.
+    - `deploy.yaml`: Workflow for deployment.
 
 ---
 
@@ -245,17 +220,4 @@ Relies on the assumption that no duplicate or overlapping artist names exist on 
 ---
 
 ## Future Improvements
-- Links to Top Tracks:
-  Provide easy access to top-performing tracks for each artist or genre, integrating streaming or purchase links to encourage user interaction and potential sales. 
-
-- Subscription Alerts Page
-  Implement a feature to allow users to subscribe to alerts for new releases or updates from their favourite artists, enhancing user engagement and retention.
-
-- Advanced Analytics and Insights for Record Labels
-  Develop a service tailored for record labels, offering advanced analytics and insights. This could include partnerships to provide customised data packages, helping labels discover emerging talent early and refine their market strategies.
-
-- Integration with Other Music Outlets:
-  Expand integrations to platforms like Spotify, Apple Music, and Bandcamp to pull live streaming data. This would enrich insights into trends and ensure the platform reflects the global music ecosystem dynamically.
-
-- Music Forecasting Tool:
-  Introduce a forecasting tool leveraging historical data and machine learning to predict the future popularity of genres and artists. This would enable artists, fans, and record labels to anticipate trends and make proactive decisions in the competitive music industry.
+- 
