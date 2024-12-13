@@ -8,7 +8,7 @@ from streamlit_graphs.queries import get_top_genre_sales
 
 
 def create_genre_sales_chart(connection: extensions.connection,
-                             start_date: date, end_date: date) -> alt.Chart | None:
+                             start_date: date, end_date: date) -> alt.Chart:
     """
     Generates a bar chart for genre sales data.
     """
@@ -35,8 +35,8 @@ def create_genre_sales_chart(connection: extensions.connection,
                 title="Genre",
                 axis=alt.Axis(labelAngle=0),
                 sort=alt.EncodingSortField(
-                    field="total_sales",  # Sort by the 'total_sales' field
-                    order="descending"   # Descending order
+                    field="total_sales",
+                    order="descending"
                 )
             ),
             y=alt.Y("total_sales:Q", title="Total Sales (USD)"),

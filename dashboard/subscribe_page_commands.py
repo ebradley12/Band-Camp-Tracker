@@ -1,6 +1,4 @@
 # pylint: disable=no-member
-# pylint: disable=logging-fstring-interpolation
-
 """Database commands and functions for the subscribe/login page of the dashboard."""
 
 import logging
@@ -23,7 +21,7 @@ def get_connection() -> psycopg2.connect:
         )
     except psycopg2.OperationalError as e:
         logging.warning("Failed to get connection to RDS.")
-        raise Exception(e) from e
+        raise e
 
 
 def get_cursor(conn: psycopg2.connect) -> RealDictCursor:
@@ -96,7 +94,7 @@ def add_subscriber_info_to_db(email: str, alerts: bool, reports: bool,
         """, (email, alerts, reports))
 
     except psycopg2.errors.UniqueViolation:
-        logging.warning(f"User with email {email} already exists!")
+        logging.warning("User with email %s already exists!", email)
         return False
 
     conn.commit()
@@ -155,7 +153,7 @@ def unsubscribe_user(email: str) -> None:
     logging.info("Successfully deleted subscriber info from RDS.")
 
 
-def get_existing_subscriber_preferences(email: str) -> list:
+def get_existing_subscriber_preferences(email: str) -> tuple:
     """
     Gets information of an existing user of the dashboard,
     such as their subscriber_id and email preferences.

@@ -1,4 +1,5 @@
 """This is the script to create embeddings from currently sold items."""
+
 import re
 import asyncio
 import logging
@@ -25,7 +26,7 @@ def config_log() -> None:
     )
 
 
-async def fetch_html(url: str) -> str | None:
+async def fetch_html(url: str) -> str:
     """
     Fetch HTML content from a given URL using aiohttp.
     """
@@ -41,7 +42,7 @@ async def fetch_html(url: str) -> str | None:
     return None
 
 
-def extract_id_from_comments(comments: list[str], pattern: re.Pattern) -> str | None:
+def extract_id_from_comments(comments: list[str], pattern: re.Pattern) -> str:
     """
     Extract ID from HTML comments using the provided regex pattern.
     """
@@ -52,7 +53,7 @@ def extract_id_from_comments(comments: list[str], pattern: re.Pattern) -> str | 
     return None
 
 
-async def get_id_from_url(artist_url: str) -> str | None:
+async def get_id_from_url(artist_url: str) -> str:
     """
     Extract the album/track ID from the given artist URL.
     """

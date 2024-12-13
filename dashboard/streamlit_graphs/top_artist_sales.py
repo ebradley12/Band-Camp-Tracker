@@ -1,4 +1,3 @@
-# pylint: disable=too-many-function-args
 """Script that to make the bar chart of the top 5 artists by units sold."""
 from datetime import date, timedelta
 import streamlit as st
@@ -71,6 +70,5 @@ def visualise_sales_per_artist_over_time(connection: extensions.connection,
         st.warning("No sales data available.")
         return
 
-    chart = plot_top_artists_by_units(
-        sales_data, start_date, adjusted_end_date)
+    chart = plot_top_artists_by_units(sales_data)
     st.altair_chart(chart, use_container_width=True)
