@@ -254,7 +254,8 @@ def subscribe_page() -> None:
             sub_genre_ids = []
         else:
             st.success("Welcome back!")
-            sub_id, general_alerts_check, daily_reports_check, sub_genre_ids = get_existing_subscriber_preferences(
+            sub_id, general_alerts_check, daily_reports_check,
+            sub_genre_ids = get_existing_subscriber_preferences(
                 email)
 
         genre_names_selected = []
