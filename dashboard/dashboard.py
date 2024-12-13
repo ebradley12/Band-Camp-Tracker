@@ -337,8 +337,6 @@ def run_dashboard() -> None:
         "Subscribe": subscribe_page,
     }
 
-    query_params = st.query_params
-    default_page = query_params.get("page", "Main Overview")
     st.sidebar.image("bandscout_logo.png", width=200)
     selected_page = st.sidebar.radio(
         "",
