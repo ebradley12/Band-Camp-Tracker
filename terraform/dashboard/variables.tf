@@ -41,11 +41,6 @@ variable "sender_email" {
   type        = string
 }
 
-# variable "recipient_email" {
-#   description = "Email address to receive the daily reports"
-#   type        = string
-# }
-
 variable "aws_access_key_id" {
   description = "Access key for aws"
   type        = string
